@@ -1,11 +1,202 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
-  <title>flayer</title>
-</head>
-<body>
-  
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/style.css">
+    <script type="text/javascript" src="./js/jwplayer.js"></script>
+    <script>
+      jwplayer.key = 'Bch7bd0cZt0adCRYHGveauTP1LaJlq1EMyrU/IxgfrGDc3gTqZxyPFEKKMI';
+    </script>
+    <title>flayer</title>
+    <template id="shadowStyle">
+      <style>
+        :host {
+          display: flex;
+          position: relative;
+          align-items: center;
+          list-style: none;
+          width: 320px;
+          height: 56px;
+          margin: 0;
+          padding: 12px 16px 12px 4px;
+          background-color: var(--color-base-blurred, rgba(255, 255, 255, 0.7));
+          backdrop-filter: blur(32px);
+          cursor: pointer;
+        }
+
+        :host::after {
+          content: '';
+          display: block;
+          position: absolute;
+          width: 272px;
+          height: 1px;
+          background-color: var(--color-base-1, #f5f5f5);
+          right: 16px;
+          bottom: 0;
+        }
+
+        :host:hover {
+          background-color: var(--color-base-1-blurred, rgba(245, 245, 245, 0.7));
+        }
+
+        :host:active {
+          background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
+        }
+        
+        :host .front-indicator {
+          display: flex;
+          justify-content: center;
+          align-content: center;
+          font: var(--font-small-bold, 700 12px/1.333333333 'NotoSans');
+          color: var(--color-ceil-2, #A9A9A9);
+          content: attr(data-index);
+          width: 24px;
+          height: 24px;
+        }
+        
+        :host:hover[data-index~=''] .front-indicator {
+          background: url("../assets/img/16px/Play.svg") no-repeat center;
+          color: transparent;
+        }
+        
+        :host.playing .front-indicator {
+          background: url("../assets/img/24px/Note.svg") no-repeat center;
+          color: transparent;
+        }
+        
+        :host .song-info {
+          display: block;
+          width: 208px;
+          height: 32px;
+          margin-left: 4px;
+        }
+        
+        :host .song-title {
+          display: block;
+          width: 208px;
+          font: var(--font-medium-bold, 700 14px/1.142857142857143 'NotoSans');
+          letter-spacing: -0.01em;
+          color: var(--color-ceil, #262626);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-bottom: 4px;
+        }
+        
+        :host .song-artist {
+          display: block;
+          width: 208px;
+          font: var(--font-artist, 400 12px/1 'NotoSans');
+          letter-spacing: -0.02em;
+          color: var(--color-ceil-1, #707070);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        :host .button-field {
+          display: flex;
+          flex-direction: flex-end;
+          width: 56px;
+          height: 24px;
+          align-items: center;
+          margin-left: 8px;
+        }
+        
+        :host .button-field button {
+          visibility: hidden;
+          display: block;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+        }
+        
+        :host:hover .button-field button {
+          visibility: visible;
+        }
+        
+        :host .music-meatballs {
+          background: url("../assets/img/24px/Meatballs-g.svg") no-repeat center;
+          margin-left: 8px;
+        }
+        
+        :host .music-meatballs:hover  {
+          visibility: visible;
+          background: url("../assets/img/24px/Meatballs-gd.svg") no-repeat center;
+          background-color: var(--color-base-1, #F5F5F5);
+          background-blend-mode: multiply;
+        }
+        
+        :host .music-meatballs:active {
+          visibility: visible;
+          background-color: var(--color-base-2, #EBEBEB);
+        }
+        
+        :host .music-add {
+          background: url("../assets/img/24px/Add-g.svg") no-repeat center;
+        }
+        
+        :host.music-add:hover {
+          visibility: visible;
+          background: url("../assets/img/24px/Add-p.svg") no-repeat center;
+          background-color: var(--color-base-1, #F5F5F5);
+          background-blend-mode: multiply;
+        }
+        
+        :host.music-add:active {
+          visibility: visible;
+          background-color: var(--color-base-2, #EBEBEB);
+        }
+        
+        :host .music-drag {
+          display: block;
+          width: 24px;
+          height: 24px;
+          background: url("../assets/img/24px/Drag.svg") no-repeat center;
+          margin-left: 8px;
+        }
+        
+        :host .music-delete {
+          background: url("../assets/img/24px/Delete-g.svg") no-repeat center;
+        }
+        
+        :host .music-delete:hover {
+          visibility: visible;
+          background: url("../assets/img/24px/Delete-s.svg") no-repeat center;
+        }
+        
+        :host .music-delete:active {
+          visibility: visible;
+          background: url("../assets/img/24px/Delete-sd.svg") no-repeat center;
+        }
+        
+      </style>
+    </template>
+    <script type="text/javascript" src="./js/music-object.js"></script>
+  </head>
+  <body>
+    <ul id="testUL">
+    </ul>
+    <script>
+      let testObj = {
+        id: 'musicID',
+        title: 'DM',
+        artist: 'fromis_9',
+        src: '',
+        startTime: 0,
+        endTime: 206,
+        duration: 206,
+        isLiked: true,
+        isPlaying: false,
+        isNew: false,
+        playedTime: 1,
+      };
+      let context = 'fromis_9';
+      
+      let libraryItem = document.createElement('library-object', 'library-object');
+      libraryItem.setup(testObj);
+      testUL.append(libraryItem);
+    </script>
+  </body>
 </html>
