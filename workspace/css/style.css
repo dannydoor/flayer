@@ -1,13 +1,13 @@
-@import url('./variables.css');
+@import url('variables.css');
 
 @font-face {
-  font-family: 'NotoSans', sans-serif;
+  font-family: 'NotoSans';
   src: url('../assets/fonts/notokr-regular.woff2');
   font-weight: 400;
 }
 
 @font-face {
-  font-family: 'NotoSans', sans-serif;
+  font-family: 'NotoSans';
   src: url('../assets/fonts/notokr-bold.woff2');
   font-weight: 700;
 }
@@ -54,7 +54,7 @@ a {
 button,
 input,
 textarea {
-  font-family: ;
+  font-family: 'NotoSans', sans-serif;
 }
 
 button:focus,

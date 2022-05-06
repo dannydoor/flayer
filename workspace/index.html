@@ -11,11 +11,47 @@
     <title>flayer</title>
     <template id="shadowStyle">
       <style>
+        * {
+          box-sizing: border-box;
+          margin: 0;
+        }
+
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+
+        button,
+        input,
+        textarea {
+          font-family: 'NotoSans', sans-serif;
+          border: none;
+          outline: none;
+          box-shadow: none;
+        }
+
+        button:focus,
+        button:active,
+        input:focus,
+        input:active,
+        textarea:focus,
+        textarea:active {
+          outline: none;
+          box-shadow: none;
+        }
+
+        ul,
+        ol,
+        li {
+          list-style-type: none;
+          padding-left: 0;
+          margin-left: 0;
+        }
+        
         :host {
           display: flex;
           position: relative;
           align-items: center;
-          list-style: none;
           width: 320px;
           height: 56px;
           margin: 0;
@@ -36,11 +72,11 @@
           bottom: 0;
         }
 
-        :host:hover {
+        :host(:hover) {
           background-color: var(--color-base-1-blurred, rgba(245, 245, 245, 0.7));
         }
 
-        :host:active {
+        :host(:active) {
           background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
         }
         
@@ -55,13 +91,15 @@
           height: 24px;
         }
         
-        :host:hover[data-index~=''] .front-indicator {
-          background: url("../assets/img/16px/Play.svg") no-repeat center;
+        :host(.library:not(.playing):hover) .front-indicator,
+        :host(.playlist:not(.playing):hover) .front-indicator {
+          background: url("./assets/img/16px/Play.svg") no-repeat center/16px;
           color: transparent;
         }
         
-        :host.playing .front-indicator {
-          background: url("../assets/img/24px/Note.svg") no-repeat center;
+        :host.playing .front-indicator,
+        :host.playing .front-indicator{
+          background: url("./assets/img/24px/Note.svg") no-repeat center/24px;
           color: transparent;
         }
         
@@ -97,14 +135,14 @@
         
         :host .button-field {
           display: flex;
-          flex-direction: flex-end;
+          flex-direction: row-reverse;
           width: 56px;
           height: 24px;
           align-items: center;
           margin-left: 8px;
         }
         
-        :host .button-field button {
+        :host .button-field button:not(.music-select) {
           visibility: hidden;
           display: block;
           width: 24px;
@@ -112,63 +150,78 @@
           border-radius: 50%;
         }
         
-        :host:hover .button-field button {
+        :host(:hover) .button-field button {
           visibility: visible;
         }
         
         :host .music-meatballs {
-          background: url("../assets/img/24px/Meatballs-g.svg") no-repeat center;
+          background: url("./assets/img/24px/Meatballs-g.svg") no-repeat center/24px;
           margin-left: 8px;
         }
         
         :host .music-meatballs:hover  {
           visibility: visible;
-          background: url("../assets/img/24px/Meatballs-gd.svg") no-repeat center;
-          background-color: var(--color-base-1, #F5F5F5);
+          background: url("./assets/img/24px/Meatballs-gd.svg") no-repeat center/24px;
+          background-color: var(--color-base-2, #F5F5F5);
           background-blend-mode: multiply;
         }
         
         :host .music-meatballs:active {
           visibility: visible;
-          background-color: var(--color-base-2, #EBEBEB);
+          background-color: var(--color-base-3, #EBEBEB);
         }
         
         :host .music-add {
-          background: url("../assets/img/24px/Add-g.svg") no-repeat center;
+          background: url("./assets/img/24px/Add-g.svg") no-repeat center/24px;
         }
         
-        :host.music-add:hover {
+        :host .music-add:hover {
           visibility: visible;
-          background: url("../assets/img/24px/Add-p.svg") no-repeat center;
-          background-color: var(--color-base-1, #F5F5F5);
+          background: url("./assets/img/24px/Add-p.svg") no-repeat center/24px;
+          background-color: var(--color-base-2, #F5F5F5);
           background-blend-mode: multiply;
         }
         
-        :host.music-add:active {
+        :host .music-add:active {
           visibility: visible;
-          background-color: var(--color-base-2, #EBEBEB);
+          background-color: var(--color-base-3, #EBEBEB);
         }
         
         :host .music-drag {
           display: block;
           width: 24px;
           height: 24px;
-          background: url("../assets/img/24px/Drag.svg") no-repeat center;
+          background: url("./assets/img/24px/Drag.svg") no-repeat center/24px;
           margin-left: 8px;
         }
         
         :host .music-delete {
-          background: url("../assets/img/24px/Delete-g.svg") no-repeat center;
+          background: url("./assets/img/24px/Delete-g.svg") no-repeat center/24px;
         }
         
         :host .music-delete:hover {
           visibility: visible;
-          background: url("../assets/img/24px/Delete-s.svg") no-repeat center;
+          background: url("./assets/img/24px/Delete-s.svg") no-repeat center/24px;
         }
         
         :host .music-delete:active {
           visibility: visible;
-          background: url("../assets/img/24px/Delete-sd.svg") no-repeat center;
+          background: url("./assets/img/24px/Delete-sd.svg") no-repeat center/24px;
+        }
+        
+         :host .music-select {
+          display: block;
+          width: 24px;
+          height: 24px;
+          background: url("./assets/img/24px/Add-g.svg") no-repeat center/24px;
+          margin-left: 8px;
+        }
+        
+        :host.selected .music-select {
+          display: block;
+          width: 24px;
+          height: 24px;
+          background: url("./assets/img/24px/Done-p.svg") no-repeat center/24px;
         }
         
       </style>
@@ -176,9 +229,11 @@
     <script type="text/javascript" src="./js/music-object.js"></script>
   </head>
   <body>
-    <ul id="testUL">
+    <div id="test-div"></div>
     </ul>
     <script>
+      
+      
       let testObj = {
         id: 'musicID',
         title: 'DM',
@@ -194,9 +249,26 @@
       };
       let context = 'fromis_9';
       
-      let libraryItem = document.createElement('library-object', 'library-object');
+      let libraryItem = document.createElement('div', {is : 'library-object'});
       libraryItem.setup(testObj);
-      testUL.append(libraryItem);
+      window['test-div'].append(libraryItem);
+      
+      let playlistItem = document.createElement('div', {is : 'playlist-object'});
+      playlistItem.setup(testObj, context, 1);
+      window['test-div'].append(playlistItem);
+      
+      let queueItem = document.createElement('div', {is : 'queue-object'});
+      queueItem.setup(testObj, context);
+      window['test-div'].append(queueItem);
+      
+      let editingItem = document.createElement('div', {is : 'editing-object'});
+      editingItem.setup(testObj);
+      window['test-div'].append(editingItem);
+      
+      let selectableItem = document.createElement('div', {is : 'selectable-object'});
+      selectableItem.setup(testObj);
+      window['test-div'].append(selectableItem);
+      
     </script>
   </body>
 </html>

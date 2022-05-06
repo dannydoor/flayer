@@ -1,4 +1,4 @@
-class MusicObject extends HTMLLIElement{
+class MusicObject extends HTMLDivElement{
   constructor() {
     super()
     this.context = '';
@@ -20,11 +20,11 @@ class MusicObject extends HTMLLIElement{
     const shadow = this.shadowRoot;
     let songTitle = shadow.querySelector('.song-title');
     let songArtist = shadow.querySelector('.song-artist');
-    let songduration = timeFormatter(duration, 'duration');
+    let songDuration = timeFormatter(duration, 'duration');
     
     songTitle.innerHTML = title;
     songTitle.setAttribute('data-tooltip', title);
-    songArtist.innerHTML = artist + ' · ' + duration;
+    songArtist.innerHTML = artist + ' · ' + songDuration;
     songArtist.setAttribute('data-tooltip', artist);
   }
   
@@ -48,7 +48,7 @@ class PlayableObject extends MusicObject {
   constructor() {
     super();
     
-    shadowMaker(this, 'playable');
+    shadowMaker.call(this, 'playable');
     const addButton = this.shadowRoot.querySelector('.music-add');
     
     addButton.onclick = this.addToPlaylistForButton.bind(this);
@@ -56,7 +56,7 @@ class PlayableObject extends MusicObject {
   }
   
   setup(obj) {
-    this.prototype.setup(obj);
+    super.setup(obj);
     if (obj.isPlaying) this.classList.add('playing');
   }
   
@@ -74,6 +74,7 @@ class PlayableObject extends MusicObject {
   
   sendToPlay(music, context) {
     //재생 대기열에 정보를 보내는 메소드.
+    console.log('sended');
   }
 }
 
@@ -89,7 +90,8 @@ class LibraryObject extends PlayableObject {
   }
   
   setup(obj) {
-    this.prototype.setup(obj);
+    super.setup(obj);
+    this.classList.add('library')
   }
   
   openContextMenu(e) {
@@ -105,7 +107,7 @@ class PlaylistObject extends PlayableObject {
   constructor() {
     super()
     
-    shadowMaker(this, 'playlist');
+    shadowMaker.call(this, 'playlist');
     let meatballs = this.shadowRoot.querySelector('.music-meatballs');
     
     meatballs.onclick = this.openContextMenu.bind(this);
@@ -114,9 +116,12 @@ class PlaylistObject extends PlayableObject {
   }
   
   setup(obj, context, index='') {
-    this.prototype.setup(obj);
+    super.setup(obj);
     this.context += context;
-    this.shadowRoot.querySelector('.frontIndicator').dataset.index = index;
+    let tmpIndex = dataIndex;
+    tmpIndex.value = index;
+    this.shadowRoot.querySelector('.front-indicator').setAttributeNode(tmpIndex);
+    this.classList.add('playlist')
   }
   
   openContextMenu(e) {
@@ -132,7 +137,7 @@ class QueueObject extends MusicObject {
   constructor() {
     super()
     
-    shadowMaker(this, 'queue');
+    shadowMaker.call(this, 'queue');
     let deleteButton = this.shadowRoot.querySelector('.music-delete');
     
     deleteButton.onclick = this.deleteMusic.bind(this);
@@ -141,10 +146,11 @@ class QueueObject extends MusicObject {
   }
   
   setup(obj, context) {
-    this.prototype.setup(obj);
+    super.setup(obj);
     
     if (obj.isPlaying) this.classList.add('playing');
     this.context = context;
+    this.classList.add('queue')
   }
   
   clickToPlay(e) {
@@ -172,23 +178,35 @@ class EditingObject extends MusicObject {
   constructor() {
     super()
     
-    shadowMaker(this, 'edit');
+    shadowMaker.call(this, 'edit');
     let deleteButton = this.shadowRoot.querySelector('.music-delete');
     
     deleteButton.onclick = this.deleteMusic.bind(this);
   }
   
+  deleteMusic(e) {
+    e.preventDefault();
+    
+    this.remove();
+  }
+  
   setup(obj) {
-    this.prototype.setup(obj);
+    super.setup(obj);
+    this.classList.add('editing')
   }
 }
 
 class SelectableObject extends MusicObject {
   constructor() {
     super()
-    shadowMaker(this, 'selectable');
+    shadowMaker.call(this, 'selectable');
     this.isSelected = false;
     this.onclick = this.toggleSelectedStatus.bind(this);
+  }
+  
+  setup(obj) {
+    super.setup(obj);
+    this.classList.add('selecting')
   }
   
   toggleSelectedStatus(e) {
@@ -197,15 +215,18 @@ class SelectableObject extends MusicObject {
   }
 }
 
-customElements.define('library-object', LibraryObject, {extends: 'li'});
-customElements.define('playlist-object', PlaylistObject, {extends: 'li'});
-customElements.define('queue-object', QueueObject, {extends: 'li'});
-customElements.define('editing-object', EditingObject, {extends: 'li'});
-customElements.define('selectable-object', SelectableObject, {extends: 'li'});
+customElements.define('library-object', LibraryObject, {extends: 'div'});
+customElements.define('playlist-object', PlaylistObject, {extends: 'div'});
+customElements.define('queue-object', QueueObject, {extends: 'div'});
+customElements.define('editing-object', EditingObject, {extends: 'div'});
+customElements.define('selectable-object', SelectableObject, {extends: 'div'});
+
+let dataIndex = document.createAttribute('data-index');
+dataIndex.value = '';
 
 function timeFormatter(time, type) {
   if (type == 'duration') {
-    let min = time/60;
+    let min = parseInt(time/60);
     let sec = time%60;
     
     if (min < 10) min = '0' + min;
@@ -214,13 +235,13 @@ function timeFormatter(time, type) {
   }
 }
 
-function shadowMaker(elem, type) {
+function shadowMaker(type) {
   let shadow;
   
-  if (!elem.shadowRoot) {
-    shadow = elem.attatchShadow({mode: 'open'});
+  if (!this.shadowRoot) {
+    shadow = this.attachShadow({mode: 'open'});
   } else {
-    shadow = elem.shadowRoot;
+    shadow = this.shadowRoot;
   }
   
   //기본 구조 생성
