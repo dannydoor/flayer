@@ -148,8 +148,8 @@ body {
 .open-queue,
 .fullscreen-button {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   background-color: var(--color-base, #fff);
 }
 
@@ -172,8 +172,8 @@ body {
 }
 
 .open-queue.active {
-  background-color: var(--color-primary, #595ae2);
   background: url("../assets/img/36px/List-w.svg") no-repeat center/36px;
+  background-color: var(--color-primary, #595ae2);
 }
 
 .open-queue.active:hover {
@@ -187,7 +187,7 @@ body {
   display: flex;
   justify-content: space-between;
   width: 320px;
-  height: 64px;
+  height: 72px;
   background-color: var(--color-base, #ffffff);
 }
 
