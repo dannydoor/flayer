@@ -8,6 +8,7 @@
     <script>
       jwplayer.key = 'Bch7bd0cZt0adCRYHGveauTP1LaJlq1EMyrU/IxgfrGDc3gTqZxyPFEKKMI';
     </script>
+    <script type="text/javascript" src="./js/slip.js"></script>
     <title>flayer</title>
     <template id="shadowStyle">
       <style>
@@ -82,8 +83,10 @@
         
         :host .front-indicator {
           display: flex;
+          flex-flow: column;
           justify-content: center;
-          align-content: center;
+          align-items: center;
+          flex-shrink: 0;
           font: var(--font-small-bold, 700 12px/1.333333333 'NotoSans');
           color: var(--color-ceil-2, #A9A9A9);
           content: attr(data-index);
@@ -92,19 +95,27 @@
         }
         
         :host(.library:not(.playing):hover) .front-indicator,
-        :host(.playlist:not(.playing):hover) .front-indicator {
+        :host(.playlist:not(.playing):hover) .front-indicator,
+        :host(.queue:not(.playing):hover) .front-indicator{
           background: url("./assets/img/16px/Play.svg") no-repeat center/16px;
           color: transparent;
         }
         
-        :host.playing .front-indicator,
-        :host.playing .front-indicator{
+        :host(.playing) .front-indicator {
           background: url("./assets/img/24px/Note.svg") no-repeat center/24px;
           color: transparent;
         }
         
+        :host(.library.playing) .song-title,
+        :host(.library.playing) .song-artist,
+        :host(.playlist.playing) .song-title,
+        :host(.playlist.playing) .song-artist{
+          color: var(--color-primary, #595ae2);
+        }
+        
         :host .song-info {
           display: block;
+          position: relative;
           width: 208px;
           height: 32px;
           margin-left: 4px;
@@ -113,20 +124,22 @@
         :host .song-title {
           display: block;
           width: 208px;
+          height: 17px;
           font: var(--font-medium-bold, 700 14px/1.142857142857143 'NotoSans');
           letter-spacing: -0.01em;
           color: var(--color-ceil, #262626);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          margin-bottom: 4px;
+          margin-bottom: 3px;
         }
         
         :host .song-artist {
           display: block;
           width: 208px;
+          height: 13px;
           font: var(--font-artist, 400 12px/1 'NotoSans');
-          letter-spacing: -0.02em;
+          letter-spacing: -0.01em;
           color: var(--color-ceil-1, #707070);
           white-space: nowrap;
           overflow: hidden;
@@ -172,7 +185,7 @@
         }
         
         :host .music-add {
-          background: url("./assets/img/24px/Add-g.svg") no-repeat center/24px;
+          background: url("./assets/img/24px/Add-gd.svg") no-repeat center/24px;
         }
         
         :host .music-add:hover {
@@ -196,7 +209,7 @@
         }
         
         :host .music-delete {
-          background: url("./assets/img/24px/Delete-g.svg") no-repeat center/24px;
+          background: url("./assets/img/24px/Delete-gd.svg") no-repeat center/24px;
         }
         
         :host .music-delete:hover {
@@ -209,7 +222,11 @@
           background: url("./assets/img/24px/Delete-sd.svg") no-repeat center/24px;
         }
         
-         :host .music-select {
+        :host(.selected) * {
+          color: var(--color-primary, #595ae2);
+        }
+        
+        :host .music-select {
           display: block;
           width: 24px;
           height: 24px;
@@ -217,57 +234,164 @@
           margin-left: 8px;
         }
         
-        :host.selected .music-select {
+        :host(.selected) .music-select {
           display: block;
           width: 24px;
           height: 24px;
           background: url("./assets/img/24px/Done-p.svg") no-repeat center/24px;
         }
         
+        [overflown]::before {
+          content: attr(data-tooltip);
+          position: absolute;
+          left: 0;
+          bottom: calc(100% + 4px);
+          display: block;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font: var(--font-tiny-bold, 700 10px/1.2 'NotoSans');
+          color: var(--color-ceil-2, #A9A9A9);
+          background: var(--color-base, #fff);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+          transition: opacity 150ms ease-in-out;
+          transition-delay: 0.3s;
+          opacity: 0;
+          z-index: 99999;
+        }
+        
+        [overflown]:hover::before {
+          opacity: 1;
+        }
       </style>
     </template>
     <script type="text/javascript" src="./js/music-object.js"></script>
   </head>
   <body>
-    <div id="test-div"></div>
+    <!-- <div id="test-div"></div> -->
+    <div class="container">
+      <div class="tab invisible"></div>
+      <div id="video"></div>
+      <div class="controller"></div>
+      <div class="range"></div>
+      <div class="info"></div>
+    </div>
     </ul>
     <script>
       
       
-      let testObj = {
-        id: 'musicID',
-        title: 'DM',
-        artist: 'fromis_9',
-        src: '',
-        startTime: 0,
-        endTime: 206,
-        duration: 206,
-        isLiked: true,
-        isPlaying: false,
-        isNew: false,
-        playedTime: 1,
-      };
+      /*
+      let testObjArray = [
+        {
+          id: 'musicID',
+          title: 'DM',
+          artist: 'fromis_9',
+          src: '',
+          startTime: 0,
+          endTime: 206,
+          duration: 206,
+          isLiked: true,
+          isPlaying: true,
+          isNew: false,
+          playedTime: 1,
+        },
+        {
+          id: 'musicID2',
+          title: 'Feel Good (SECRET CODE)',
+          artist: 'fromis_9',
+          src: '',
+          startTime: 0,
+          endTime: 223,
+          duration: 223,
+          isLiked: true,
+          isPlaying: false,
+          isNew: false,
+          playedTime: 1,
+        },
+        {
+          id: 'musicID3',
+          title: '우리의 길 (feat. 김관호, 김다영, 김명식, 김상우, 김형미, 김훈희, 민나래, 이찬미, 임성규, 조서연, 조아라, 조찬미 & 한설희)',
+          artist: '염평안',
+          src: '',
+          startTime: 0,
+          endTime: 306,
+          duration: 306,
+          isLiked: true,
+          isPlaying: false,
+          isNew: false,
+          playedTime: 1,
+        },
+        {
+          id: 'musicID4',
+          title: '너를 따라 너에게',
+          artist: 'fromis_9',
+          src: '',
+          startTime: 0,
+          endTime: 213,
+          duration: 213,
+          isLiked: true,
+          isPlaying: false,
+          isNew: false,
+          playedTime: 1,
+        },
+        {
+          id: 'musicID5',
+          title: "L'Amour, Les Baguettes, Paris",
+          artist: 'Stella Jang',
+          src: '',
+          startTime: 0,
+          endTime: 167,
+          duration: 167,
+          isLiked: true,
+          isPlaying: false,
+          isNew: false,
+          playedTime: 1,
+        },
+      ];
+      
+      let itemType = ['library', 'playlist', 'queue', 'editing', 'selectable'];
+      
       let context = 'fromis_9';
       
-      let libraryItem = document.createElement('div', {is : 'library-object'});
-      libraryItem.setup(testObj);
-      window['test-div'].append(libraryItem);
+      for (let i=0; i<5; i++) {
+        let obj = testObjArray[i];
+        let type = itemType[i];
+        
+        let item = document.createElement('div', {is : `${type}-item`});
+        item.setup(obj, context, i+1);
+        window['test-div'].append(item);
+      }
       
-      let playlistItem = document.createElement('div', {is : 'playlist-object'});
-      playlistItem.setup(testObj, context, 1);
-      window['test-div'].append(playlistItem);
+      function setupSlip(list) {
+        list.addEventListener('slip:beforereorder', function(e){
+            if (!e.target.classList.contains('queue') && !e.target.classList.contains('editing')) {
+                e.preventDefault();
+            }
+        }, false);
+        
+        list.addEventListener('slip:beforeswipe', e => {
+          e.preventDefault();
+        }, false);
+        
+        list.addEventListener('slip:beforewait', e => {
+          if (e.target.classList.contains('music-drag')) {
+            e.preventDefault();
+          }
+        }, false);
+        
+        list.addEventListener('slip:reorder', e => {
+          e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
+          return false;
+        }, false);
+        
+        let options = {
+          ignoredElements: ['.library', '.playlist', '.selectable'],
+        };
+        
+        return new Slip(list, options);
+      }
       
-      let queueItem = document.createElement('div', {is : 'queue-object'});
-      queueItem.setup(testObj, context);
-      window['test-div'].append(queueItem);
-      
-      let editingItem = document.createElement('div', {is : 'editing-object'});
-      editingItem.setup(testObj);
-      window['test-div'].append(editingItem);
-      
-      let selectableItem = document.createElement('div', {is : 'selectable-object'});
-      selectableItem.setup(testObj);
-      window['test-div'].append(selectableItem);
+      let testDiv = window['test-div'];
+      setupSlip(testDiv);*/
       
     </script>
   </body>

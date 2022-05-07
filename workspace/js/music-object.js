@@ -1,4 +1,4 @@
-class MusicObject extends HTMLDivElement{
+class MusicItem extends HTMLDivElement{
   constructor() {
     super()
     this.context = '';
@@ -6,8 +6,8 @@ class MusicObject extends HTMLDivElement{
   
   setup(obj) {
     this.setAttribute('music-id', obj.id);
-    this.setAttribute('title', obj.title);
-    this.setAttribute('artist', obj.artist);
+    this.setAttribute('song-title', obj.title);
+    this.setAttribute('song-artist', obj.artist);
     this.setAttribute('duration', obj.duration);
     this.setAttribute('is-liked', obj.isLiked);
     this.setAttribute('is-new', obj.isNew);
@@ -23,9 +23,12 @@ class MusicObject extends HTMLDivElement{
     let songDuration = timeFormatter(duration, 'duration');
     
     songTitle.innerHTML = title;
-    songTitle.setAttribute('data-tooltip', title);
+    let overflown = title.length >= 22;
+    if (overflown) {
+      songTitle.setAttribute('overflown', true);
+      songTitle.setAttribute('data-tooltip', title);
+    }
     songArtist.innerHTML = artist + ' · ' + songDuration;
-    songArtist.setAttribute('data-tooltip', artist);
   }
   
   updateLikeStatus() {
@@ -39,12 +42,12 @@ class MusicObject extends HTMLDivElement{
     })
   }
   
-  static get musicObject() {
+  static get musicItem() {
     return this.referencedObj;
   }
 }
 
-class PlayableObject extends MusicObject {
+class PlayableItem extends MusicItem {
   constructor() {
     super();
     
@@ -78,7 +81,7 @@ class PlayableObject extends MusicObject {
   }
 }
 
-class LibraryObject extends PlayableObject {
+class LibraryItem extends PlayableItem {
   constructor() {
     super()
     
@@ -103,25 +106,29 @@ class LibraryObject extends PlayableObject {
   }
 }
 
-class PlaylistObject extends PlayableObject {
+class PlaylistItem extends PlayableItem {
   constructor() {
     super()
     
-    shadowMaker.call(this, 'playlist');
     let meatballs = this.shadowRoot.querySelector('.music-meatballs');
     
     meatballs.onclick = this.openContextMenu.bind(this);
-    this.context = 'Playlist';
+    this.context = 'Playlist:';
     this.oncontextmenu = this.openContextMenu.bind(this);
   }
   
   setup(obj, context, index='') {
     super.setup(obj);
     this.context += context;
-    let tmpIndex = dataIndex;
-    tmpIndex.value = index;
-    this.shadowRoot.querySelector('.front-indicator').setAttributeNode(tmpIndex);
+    this.index = index;
+    this.shadowRoot.querySelector('.front-indicator').innerHTML = index;
     this.classList.add('playlist')
+  }
+  
+  updateIndex(index) {
+    if (this.index == index) return;
+    this.index = index;
+    this.shadowRoot.querySelector('.front-indicator').innerHTML = index;
   }
   
   openContextMenu(e) {
@@ -133,7 +140,7 @@ class PlaylistObject extends PlayableObject {
   }
 }
 
-class QueueObject extends MusicObject {
+class QueueItem extends MusicItem {
   constructor() {
     super()
     
@@ -174,7 +181,7 @@ class QueueObject extends MusicObject {
   }
 }
 
-class EditingObject extends MusicObject {
+class EditingItem extends MusicItem {
   constructor() {
     super()
     
@@ -196,7 +203,7 @@ class EditingObject extends MusicObject {
   }
 }
 
-class SelectableObject extends MusicObject {
+class SelectableItem extends MusicItem {
   constructor() {
     super()
     shadowMaker.call(this, 'selectable');
@@ -206,23 +213,21 @@ class SelectableObject extends MusicObject {
   
   setup(obj) {
     super.setup(obj);
-    this.classList.add('selecting')
+    this.classList.add('selectable')
   }
   
   toggleSelectedStatus(e) {
     this.isSelected = !this.isSelected;
     this.classList.toggle('selected');
+    // this.index = selectableManager.addOrClear(this.referencedObj, this.index) => 인덱스가 undefined이면 스택에 추가, 새로운 인덱스를 반환, 인덱스가 있으면 해당 인덱스의 아이템 삭제 후 undefined 반환.
   }
 }
 
-customElements.define('library-object', LibraryObject, {extends: 'div'});
-customElements.define('playlist-object', PlaylistObject, {extends: 'div'});
-customElements.define('queue-object', QueueObject, {extends: 'div'});
-customElements.define('editing-object', EditingObject, {extends: 'div'});
-customElements.define('selectable-object', SelectableObject, {extends: 'div'});
-
-let dataIndex = document.createAttribute('data-index');
-dataIndex.value = '';
+customElements.define('library-item', LibraryItem, {extends: 'div'});
+customElements.define('playlist-item', PlaylistItem, {extends: 'div'});
+customElements.define('queue-item', QueueItem, {extends: 'div'});
+customElements.define('editing-item', EditingItem, {extends: 'div'});
+customElements.define('selectable-item', SelectableItem, {extends: 'div'});
 
 function timeFormatter(time, type) {
   if (type == 'duration') {
@@ -230,6 +235,7 @@ function timeFormatter(time, type) {
     let sec = time%60;
     
     if (min < 10) min = '0' + min;
+    if (sec < 10) sec = '0' + sec;
     
     return min + ':' + sec;
   }
