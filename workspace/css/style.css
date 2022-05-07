@@ -1,14 +1,14 @@
-@import url('variables.css');
+@import url("variables.css");
 
 @font-face {
-  font-family: 'NotoSans';
-  src: url('../assets/fonts/notokr-regular.woff2');
+  font-family: "NotoSans";
+  src: url("../assets/fonts/notokr-regular.woff2");
   font-weight: 400;
 }
 
 @font-face {
-  font-family: 'NotoSans';
-  src: url('../assets/fonts/notokr-bold.woff2');
+  font-family: "NotoSans";
+  src: url("../assets/fonts/notokr-bold.woff2");
   font-weight: 700;
 }
 
@@ -31,13 +31,13 @@
   --color-white-blurred: rgba(255, 255, 255, 0.7);
   --color-grey-lightest: rgba(245, 245, 245, 0.7);
   --color-grey-lighter: rgba(235, 235, 235, 0.7);
-  --font-tiny-bold: 700 10px/1.2 'NotoSans';
-  --font-small: 400 12px/1.333333333 'NotoSans';
-  --font-artist: 400 12px/1 'NotoSans';
-  --font-small-bold: 700 12px/1.333333333 'NotoSans';
-  --font-medium-bold: 700 14px/1.142857142857143 'NotoSans';
-  --font-large: 400 16px/1.5 'NotoSans';
-  --font-large-bold: 700 16px/1.5 'NotoSans';
+  --font-tiny-bold: 700 10px/1.2 "NotoSans";
+  --font-small: 400 12px/1.333333333 "NotoSans";
+  --font-artist: 400 12px/1 "NotoSans";
+  --font-small-bold: 700 12px/1.333333333 "NotoSans";
+  --font-medium-bold: 700 14px/1.142857142857143 "NotoSans";
+  --font-large: 400 16px/1.5 "NotoSans";
+  --font-large-bold: 700 16px/1.5 "NotoSans";
 }
 
 /* Reset CSS */
@@ -56,7 +56,7 @@ a {
 button,
 input,
 textarea {
-  font-family: 'NotoSans', sans-serif;
+  font-family: "NotoSans", sans-serif;
 }
 
 *:focus,
@@ -79,7 +79,7 @@ li {
 }
 
 .slip-reordering {
-  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 html {
@@ -90,7 +90,7 @@ html {
 }
 
 body {
-  font-family: 'NotoSans', sans-serif;
+  font-family: "NotoSans", sans-serif;
   width: 100%;
   height: 100%;
 }
@@ -132,13 +132,13 @@ body {
   grid-row: 2 / 3;
 }
 
-.range {
+.play-volume-bars {
   display: block;
   grid-column: 2 / 3;
   grid-row: 2 / 3;
 }
 
-.info {
+.song-info-section {
   display: block;
   grid-column: 3 / 4;
   grid-row: 2 / 3;
