@@ -193,13 +193,13 @@ body {
 }
 
 .control-container {
+  flex-shrink: 0;
+  flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: var(--color-base, #ffffff);
 }
-
-
 
 .repeat-button,
 .shuffle-button {
@@ -207,31 +207,6 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 4px;
-}
-
-.repeat-button:hover,
-.shuffle-button:hover {
-  background-color: var(--color-base-1, #F5F5F5);
-}
-
-.repeat-button:active,
-.shuffle-button:active {
-  background-color: var(--color-base-2, #EBEBEB);
-}
-
-.repeat-button.active,
-.shuffle-button.active {
-  background-color: var(--color-primary, #595ae2);
-}
-
-.repeat-button.active:hover,
-.shuffle-button.active:hover {
-  background-color: var(--color-primary-darker, #4344d4);
-}
-
-.repeat-button.active:active,
-.shuffle-button.active:active {
-  background-color: var(--color-primary-darkest, #3435c3);
 }
 
 .repeat-button {
@@ -254,34 +229,40 @@ body {
   background: url("../assets/img/24px/Repeat-w.svg") no-repeat center/24px;
 }
 
+.repeat-button:hover,
+.shuffle-button:hover {
+  background-color: var(--color-base-1, #F5F5F5);
+}
+
+.repeat-button:active,
+.shuffle-button:active {
+  background-color: var(--color-base-2, #EBEBEB);
+}
+
+.repeat-button.active,
+.repeat-button.one.active,
+.shuffle-button.active {
+  background-color: var(--color-primary, #595ae2);
+}
+
+.repeat-button.active:hover,
+.shuffle-button.active:hover {
+  background-color: var(--color-primary-darker, #4344d4);
+}
+
+.repeat-button.active:active,
+.shuffle-button.active:active {
+  background-color: var(--color-primary-darkest, #3435c3);
+}
+
+
+
 .control-buttons {
   display: flex;
   align-items: center;
   margin: 0 16px;
 }
 
-.prev-button,
-.play-or-pause,
-.next-button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: transparent;
-  transition: background-color 150ms ease-in-out, transform 150ms ease-in-out;
-}
-
-.prev-button:hover,
-.play-or-pause:hover,
-.next-button:hover {
-  background-color: var(--color-base-1, #F5F5F5);
-}
-
-.prev-button:active,
-.play-or-pause:active,
-.next-button:active {
-  transform: scale(0.7);
-  background-color: var(--color-base-2, #EBEBEB);
-}
 
 .prev-button {
   background: url("../assets/img/36px/Prev.svg") no-repeat center/36px;
@@ -307,6 +288,10 @@ body {
   background: url("../assets/img/36px/Next-pd.svg") no-repeat center/36px;
 }
 
+.play-or-pause {
+  margin: 0 8px;
+}
+
 .play-or-pause.play {
   background: url("../assets/img/36px/Play.svg") no-repeat center/36px;
 }
@@ -329,4 +314,29 @@ body {
 
 .play-or-pause.pause:active {
   background: url("../assets/img/36px/Pause-pd.svg") no-repeat center/36px;
+}
+
+.prev-button,
+.play-or-pause,
+.next-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 150ms ease-in-out, transform 150ms ease-in-out;
+}
+
+.prev-button:hover,
+.play-or-pause.play:hover,
+.play-or-pause.pause:hover,
+.next-button:hover {
+  background-color: var(--color-base-1, #F5F5F5);
+}
+
+.prev-button:active,
+.play-or-pause.play:active,
+.play-or-pause.pause:active,
+.next-button:active {
+  transform: scale(0.7);
+  background-color: var(--color-base-2, #EBEBEB);
 }
