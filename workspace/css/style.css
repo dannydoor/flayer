@@ -127,7 +127,7 @@ body {
   grid-row: 1 / 2;
 }
 
-.controller {
+.control-panel {
   display: block;
   grid-column: 1 / 2;
   grid-row: 2 / 3;
@@ -183,7 +183,8 @@ body {
 .open-queue.active:active {
   background-color: var(--color-primary-darkest, #3435c3);
 }
-.controller {
+
+.control-panel {
   display: flex;
   justify-content: space-between;
   width: 320px;
@@ -193,4 +194,139 @@ body {
 
 .control-container {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-base, #ffffff);
+}
+
+
+
+.repeat-button,
+.shuffle-button {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.repeat-button:hover,
+.shuffle-button:hover {
+  background-color: var(--color-base-1, #F5F5F5);
+}
+
+.repeat-button:active,
+.shuffle-button:active {
+  background-color: var(--color-base-2, #EBEBEB);
+}
+
+.repeat-button.active,
+.shuffle-button.active {
+  background-color: var(--color-primary, #595ae2);
+}
+
+.repeat-button.active:hover,
+.shuffle-button.active:hover {
+  background-color: var(--color-primary-darker, #4344d4);
+}
+
+.repeat-button.active:active,
+.shuffle-button.active:active {
+  background-color: var(--color-primary-darkest, #3435c3);
+}
+
+.repeat-button {
+  background: url("../assets/img/24px/Repeat-p.svg") no-repeat center/24px;
+}
+
+.repeat-button.active {
+  background: url("../assets/img/24px/Repeat-w.svg") no-repeat center/24px;
+}
+
+.repeat-button.active.one {
+  background: url("../assets/img/24px/Repeat-One.svg") no-repeat center/24px;
+}
+
+.shuffle-button {
+  background: url("../assets/img/24px/Shuffle-p.svg") no-repeat center/24px;
+}
+
+.shuffle-button.active {
+  background: url("../assets/img/24px/Repeat-w.svg") no-repeat center/24px;
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  margin: 0 16px;
+}
+
+.prev-button,
+.play-or-pause,
+.next-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 150ms ease-in-out, transform 150ms ease-in-out;
+}
+
+.prev-button:hover,
+.play-or-pause:hover,
+.next-button:hover {
+  background-color: var(--color-base-1, #F5F5F5);
+}
+
+.prev-button:active,
+.play-or-pause:active,
+.next-button:active {
+  transform: scale(0.7);
+  background-color: var(--color-base-2, #EBEBEB);
+}
+
+.prev-button {
+  background: url("../assets/img/36px/Prev.svg") no-repeat center/36px;
+}
+
+.prev-button:hover {
+  background: url("../assets/img/36px/Prev-p.svg") no-repeat center/36px;
+}
+
+.prev-button:active {
+  background: url("../assets/img/36px/Prev-pd.svg") no-repeat center/36px;
+}
+
+.next-button {
+  background: url("../assets/img/36px/Next.svg") no-repeat center/36px;
+}
+
+.next-button:hover {
+  background: url("../assets/img/36px/Next-p.svg") no-repeat center/36px;
+}
+
+.next-button:active {
+  background: url("../assets/img/36px/Next-pd.svg") no-repeat center/36px;
+}
+
+.play-or-pause.play {
+  background: url("../assets/img/36px/Play.svg") no-repeat center/36px;
+}
+
+.play-or-pause.play:hover {
+  background: url("../assets/img/36px/Play-p.svg") no-repeat center/36px;
+}
+
+.play-or-pause.play:active {
+  background: url("../assets/img/36px/Play-pd.svg") no-repeat center/36px;
+}
+
+.play-or-pause.pause {
+  background: url("../assets/img/36px/Pause.svg") no-repeat center/36px;
+}
+
+.play-or-pause.pause:hover {
+  background: url("../assets/img/36px/Pause-p.svg") no-repeat center/36px;
+}
+
+.play-or-pause.pause:active {
+  background: url("../assets/img/36px/Pause-pd.svg") no-repeat center/36px;
 }
