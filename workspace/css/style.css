@@ -57,6 +57,7 @@ button,
 input,
 textarea {
   font-family: "NotoSans", sans-serif;
+  border: none;
 }
 
 *:focus,
@@ -142,4 +143,54 @@ body {
   display: block;
   grid-column: 3 / 4;
   grid-row: 2 / 3;
+}
+
+.open-queue,
+.fullscreen-button {
+  display: block;
+  width: 64px;
+  height: 64px;
+  background-color: var(--color-base, #fff);
+}
+
+.open-queue {
+  background: url("../assets/img/36px/List-p.svg") no-repeat center/36px;
+}
+
+.fullscreen-button {
+  background: url("../assets/img/36px/Fullscreen.svg") no-repeat center/36px;
+}
+
+.open-queue:hover,
+.fullscreen-button:hover {
+  background-color: var(--color-base-1, #f5f5f5);
+}
+
+.open-queue:active,
+.fullscreen-button:active {
+  background-color: var(--color-base-2, #ebebeb);
+}
+
+.open-queue.active {
+  background-color: var(--color-primary, #595ae2);
+  background: url("../assets/img/36px/List-w.svg") no-repeat center/36px;
+}
+
+.open-queue.active:hover {
+  background-color: var(--color-primary-darker, #4344d4);
+}
+
+.open-queue.active:active {
+  background-color: var(--color-primary-darkest, #3435c3);
+}
+.controller {
+  display: flex;
+  justify-content: space-between;
+  width: 320px;
+  height: 64px;
+  background-color: var(--color-base, #ffffff);
+}
+
+.control-container {
+  display: flex;
 }
