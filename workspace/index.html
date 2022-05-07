@@ -284,14 +284,14 @@
         </div>
       </div>
       <div class="play-volume-bars">
-        <div class="play-bar-container">
-          <input type="range" class="play-bar">
-          <span class="current-time"></span>
-          <span class="remaining-time"></span>
+        <input type="range" class="play-bar" value="0">
+        <div class="timers">
+          <span class="current-time">00:00</span>
+          <span class="remaining-time">- 05:02</span>
         </div>
         <div class="volume-bar-container">
-          <input type="range" class="volume-bar">
           <div class="mute-button"></div>
+          <input type="range" class="volume-bar" value="0">
           <div class="volume-button"></div>
         </div>
       </div>
@@ -310,6 +310,12 @@
     </div>
     </ul>
     <script>
+      document.querySelectorAll('input[type=range]').forEach(item => {
+        item.oninput = function(e) {
+        let value = e.target.value;
+        e.target.style.background = 'linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) '+this.value +'%, var(--color-base-3, #d9d9d9) ' + this.value + '%, var(--color-base-3, #d9d9d9) 100%)'
+      };
+      })
       /*
       let testObjArray = [
         {

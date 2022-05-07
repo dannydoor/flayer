@@ -60,6 +60,15 @@ textarea {
   border: none;
 }
 
+
+input[type=range]:focus {
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
 *:focus,
 button:focus,
 button:active,
@@ -83,6 +92,7 @@ li {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
+/* 본격적인 스타일 시작 */
 html {
   width: 100vw;
   min-width: 960px;
@@ -145,6 +155,7 @@ body {
   grid-row: 2 / 3;
 }
 
+/* 양 옆 버튼 스타일 */
 .open-queue,
 .fullscreen-button {
   display: block;
@@ -184,11 +195,12 @@ body {
   background-color: var(--color-primary-darkest, #3435c3);
 }
 
+/* 컨트롤 패널 스타일 */
 .control-panel {
   display: flex;
   justify-content: space-between;
-  width: 320px;
-  height: 72px;
+  width: 100%;
+  height: 100%;
   background-color: var(--color-base, #ffffff);
 }
 
@@ -254,8 +266,6 @@ body {
 .shuffle-button.active:active {
   background-color: var(--color-primary-darkest, #3435c3);
 }
-
-
 
 .control-buttons {
   display: flex;
@@ -323,7 +333,7 @@ body {
   height: 36px;
   border-radius: 50%;
   background-color: transparent;
-  transition: background-color 150ms ease-in-out, transform 150ms ease-in-out;
+  transition: background-color 450ms ease-in-out, transform 450ms cubic-bezier(0.54, -0.04, 0.35, 2.5);
 }
 
 .prev-button:hover,
@@ -337,6 +347,102 @@ body {
 .play-or-pause.play:active,
 .play-or-pause.pause:active,
 .next-button:active {
-  transform: scale(0.7);
+  transform: scale(0.8);
   background-color: var(--color-base-2, #EBEBEB);
+}
+
+/* 플레이 볼륨 바 스타일 */
+.play-volume-bars {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-base, #fff);
+  padding: 20px 40px;
+}
+
+.play-bar {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 100px;
+  background: linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) 0%, var(--color-base-3, #d9d9d9) 0%, var(--color-base-3, #d9d9d9) 100%);
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.play-bar::-webkit-slider-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-primary, #595ae2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  transition: all 150ms ease-in-out;
+}
+
+.play-bar::-webkit-slider-thumb:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transform: scale(1.2);
+}
+
+.play-bar::-webkit-slider-thumb:active {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transform: scale(1.6);
+}
+
+.timers {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font: 400 12px/1.25 'NotoSans';
+  color: var(--color-ceil-1, #707070);
+  padding: 0 4px;
+}
+
+.volume-bar-container {
+  display: flex;
+  align-items: center;
+  width: 68.75%;
+}
+
+.mute-button,
+.volume-button {
+  width: 16px;
+  height: 16px;
+}
+
+.mute-button {
+  background: url("../assets/img/16px/Mute.svg") no-repeat center/16px;
+}
+
+.volume-button {
+  background: url("../assets/img/16px/Volume-Up.svg") no-repeat center/16px;
+}
+
+.volume-bar {
+  -webkit-appearance: none;
+  width: calc(100% - 64px);
+  height: 4px;
+  border-radius: 100px;
+  margin: 0 8px 0;
+  background: linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) 0%, var(--color-base-3, #d9d9d9) 0%, var(--color-base-3, #d9d9d9) 100%);
+  cursor: pointer;
+}
+
+.volume-bar::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--color-base, #fff);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  transition: all 150ms ease-in-out;
+}
+
+.volume-bar::-webkit-slider-thumb:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.volume-bar::-webkit-slider-thumb:active {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
