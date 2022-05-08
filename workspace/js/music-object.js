@@ -22,12 +22,8 @@ class MusicItem extends HTMLDivElement{
     let songArtist = shadow.querySelector('.song-artist');
     let songDuration = timeFormatter(duration, 'duration');
     
+    songTitle.setAttribute('title', title);
     songTitle.innerHTML = title;
-    let overflown = title.length >= 22;
-    if (overflown) {
-      songTitle.setAttribute('overflown', true);
-      songTitle.setAttribute('data-tooltip', title);
-    }
     songArtist.innerHTML = artist + ' · ' + songDuration;
   }
   

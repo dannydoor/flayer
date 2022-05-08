@@ -241,27 +241,6 @@
           background: url("./assets/img/24px/Done-p.svg") no-repeat center/24px;
         }
         
-        [overflown]::before {
-          content: attr(data-tooltip);
-          position: absolute;
-          left: 0;
-          bottom: calc(100% + 4px);
-          display: block;
-          padding: 4px 8px;
-          border-radius: 4px;
-          font: var(--font-tiny-bold, 700 10px/1.2 'NotoSans');
-          color: var(--color-ceil-2, #A9A9A9);
-          background: var(--color-base, #fff);
-          box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-          transition: opacity 150ms ease-in-out;
-          transition-delay: 0.3s;
-          opacity: 0;
-          z-index: 99999;
-        }
-        
-        [overflown]:hover::before {
-          opacity: 1;
-        }
       </style>
     </template>
     <script type="text/javascript" src="./js/music-object.js"></script>
@@ -269,7 +248,9 @@
   <body>
     <!-- <div id="test-div"></div> -->
     <div class="container">
-      <div id='tab' class="invisible"></div>
+      <div id='tab' class="">
+        <div id="test-div"></div>
+      </div>
       <div id="video"></div>
       <div class="control-panel">
         <button id="open-queue" data-tooltip="재생 중인 목록 보기"></button>
@@ -316,7 +297,7 @@
         e.target.style.background = 'linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) '+this.value +'%, var(--color-base-3, #d9d9d9) ' + this.value + '%, var(--color-base-3, #d9d9d9) 100%)'
       };
       })
-      /*
+      
       let testObjArray = [
         {
           id: 'musicID',
@@ -429,7 +410,7 @@
       
       let testDiv = window['test-div'];
       setupSlip(testDiv);
-      */
+      
     </script>
   </body>
 </html>
