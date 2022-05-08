@@ -239,7 +239,7 @@ body {
 }
 
 #shuffle-button.active {
-  background: url("../assets/img/24px/Repeat-w.svg") no-repeat center/24px;
+  background: url("../assets/img/24px/Shuffle-w.svg") no-repeat center/24px;
 }
 
 #repeat-button:hover,
