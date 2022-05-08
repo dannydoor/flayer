@@ -2,10 +2,11 @@ class Controller {
   constructor() {
 
     this._options = {
-      autostart: true,
-      width: '100%',
-      mute: false,
-      controls: false,
+      'file': '"https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/202205/9617396921029532/9617396921029532.smil/playlist.m3u8"'
+      'autostart': true,
+      'width': '100%',
+      'mute': false,
+      'controls': false,
     }
 
     this.title;
@@ -35,6 +36,7 @@ class Controller {
   }
 
   loadMusic(obj) {
+    jwplayer('video').off('time');
     this.title = obj.title;
     this.artist = obj.artist;
     this.URL = 'http://media.dema.mnd.mil:1935/vod/_definst_/mp4:DIMOS/' + obj.src + '/playlist.m3u8';
@@ -45,7 +47,12 @@ class Controller {
 
     this._options.title = this.title;
     this._options.file = this.URL;
-    //on(time), on()
+
+    jwplayer('video').once('beforePlay', function() {
+      jwplayer('video').seek(this.startTime);
+    });
+    jwplayer('video').load
+    
   }
 
   toggleControlStatus() {
