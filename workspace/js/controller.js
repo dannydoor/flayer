@@ -18,7 +18,7 @@ class Controller {
 
     this.isShuffled = initShuffle;
     this.isRepeat = initRepeat;
-    this.timestamp = null;
+    this.timerID = null;
     this._setupOptions = {
       'autostart': true,
       'width': '100%',
@@ -31,6 +31,8 @@ class Controller {
     this._updateControlBar = this._updateControlBar.bind(this);
     this._updateVolumeBar = this._updateVolumeBar.bind(this);
     this._updateProperties = this._updateProperties.bind(this);
+    this._letIncreaseStop = this._letIncreaseStop.bind(this);
+    this._letPlaybarIncrease = this._letPlaybarIncrease.bind(this);
     this._onPlay = this._onPlay.bind(this);
     this._onPause = this._onPause.bind(this);
     this._onBuffer = this._onBuffer.bind(this);
@@ -52,73 +54,6 @@ class Controller {
 
     let muteHandler = this._muteButtonHandler;
     this.muteButton.onclick = muteHandler;
-  }
-
-  _updateControlBar() {
-    let isLiked = this.isLiked ? 'liked' : '';
-    let isContextValid = this.context.startsWith('playlist:') ? true : false;
-    let playlistID;
-    let playlistName = null;
-    if (isContextValid) playlistID = this.context.slice(9);
-
-    this.playBar.setAttribute('max', parseInt(this.duration));
-    this.playBar.value = 0;
-    [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(0, this.duration);
-    this.volumeBar.value = jwplayer().getVolume();
-
-    this.songTitleSection.innerHTML = this.title;
-    this.songArtistSection.innerHTML = this.artist
-    
-    this.likeButton.className = isLiked;
-
-    if (!isContextValid) {
-      this._toggleDisabledStatus('playlist', true);
-      playlistName = playlistManager.getPlaylistByID(playlistID); // 플레이리스트 이름 접근
-      this.openPlaylistButton.setAttribute('data-tooltip', '재생 중인 플레이리스트: ' + playlistName);
-    }
-  }
-
-  _updatePlayBar() {
-    let currentTime = jwplayer().getPosition() - this.startTime;
-    if (this.playBar.value == currentTime) return;
-    this.playBar.value = currentTime;
-    [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(currentTime, this.duration);
-  }
-
-  _updateVolumeBar() {
-    let currentVolume = jwplayer().getVolume();
-    if (this.volumeBar.value == currentVolume) return;
-    this.volumeBar.value = currentVolume;
-  }
-
-  _updateMuteState() {
-    let currentMuteState = jwplayer().getMute();
-    let userMuteState = this.volumeBar.getAttribute('mute')
-
-    if (userMuteState == currentMuteState) return;
-    else {
-      this.volumeBar.setAttribute('mute', currentMuteState);
-      this._toggleVolumeMuteState(currentMuteState);
-    }
-  }
-
-  _updatePlayerHandler() {
-    let onTimeHandler = this._onTime;
-    jwplayer().on('time', onTimeHandler);
-  }
-
-  _updateProperties(obj, context) {
-    this.musicID = obj.id;
-    this.title = obj.title;
-    this.artist = obj.artist;
-    this.context = context;
-    this.URL = "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" + obj.src + '/playlist.m3u8';
-    // this.URL = 'http://media.dema.mnd.mil:1935/vod/_definst_/mp4:DIMOS/' + obj.src + '/playlist.m3u8'; 인트라넷 버전
-    this.startTime = obj.startTime;
-    this.endTime = obj.endTime;
-    this.duration = obj.duration;
-    this.isLiked = obj.isLiked;
-    this.referencedObj = obj;
   }
 
   setupPlayer(obj, context) {
@@ -186,6 +121,89 @@ class Controller {
 
     this._updatePlayerHandler();
     this._updateControlBar();
+  }
+
+  _updateControlBar() {
+    let isLiked = this.isLiked ? 'liked' : '';
+    let isContextValid = this.context.startsWith('playlist:') ? true : false;
+    let playlistID;
+    let playlistName = null;
+    if (isContextValid) playlistID = this.context.slice(9);
+
+    this.playBar.setAttribute('max', parseInt(this.duration));
+    this.playBar.value = 0;
+    [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(0, this.duration);
+    this.volumeBar.value = jwplayer().getVolume();
+
+    this.songTitleSection.innerHTML = this.title;
+    this.songArtistSection.innerHTML = this.artist
+    
+    this.likeButton.className = isLiked;
+
+    if (!isContextValid) {
+      this._toggleDisabledStatus('playlist', true);
+      playlistName = playlistManager.getPlaylistByID(playlistID); // 플레이리스트 이름 접근
+      this.openPlaylistButton.setAttribute('data-tooltip', '재생 중인 플레이리스트: ' + playlistName);
+    }
+  }
+
+  _letIncreaseStop() {
+    if (!this.timerID) return;
+    clearInterval(this.timerID);
+  }
+
+  _letPlaybarIncrease() {
+    if (this.timerID) return;
+    let boundIncrease = increase.bind(this);
+    this.timerID = setInterval(boundIncrease, 1000);
+
+    function increase() {
+      this.playBar.stepUp();
+      [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(this.playBar.value);
+    }
+  }
+
+  _updatePlayBar() {
+    let currentTime = jwplayer().getPosition() - this.startTime;
+    if (this.playBar.value == currentTime) return;
+    this.playBar.value = currentTime;
+    [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(currentTime, this.duration);
+  }
+
+  _updateVolumeBar() {
+    let currentVolume = jwplayer().getVolume();
+    if (this.volumeBar.value == currentVolume) return;
+    this.volumeBar.value = currentVolume;
+  }
+
+  _updateMuteState() {
+    let currentMuteState = jwplayer().getMute();
+    let userMuteState = this.volumeBar.getAttribute('mute')
+
+    if (userMuteState == currentMuteState) return;
+    else {
+      this.volumeBar.setAttribute('mute', currentMuteState);
+      this._toggleVolumeMuteState(currentMuteState);
+    }
+  }
+
+  _updatePlayerHandler() {
+    let onTimeHandler = this._onTime;
+    jwplayer().on('time', onTimeHandler);
+  }
+
+  _updateProperties(obj, context) {
+    this.musicID = obj.id;
+    this.title = obj.title;
+    this.artist = obj.artist;
+    this.context = context;
+    this.URL = "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" + obj.src + '/playlist.m3u8';
+    // this.URL = 'http://media.dema.mnd.mil:1935/vod/_definst_/mp4:DIMOS/' + obj.src + '/playlist.m3u8'; 인트라넷 버전
+    this.startTime = obj.startTime;
+    this.endTime = obj.endTime;
+    this.duration = obj.duration;
+    this.isLiked = obj.isLiked;
+    this.referencedObj = obj;
   }
 
   setPlayerHandlers() {
@@ -268,6 +286,7 @@ class Controller {
     if (oldstate === 'buffering') {
       this._toggleControlStatus();
     }
+    this._letPlaybarIncrease();
   }
 
   _onPause(e) {
@@ -275,6 +294,8 @@ class Controller {
     if (oldstate === 'buffering') {
       this._toggleControlStatus();
     }
+    this._letIncreaseStop();
+    this._updatePlayBar();
   }
 
   _onTime(e) {
