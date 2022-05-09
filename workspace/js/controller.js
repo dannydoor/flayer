@@ -165,26 +165,26 @@ class Controller {
   }
 
   _updatePlayBar() {
-    let currentTime = jwplayer().getPosition() - this.startTime;
-    if (this.playBar.value == currentTime) return;
-    this.playBar.value = currentTime;
-    [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(currentTime, this.duration);
+    let currTime = jwplayer().getPosition() - this.startTime;
+    if (this.playBar.value == currTime) return;
+    this.playBar.value = currTime;
+    [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(currTime, this.duration);
   }
 
   _updateVolumeBar() {
-    let currentVolume = jwplayer().getVolume();
-    if (this.volumeBar.value == currentVolume) return;
-    this.volumeBar.value = currentVolume;
+    let currVolume = jwplayer().getVolume();
+    if (this.volumeBar.value == currVolume) return;
+    this.volumeBar.value = currVolume;
   }
 
   _updateMuteState() {
-    let currentMuteState = jwplayer().getMute();
+    let currMuteState = jwplayer().getMute();
     let userMuteState = this.volumeBar.getAttribute('mute')
 
-    if (userMuteState == currentMuteState) return;
+    if (userMuteState == currMuteState) return;
     else {
-      this.volumeBar.setAttribute('mute', currentMuteState);
-      this._toggleVolumeMuteState(currentMuteState);
+      this.volumeBar.setAttribute('mute', currMuteState);
+      this._toggleVolumeMuteState(currMuteState);
     }
   }
 
@@ -241,9 +241,9 @@ class Controller {
     this._toggleDisabledStatus('control', false);
   }
 
-  _toggleVolumeMuteState(currentMuteState) {
+  _toggleVolumeMuteState(currMuteState) {
     let inputEvent = new InputEvent('input')
-    if (currentMuteState) {
+    if (currMuteState) {
         this.volumeBar.removeEventListener('input', this._volumeBarHandler);
         this.volumeBar.addEventListener('input', this._volumeBarHandlerMuted);
         this.volumeBar.dispatchEvent(inputEvent);
@@ -304,11 +304,11 @@ class Controller {
   _onTime(e) {
     let startTime = this.startTime;
     let endTime = this.endTime;
-    let currentTime = e.position;
+    let currTime = e.position;
 
-    if (currentTime < startTime) {
+    if (currTime < startTime) {
       jwplayer().seek(startTime);
-    } else if (currentTime >= endTime) {
+    } else if (currTime >= endTime) {
       if (this.isRepeat == 'one') jwplayer().seek(startTime);
       else window['next-button'].click();
     }
@@ -328,9 +328,9 @@ class Controller {
   }
 
   _muteButtonHandler() {
-    let currentMuteState = this.volumeBar.getAttribute('mute');
-    currentMuteState = !currentMuteState;
-    this._toggleVolumeMuteState(currentMuteState);
+    let currMuteState = this.volumeBar.getAttribute('mute');
+    currMuteState = !currMuteState;
+    this._toggleVolumeMuteState(currMuteState);
   }
 
   _volumeBarHandler(e) {
@@ -408,7 +408,7 @@ class Controller {
     remMin = formatter(remMin);
     remSec = formatter(remSec);
 
-    let currentTime = curMin + ':' + curSec;
+    let currTime = curMin + ':' + curSec;
     let remainingTime = '- ' + remMin + ':' + remSec;
 
     function formatter(num) {
@@ -416,6 +416,6 @@ class Controller {
       else return num;
     }
 
-    return [currentTime, remainingTime];
+    return [currTime, remainingTime];
   }
 }
