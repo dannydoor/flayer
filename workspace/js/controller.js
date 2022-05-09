@@ -123,6 +123,22 @@ class Controller {
     this._updateControlBar();
   }
 
+  _letIncreaseStop() {
+    if (!this.timerID) return;
+    clearInterval(this.timerID);
+  }
+
+  _letPlaybarIncrease() {
+    if (this.timerID) return;
+    let boundIncrease = increase.bind(this);
+    this.timerID = setInterval(boundIncrease, 1000);
+
+    function increase() {
+      this.playBar.stepUp();
+      [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(this.playBar.value);
+    }
+  }
+  
   _updateControlBar() {
     let isLiked = this.isLiked ? 'liked' : '';
     let isContextValid = this.context.startsWith('playlist:') ? true : false;
@@ -142,24 +158,9 @@ class Controller {
 
     if (!isContextValid) {
       this._toggleDisabledStatus('playlist', true);
+    } else {
       playlistName = playlistManager.getPlaylistByID(playlistID); // 플레이리스트 이름 접근
       this.openPlaylistButton.setAttribute('data-tooltip', '재생 중인 플레이리스트: ' + playlistName);
-    }
-  }
-
-  _letIncreaseStop() {
-    if (!this.timerID) return;
-    clearInterval(this.timerID);
-  }
-
-  _letPlaybarIncrease() {
-    if (this.timerID) return;
-    let boundIncrease = increase.bind(this);
-    this.timerID = setInterval(boundIncrease, 1000);
-
-    function increase() {
-      this.playBar.stepUp();
-      [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(this.playBar.value);
     }
   }
 
@@ -246,10 +247,12 @@ class Controller {
         this.volumeBar.removeEventListener('input', this._volumeBarHandler);
         this.volumeBar.addEventListener('input', this._volumeBarHandlerMuted);
         this.volumeBar.dispatchEvent(inputEvent);
+        this.volumeBar.disabled = true;
     } else {
       this.volumeBar.removeEventListener('input', this._volumeBarHandlerMuted);
       this.volumeBar.addEventListener('input', this._volumeBarHandler);
       this.volumeBar.dispatchEvent(inputEvent);
+      this.volumeBar.disabled = false;
     }
   }
 
