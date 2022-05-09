@@ -23,10 +23,10 @@ class Controller {
     this._updateControlBar = this._updateControlBar.bind(this);
     this._updateVolumeBar = this._updateVolumeBar.bind(this);
     this._updateProperties = this._updateProperties.bind(this);
-    this._onPlayHandler = this._onPlayHandler.bind(this);
-    this._onPauseHandler = this._onPauseHandler.bind(this);
-    this._onBufferHandler = this._onBufferHandler.bind(this);
-    this._onTimeHandler = this._onTimeHandler.bind(this);
+    this._onPlay = this._onPlay.bind(this);
+    this._onPause = this._onPause.bind(this);
+    this._onBuffer = this._onBuffer.bind(this);
+    this._onTime = this._onTime.bind(this);
     this._playBarHandler = this._playBarHandler.bind(this);
     this._playBarChangeHandler = this._playBarChangeHandler.bind(this);
     this._muteButtonHandler = this._muteButtonHandler.bind(this);
@@ -103,7 +103,7 @@ class Controller {
   }
 
   _updatePlayerHandler() {
-    let onTimeHandler = this._onTimeHandler;
+    let onTimeHandler = this._onTime;
     jwplayer().on('time', onTimeHandler);
   }
 
@@ -177,9 +177,9 @@ class Controller {
 
   setPlayerHandlers() {
     let onSeekHandler = this._updatePlayBar;
-    let onPlayHandler = this._onPlayHandler;
-    let onPauseHandler = this._onPauseHandler;
-    let onBufferHandler = this._onBufferHandler;
+    let onPlayHandler = this._onPlay;
+    let onPauseHandler = this._onPause;
+    let onBufferHandler = this._onBuffer;
     let onVolumeHandler = this._updateVolumeBar;
     let onMuteHandler = this._updateMuteState;
 
@@ -236,21 +236,21 @@ class Controller {
     return;
   }
 
-  _onPlayHandler(e) {
+  _onPlay(e) {
     let oldstate = e.oldstate;
     if (oldstate === 'buffering') {
       this._toggleControlStatus();
     }
   }
 
-  _onPauseHandler(e) {
+  _onPause(e) {
     let oldstate = e.oldstate;
     if (oldstate === 'buffering') {
       this._toggleControlStatus();
     }
   }
 
-  _onTimeHandler(e) {
+  _onTime(e) {
     let startTime = this.startTime;
     let endTime = this.endTime;
     let currentTime = e.position;
@@ -258,11 +258,12 @@ class Controller {
     if (currentTime < startTime) {
       jwplayer().seek(startTime);
     } else if (currentTime >= endTime) {
-      window['next-button'].click();
+      if (this.isRepeat == 'one') jwplayer().seek(startTime);
+      else window['next-button'].click();
     }
   }
 
-  _onBufferHandler(e) {
+  _onBuffer(e) {
     let oldstate = e.oldstate;
     if (oldstate === 'playing') {
       this._toggleControlStatus();
