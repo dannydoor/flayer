@@ -47,6 +47,9 @@ class Controller {
     this.playBar.addEventListener('input', playInput);
     this.playBar.addEventListener('change', playChange);
     this.playBar.dispatchEvent(inputEvent);
+
+    let muteHandler = this._muteButtonHandler;
+    this.muteButton.onclick = muteHandler;
   }
 
   _updateControlBar() {
@@ -56,10 +59,10 @@ class Controller {
     let playlistName = null;
     if (isContextValid) playlistID = this.context.slice(9);
 
-    this.playBar.setAttribute('step', parseInt(this.duration));
-    this.playBar.setAttribute('value', 0);
+    this.playBar.setAttribute('max', parseInt(this.duration));
+    this.playBar.value = 0;
     [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(0, this.duration);
-    this.volumeBar.setAttribute('value', jwplayer().getVolume());
+    this.volumeBar.value = jwplayer().getVolume();
 
     this.songTitleSection.innerHTML = this.title;
     this.songArtistSection.innerHTML = this.artist
@@ -75,15 +78,15 @@ class Controller {
 
   _updatePlayBar() {
     let currentTime = jwplayer().getPosition() - this.startTime;
-    if (this.playBar.getAttribute('value') == currentTime) return;
-    this.playBar.setAttribute('value', currentTime);
+    if (this.playBar.value == currentTime) return;
+    this.playBar.value = currentTime;
     [this.currentTime.innerHTML, this.remainingTime.innerHTML] = this._timeFormatter(currentTime, this.duration);
   }
 
   _updateVolumeBar() {
     let currentVolume = jwplayer().getVolume();
-    if (this.volumeBar.getAttribute('value') == currentVolume) return;
-    this.volumeBar.setAttribute('value', currentVolume);
+    if (this.volumeBar.value == currentVolume) return;
+    this.volumeBar.value = currentVolume;
   }
 
   _updateMuteState() {
@@ -138,8 +141,9 @@ class Controller {
       this._toggleDisabledStatus('bars', true);
       this._toggleDisabledStatus('info', true);
       // 창 정보 비우기
-      this.playBar.setAttribute('step', 1);
-      this.playBar.setAttribute('value', 0);
+      this.playBar.setAttribute('min', 0);
+      this.playBar.setAttribute('max', 0);
+      this.playBar.value = 0;
       this.currentTime.innerHTML = '00:00';
       this.remainingTime.innerHTML = '- 00:00';
       this.songTitleSection.innerHTML = '';
@@ -157,9 +161,9 @@ class Controller {
     this.volumeBar.dispatchEvent(inputEvent);
   }
 
-  loadMusic(obj) {
+  loadMusic(obj, context) {
     jwplayer().off('time');
-    this._updateProperties(obj);
+    this._updateProperties(obj, context);
 
     let startTime = this.startTime;
     let file = {'file': this.URL};
