@@ -27,6 +27,7 @@ class Controller {
     this._onPause = this._onPause.bind(this);
     this._onBuffer = this._onBuffer.bind(this);
     this._onTime = this._onTime.bind(this);
+    this._onComplete = this._onComplete.bind(this);
     this._playBarHandler = this._playBarHandler.bind(this);
     this._playBarChangeHandler = this._playBarChangeHandler.bind(this);
     this._muteButtonHandler = this._muteButtonHandler.bind(this);
@@ -66,7 +67,7 @@ class Controller {
     this.likeButton.className = isLiked;
 
     if (!isContextValid) {
-      this.toggleDisabledStatus('playlist', true);
+      this._toggleDisabledStatus('playlist', true);
       playlistName = playlistManager.getPlaylistByID(playlistID); // 플레이리스트 이름 접근
       this.openPlaylistButton.setAttribute('data-tooltip', '재생 중인 플레이리스트: ' + playlistName);
     }
@@ -92,13 +93,7 @@ class Controller {
     if (userMuteState == currentMuteState) return;
     else {
       this.volumeBar.setAttribute('mute', currentMuteState);
-      if (currentMuteState) {
-        this.volumeBar.removeEventListener('input', this._volumeBarHandler);
-        this.volumeBar.addEventListener('input', this._volumeBarHandlerMuted);
-      } else {
-        this.volumeBar.removeEventListener('input', this._volumeBarHandlerMuted);
-        this.volumeBar.addEventListener('input', this._volumeBarHandler);
-      }
+      this._toggleVolumeMuteState(currentMuteState);
     }
   }
 
@@ -139,9 +134,9 @@ class Controller {
       jwplayer('video').setup.call(this, this._setupOptions);
       jwplayer().once('ready', () => jwplayer().stop());
       // 컨트롤바 비활성화
-      this.toggleDisabledStatus('control', true);
-      this.toggleDisabledStatus('bars', true);
-      this.toggleDisabledStatus('info', true);
+      this._toggleDisabledStatus('control', true);
+      this._toggleDisabledStatus('bars', true);
+      this._toggleDisabledStatus('info', true);
       // 창 정보 비우기
       this.playBar.setAttribute('step', 1);
       this.playBar.setAttribute('value', 0);
@@ -166,9 +161,10 @@ class Controller {
     jwplayer().off('time');
     this._updateProperties(obj);
 
+    let startTime = this.startTime;
     let file = {'file': this.URL};
 
-    jwplayer().once.call(this, 'beforePlay', () => jwplayer().seek(this.startTime));
+    jwplayer().once('beforePlay', () => jwplayer().seek(startTime));
     jwplayer().load(file);
 
     this._updatePlayerHandler();
@@ -180,6 +176,7 @@ class Controller {
     let onPlayHandler = this._onPlay;
     let onPauseHandler = this._onPause;
     let onBufferHandler = this._onBuffer;
+    let onCompleteHandler = this._onComplete;
     let onVolumeHandler = this._updateVolumeBar;
     let onMuteHandler = this._updateMuteState;
 
@@ -187,9 +184,9 @@ class Controller {
     jwplayer().on('play', onPlayHandler);
     jwplayer().on('pause', onPauseHandler);
     jwplayer().on('buffer', onBufferHandler);
+    jwplayer().on('complete', onCompleteHandler);
     jwplayer().on('volume', onVolumeHandler);
     jwplayer().on('mute', onMuteHandler);
-    jwplayer().on('complete', () => window['next-button'].click());
   }
 
   _toggleControlStatus() {
@@ -197,7 +194,7 @@ class Controller {
     let currState = (this.playButton.className == 'play') ? 'paused' : (this.playButton.className == 'pause') ? 'playing' : 'undefined';
     
     if (isPlaying == 'buffering') {
-      this.toggleDisabledStatus('control', true);
+      this._toggleDisabledStatus('control', true);
       return;
     } else if (isPlaying == 'playing' && currState != isPlaying) {
       this.playButton.className = 'pause';
@@ -205,10 +202,23 @@ class Controller {
       this.playButton.className = 'play';
     }
 
-    this.toggleDisabledStatus('control', false);
+    this._toggleDisabledStatus('control', false);
   }
 
-  toggleDisabledStatus(node, bool) {
+  _toggleVolumeMuteState(currentMuteState) {
+    let inputEvent = new InputEvent('input')
+    if (currentMuteState) {
+        this.volumeBar.removeEventListener('input', this._volumeBarHandler);
+        this.volumeBar.addEventListener('input', this._volumeBarHandlerMuted);
+        this.volumeBar.dispatchEvent(inputEvent);
+    } else {
+      this.volumeBar.removeEventListener('input', this._volumeBarHandlerMuted);
+      this.volumeBar.addEventListener('input', this._volumeBarHandler);
+      this.volumeBar.dispatchEvent(inputEvent);
+    }
+  }
+
+  _toggleDisabledStatus(node, bool) {
     switch(node) {
       case 'control' : {
         this.playButton.disabled = bool;
@@ -270,20 +280,16 @@ class Controller {
     }
   }
 
+  _onComplete() {
+    let startTime = this.startTime;
+    if (this.isRepeat == 'one') jwplayer().seek(startTime);
+    else this.nextButton.click();
+  }
+
   _muteButtonHandler() {
     let currentMuteState = this.volumeBar.getAttribute('mute');
-    let inputEvent = new InputEvent('input');
     currentMuteState = !currentMuteState;
-    
-    if (currentMuteState) {
-      this.volumeBar.removeEventListener('input', this._volumeBarHandler);
-      this.volumeBar.addEventListener('input', this._volumeBarHandlerMuted);
-      this.volumeBar.dispatchEvent(inputEvent);
-    } else {
-      this.volumeBar.removeEventListener('input', this._volumeBarHandlerMuted);
-      this.volumeBar.addEventListener('input', this._volumeBarHandler);
-      this.volumeBar.dispatchEvent(inputEvent);
-    }
+    this._toggleVolumeMuteState(currentMuteState);
   }
 
   _volumeBarHandler(e) {
@@ -310,6 +316,44 @@ class Controller {
   _playBarChangeHandler(e) {
     let position = this.startTime + e.target.value;
     jwplayer().seek(position);
+  }
+
+  _debounce(func, ms) {
+    let timeout;
+    return function() {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, arguments), ms);
+    };
+  }
+
+  _throttle(func, ms) {
+
+    let isThrottled = false,
+      savedArgs,
+      savedThis;
+  
+    function wrapper() {
+  
+      if (isThrottled) {
+        savedArgs = arguments;
+        savedThis = this;
+        return;
+      }
+  
+      func.apply(this, arguments);
+  
+      isThrottled = true;
+  
+      setTimeout(function() {
+        isThrottled = false;
+        if (savedArgs) {
+          wrapper.apply(savedThis, savedArgs);
+          savedArgs = savedThis = null;
+        }
+      }, ms);
+    }
+  
+    return wrapper;
   }
 
   _timeFormatter(current, duration) {
