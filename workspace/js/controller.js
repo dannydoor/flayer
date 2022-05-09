@@ -15,9 +15,17 @@ class Controller {
     this.openPlaylistButton = window['open-curr-playlist'];
     this.likeButton = window['like-this-button'];
     this.meatballsButton = window['meatball-button'];
+
     this.isShuffled = initShuffle;
     this.isRepeat = initRepeat;
     this.timestamp = null;
+    this._setupOptions = {
+      'autostart': true,
+      'width': '100%',
+      'mute': false,
+      'controls': false,
+    }
+
     this._updatePlayBar = this._updatePlayBar.bind(this);
     this._updateMuteState = this._updateMuteState.bind(this);
     this._updateControlBar = this._updateControlBar.bind(this);
@@ -31,12 +39,6 @@ class Controller {
     this._playBarHandler = this._playBarHandler.bind(this);
     this._playBarChangeHandler = this._playBarChangeHandler.bind(this);
     this._muteButtonHandler = this._muteButtonHandler.bind(this);
-    this._setupOptions = {
-      'autostart': true,
-      'width': '100%',
-      'mute': false,
-      'controls': false,
-    }
     
     this.setupPlayer(initObj, initContext);
 
@@ -124,22 +126,32 @@ class Controller {
       // 마지막 세션 세팅
       this._updateProperties(obj, context);
       this._setupOptions.file = this.URL;
-      jwplayer('video').setup.call(this, this._setupOptions);
-      jwplayer().once.call(this, 'beforePlay', () => {
-        jwplayer().seek(this.startTime);
-        this._updateControlBar();
+
+      let options = this._setupOptions;
+      let update = this._updateControlBar;
+      let startTime = this.startTime;
+
+      jwplayer('video').setup(options);
+      jwplayer().once('beforePlay', () => {
+        jwplayer().seek(startTime);
+        update();
       });
+
       this.setPlayerHandlers();
       this._updatePlayerHandler();
     } else {
+      
       // 초기화
       this._setupOptions.file = "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/202205/9617396921029532/9617396921029532.smil/playlist.m3u8";
-      jwplayer('video').setup.call(this, this._setupOptions);
+      let options = this._setupOptions;
+      jwplayer('video').setup(options);
       jwplayer().once('ready', () => jwplayer().stop());
+
       // 컨트롤바 비활성화
       this._toggleDisabledStatus('control', true);
       this._toggleDisabledStatus('bars', true);
       this._toggleDisabledStatus('info', true);
+
       // 창 정보 비우기
       this.playBar.setAttribute('min', 0);
       this.playBar.setAttribute('max', 0);
@@ -148,6 +160,7 @@ class Controller {
       this.remainingTime.innerHTML = '- 00:00';
       this.songTitleSection.innerHTML = '';
       this.songArtistSection.innerHTML = '';
+
       // 핸들러 달기
       this.setPlayerHandlers();
     }
