@@ -1,5 +1,20 @@
 class Controller {
   constructor(initObj = null, initContext = null, initShuffle = false, initRepeat = false) {
+    this.playButton = window['play-or-pause'];
+    this.prevButton = window['prev-button'];
+    this.nextButton = window['next-button'];
+    this.repeatButton = window['repeat-button'];
+    this.shuffleButton = window['shuffle-button'];
+    this.playBar = window['play-bar'];
+    this.volumeBar = window['volume-bar'];
+    this.currentTime = window['current-time'];
+    this.remainingTime = window['remaining-time'];
+    this.muteButton = window['mute-button'];
+    this.songTitleSection = window['curr-song-title'];
+    this.songArtistSection = window['curr-song-artist'];
+    this.openPlaylistButton = window['open-curr-playlist'];
+    this.likeButton = window['like-this-button'];
+    this.meatballsButton = window['meatball-button'];
     this.isShuffled = initShuffle;
     this.isRepeat = initRepeat;
     this.timestamp = null;
@@ -21,24 +36,16 @@ class Controller {
       'mute': false,
       'controls': false,
     }
-
+    
     this.setupPlayer(initObj, initContext);
 
-    this.playButton = window['play-or-pause'];
-    this.prevButton = window['prev-button'];
-    this.nextButton = window['next-button'];
-    this.repeatButton = window['repeat-button'];
-    this.shuffleButton = window['shuffle-button'];
-    this.playBar = window['play-bar'];
-    this.volumeBar = window['volume-bar'];
-    this.currentTime = window['current-time'];
-    this.remainingTime = window['remaining-time'];
-    this.muteButton = window['mute-button'];
-    this.songTitleSection = window['curr-song-title'];
-    this.songArtistSection = window['curr-song-artist'];
-    this.openPlaylistButton = window['open-curr-playlist'];
-    this.likeButton = window['like-this-button'];
-    this.meatballsButton = window['meatball-button'];
+    let playInput = this._playBarHandler;
+    let playChange = this._playBarChangeHandler;
+    let inputEvent = new InputEvent('input');
+
+    this.playBar.addEventListener('input', playInput);
+    this.playBar.addEventListener('change', playChange);
+    this.playBar.dispatchEvent(inputEvent);
   }
 
   _updateControlBar() {
@@ -145,8 +152,14 @@ class Controller {
       // 핸들러 달기
       this.setPlayerHandlers();
     }
+    let volumeInput = this._volumeBarHandler;
+    let volumeChange = this._volumeBarChangeHandler;
+    let inputEvent = new InputEvent('input');
+
     this.volumeBar.setAttribute('mute', false);
-    this.volumeBar.addEventListener('input', this._volumeBarHandler);
+    this.volumeBar.addEventListener('input', volumeInput);
+    this.volumeBar.addEventListener('change', volumeChange);
+    this.volumeBar.dispatchEvent(inputEvent);
   }
 
   loadMusic(obj) {
@@ -258,14 +271,17 @@ class Controller {
 
   _muteButtonHandler() {
     let currentMuteState = this.volumeBar.getAttribute('mute');
+    let inputEvent = new InputEvent('input');
     currentMuteState = !currentMuteState;
     
     if (currentMuteState) {
       this.volumeBar.removeEventListener('input', this._volumeBarHandler);
       this.volumeBar.addEventListener('input', this._volumeBarHandlerMuted);
+      this.volumeBar.dispatchEvent(inputEvent);
     } else {
       this.volumeBar.removeEventListener('input', this._volumeBarHandlerMuted);
       this.volumeBar.addEventListener('input', this._volumeBarHandler);
+      this.volumeBar.dispatchEvent(inputEvent);
     }
   }
 
