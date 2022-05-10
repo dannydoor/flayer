@@ -257,9 +257,29 @@
         <div class="control-container">
           <button id="repeat-button"></button>
           <div class="control-buttons">
-            <button id="prev-button"></button>
+            <button id="prev-button">
+              <div class="tooltip">
+                <div class="tooltip-header">
+                  이전 곡
+                </div>
+                <div class="tooltip-desc">
+                  <strong></strong>
+                  <span></span>
+                </div>
+              </div>
+            </button>
             <button id="play-or-pause" class="play"></button>
-            <button id="next-button"></button>
+            <button id="next-button">
+              <div class="tooltip">
+                <div class="tooltip-header">
+                  다음 곡
+                </div>
+                <div class="tooltip-desc">
+                  <strong></strong>
+                  <span></span>
+                </div>
+              </div>
+            </button>
           </div>
           <button id="shuffle-button"></button>
         </div>
@@ -282,7 +302,16 @@
             <strong id="curr-song-title">DM</strong>
             <span id="curr-song-artist">fromis_9</span>
           </div>
-          <button id="open-curr-playlist"></button>
+          <button id="open-curr-playlist">
+            <div class="tooltip">
+              <div class="tooltip-header">
+                재생 중인 플레이리스트
+              </div>
+              <div class="tooltip-desc">
+                <strong></strong>
+              </div>
+            </div>
+          </button>
           <button id="like-this-button"></button>
           <button id="meatball-button"></button>
         </div>
