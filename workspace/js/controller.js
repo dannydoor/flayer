@@ -7,7 +7,11 @@ class Controller {
   ) {
     this.playButton = window["play-or-pause"];
     this.prevButton = window["prev-button"];
+    this.prevSongTitle = this.prevButton.querySelector(".tooltip strong");
+    this.prevSongArtist = this.prevButton.querySelector(".tooltip span");
     this.nextButton = window["next-button"];
+    this.nextSongTitle = this.nextButton.querySelector(".tooltip strong");
+    this.nextSongArtist = this.nextButton.querySelector(".tooltip span");
     this.repeatButton = window["repeat-button"];
     this.shuffleButton = window["shuffle-button"];
     this.playBar = window["play-bar"];
@@ -18,6 +22,8 @@ class Controller {
     this.songTitleSection = window["curr-song-title"];
     this.songArtistSection = window["curr-song-artist"];
     this.openPlaylistButton = window["open-curr-playlist"];
+    this.currentPlaylist =
+      this.openPlaylistButton.querySelector(".tooltip strong");
     this.likeButton = window["like-this-button"];
     this.meatballsButton = window["meatball-button"];
 
@@ -165,12 +171,6 @@ class Controller {
 
     if (!isContextValid) {
       this._toggleDisabledStatus("playlist", true);
-    } else {
-      playlistName = playlistManager.getPlaylistByID(playlistID); // 플레이리스트 이름 접근
-      this.openPlaylistButton.setAttribute(
-        "data-tooltip",
-        "재생 중인 플레이리스트: " + playlistName
-      );
     }
   }
 
@@ -196,6 +196,36 @@ class Controller {
     else {
       this.volumeBar.setAttribute("mute", currMuteState);
       this._toggleVolumeMuteState(currMuteState);
+    }
+  }
+
+  _updateTooltip() {
+    let [, prevObj] = queueManager.returnPrevInfo();
+    let [, nextObj] = queueManager.returnNextInfo();
+    let currPlaylistName;
+
+    if (prevObj) {
+      [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
+        prevObj.title,
+        prevObj.artist,
+      ];
+    } else {
+      [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
+        "이전 곡이",
+        "존재하지 않습니다",
+      ];
+    }
+
+    if (nextObj) {
+      [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
+        nextObj.title,
+        nextObj.artist,
+      ];
+    } else {
+      [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
+        "다음 곡이",
+        "존재하지 않습니다",
+      ];
     }
   }
 
