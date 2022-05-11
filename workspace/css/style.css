@@ -605,6 +605,7 @@ body {
 .tooltip {
   position: absolute;
   display: flex;
+  max-width: 240px;
   flex-direction: column;
   align-items: center;
   background-color: var(--color-base-blurred, rgba(255, 255, 255, 0.7));
@@ -615,6 +616,8 @@ body {
   left: calc(50% - 15px);
   opacity: 0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tooltip.visible {

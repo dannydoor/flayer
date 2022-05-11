@@ -30,6 +30,7 @@ class Controller {
     this.isShuffled = initShuffle;
     this.isRepeat = initRepeat;
     this.timerID = null;
+    this.tooltipTImerID = null;
     this._setupOptions = {
       autostart: true,
       width: "100%",
@@ -42,6 +43,7 @@ class Controller {
     this._updateControlBar = this._updateControlBar.bind(this);
     this._updateVolumeBar = this._updateVolumeBar.bind(this);
     this._updateProperties = this._updateProperties.bind(this);
+    this._updateTooltip = this._updateTooltip.bind(this);
     this._letIncreaseStop = this._letIncreaseStop.bind(this);
     this._letPlaybarIncrease = this._letPlaybarIncrease.bind(this);
     this._onPlay = this._onPlay.bind(this);
@@ -54,6 +56,17 @@ class Controller {
     this._muteButtonHandler = this._muteButtonHandler.bind(this);
 
     this.setupPlayer(initObj, initContext);
+
+    this.prevButton.onmouseover = this._onMouseOverTooltip;
+    this.nextButton.onmouseover = this._onMouseOverTooltip;
+    this.openPlaylistButton.onmouseover = this._onMouseOverTooltip;
+    this.prevButton.onmouseleave = this._onMouseLeaveTooltip;
+    this.nextButton.onmouseleave = this._onMouseLeaveTooltip;
+    this.openPlaylistButton.onmouseleave = this._onMouseLeaveTooltip;
+    this.prevButton.onmousedown = this._onMouseDownSeekForeward;
+    this.nextButton.onmousedown = this._onMouseDownSeekBackward;
+    this.prevButton.onmouseup = this._onMouseUpSeek;
+    this.nextButton.onmouseup = this._onMouseUpSeek;
 
     let playInput = this._playBarHandler;
     let playChange = this._playBarChangeHandler;
@@ -132,6 +145,7 @@ class Controller {
 
     this._updatePlayerHandler();
     this._updateControlBar();
+    this._updateTooltip(true, true, true);
   }
 
   _letIncreaseStop() {
@@ -154,9 +168,6 @@ class Controller {
   _updateControlBar() {
     let isLiked = this.isLiked ? "liked" : "";
     let isContextValid = this.context.startsWith("playlist:") ? true : false;
-    let playlistID;
-    let playlistName = null;
-    if (isContextValid) playlistID = this.context.slice(9);
 
     this.playBar.setAttribute("max", parseInt(this.duration));
     this.playBar.value = 0;
@@ -195,37 +206,48 @@ class Controller {
     if (userMuteState == currMuteState) return;
     else {
       this.volumeBar.setAttribute("mute", currMuteState);
-      this._toggleVolumeMuteState(currMuteState);
+      this._toggleVolumeBarMuteState(currMuteState);
     }
   }
 
-  _updateTooltip() {
-    let [, prevObj] = queueManager.returnPrevInfo();
-    let [, nextObj] = queueManager.returnNextInfo();
-    let currPlaylistName;
-
-    if (prevObj) {
-      [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
-        prevObj.title,
-        prevObj.artist,
-      ];
-    } else {
-      [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
-        "이전 곡이",
-        "존재하지 않습니다",
-      ];
+  _updateTooltip(prev = false, next = false, playlist = false) {
+    if (prev) {
+      let [, prevObj] = queueManager.getPrevInfo();
+      if (prevObj) {
+        [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
+          prevObj.title,
+          prevObj.artist,
+        ];
+      } else {
+        [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
+          "이전 곡이",
+          "존재하지 않습니다",
+        ];
+      }
     }
 
-    if (nextObj) {
-      [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
-        nextObj.title,
-        nextObj.artist,
-      ];
-    } else {
-      [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
-        "다음 곡이",
-        "존재하지 않습니다",
-      ];
+    if (next) {
+      let [, nextObj] = queueManager.getNextInfo();
+      if (nextObj) {
+        [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
+          nextObj.title,
+          nextObj.artist,
+        ];
+      } else {
+        [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
+          "다음 곡이",
+          "존재하지 않습니다",
+        ];
+      }
+    }
+
+    if (playlist) {
+      let currPlaylistName = playlistManager.getPlaylistName(this.context);
+      if (currPlaylistName) {
+        this.currentPlaylist.innerHTML = currPlaylistName;
+      } else {
+        this.currentPlaylist.innerHTML = "플레이리스트 재생 중이 아닙니다.";
+      }
     }
   }
 
@@ -253,7 +275,7 @@ class Controller {
   }
 
   setPlayerHandlers() {
-    let onSeekHandler = this._updatePlayBar;
+    let onSeekedHandler = this._updatePlayBar;
     let onPlayHandler = this._onPlay;
     let onPauseHandler = this._onPause;
     let onBufferHandler = this._onBuffer;
@@ -261,7 +283,7 @@ class Controller {
     let onVolumeHandler = this._updateVolumeBar;
     let onMuteHandler = this._updateMuteState;
 
-    jwplayer().on("seek", onSeekHandler);
+    jwplayer().on("seeked", onSeekedHandler);
     jwplayer().on("play", onPlayHandler);
     jwplayer().on("pause", onPauseHandler);
     jwplayer().on("buffer", onBufferHandler);
@@ -297,7 +319,7 @@ class Controller {
     this._toggleDisabledStatus("control", false);
   }
 
-  _toggleVolumeMuteState(currMuteState) {
+  _toggleVolumeBarMuteState(currMuteState) {
     let inputEvent = new InputEvent("input");
     if (currMuteState) {
       this.volumeBar.removeEventListener("input", this._volumeBarHandler);
@@ -385,7 +407,7 @@ class Controller {
 
   _onPrev() {
     // 이전 곡이 없다면 시작 시간으로 이동.
-    let [prevElement, prevObj, prevContext] = queueManager.returnPrevInfo();
+    let [prevElement, prevObj, prevContext] = queueManager.getPrevInfo();
     let newPrevElement = prevElement.previousElementSibling;
     let newNextElement = prevElement.nextElementSibling;
 
@@ -417,7 +439,7 @@ class Controller {
     });
 
     // next prev 속성 업데이트
-    let nextElement = queueManager.returnNextInfo();
+    let nextElement = queueManager.getNextInfo();
     if (nextElement) {
       nextElement.classList.remove("next");
     }
@@ -428,7 +450,7 @@ class Controller {
     queueManager.correctAttribute();
 
     // 툴팁 업데이트
-    this._updateTooltip();
+    this._updateTooltip(true, true, true);
   }
 
   _onNext() {
@@ -447,7 +469,7 @@ class Controller {
     });
 
     // next 속성 곡 정보 불러오기
-    let [nextElement, nextObj, nextContext] = queueManager.returnNextInfo();
+    let [nextElement, nextObj, nextContext] = queueManager.getNextInfo();
     let newPrevElement = nextElement.previousElementSibling;
     let newNextElement = nextElement.nextElementSibling;
 
@@ -459,7 +481,7 @@ class Controller {
     });
 
     // next, prev 속성 업데이트
-    let prevElement = queueManager.returnPrevInfo();
+    let prevElement = queueManager.getPrevInfo();
     if (prevElement) {
       prevElement.classList.remove("prev");
     }
@@ -470,13 +492,76 @@ class Controller {
     queueManager.correctAttribute();
 
     // 툴팁 정보 업데이트
-    this._updateTooltip();
+    this._updateTooltip(true, true, true);
+  }
+
+  _onMouseOverTooltip(e) {
+    let target = e.target;
+    target.timerID = setTimeout(() => makeTooltipVisible(), 1000);
+
+    function makeTooltipVisible() {
+      let tooltip = target.querySelector(".tooltip");
+      tooltip.classList.add("visible");
+    }
+  }
+
+  _onMouseLeaveTooltip(e) {
+    clearTimeout(e.target.timerID);
+
+    e.target.querySelector(".tooltip").classList.remove("visible");
+  }
+
+  _onMouseDownSeekBackward(e) {
+    let target = e.target;
+    target.timerID = setTimeout(() => {
+      target.classList.add("seeking");
+      startSeeking();
+    }, 2000);
+
+    function startSeeking() {
+      let origPosition = jwplayer().getPosition();
+      const SEEK_TERM = 5;
+      let position = origPosition;
+      target.timerID2 = setInterval(seeking, 1000);
+
+      function seeking() {
+        position += SEEK_TERM;
+        jwplayer().seek(position);
+      }
+    }
+  }
+
+  _onMouseDownSeekForeward(e) {
+    let target = e.target;
+    target.timerID = setTimeout(() => {
+      target.classList.add("seeking");
+      startSeeking();
+    }, 2000);
+
+    function startSeeking() {
+      let origPosition = jwplayer().getPosition();
+      const SEEK_TERM = 5;
+      let position = origPosition;
+      target.timerID2 = setInterval(seeking, 1000);
+
+      function seeking() {
+        position -= SEEK_TERM;
+        jwplayer().seek(position);
+      }
+    }
+  }
+
+  _onMouseUpSeek(e) {
+    let target = e.target;
+    target.classList.remove("seeking");
+    clearTimeout(target.timerID);
+    clearInterval(target.timerID2);
   }
 
   _muteButtonHandler() {
     let currMuteState = this.volumeBar.getAttribute("mute");
     currMuteState = !currMuteState;
-    this._toggleVolumeMuteState(currMuteState);
+    this._toggleVolumeBarMuteState(currMuteState);
   }
 
   _volumeBarHandler(e) {
