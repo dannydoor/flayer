@@ -386,17 +386,19 @@ class Controller {
 
     if (currTime < startTime) {
       jwplayer().seek(startTime);
+    } else if (currTime >= endTime - 10) {
+      this.nextButton.querySelector(".tooltip").classList.add("must-visible");
     } else if (currTime >= endTime) {
       if (this.isRepeat == "one") jwplayer().seek(startTime);
       else this.nextButton.click();
+      this.nextButton
+        .querySelector(".tooltip")
+        .classList.remove("must-visible");
     }
   }
 
   _onBuffer(e) {
-    let oldstate = e.oldstate;
-    if (oldstate === "playing") {
-      this._toggleControlStatus();
-    }
+    this._toggleControlStatus();
   }
 
   _onComplete() {
@@ -652,7 +654,7 @@ class Controller {
     remMin = formatter(remMin);
     remSec = formatter(remSec);
 
-    let currTime = curMin + ":" + curSec;
+    let currentTime = curMin + ":" + curSec;
     let remainingTime = "- " + remMin + ":" + remSec;
 
     function formatter(num) {
@@ -660,6 +662,6 @@ class Controller {
       else return num;
     }
 
-    return [currTime, remainingTime];
+    return [currentTime, remainingTime];
   }
 }

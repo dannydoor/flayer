@@ -368,6 +368,11 @@ body {
   background-color: var(--color-base-2, #EBEBEB);
 }
 
+#prev-button.seeking:active:not(:disabled),
+#next-button.seeking:active:not(:disabled) {
+  transform: scale(1.1);
+}
+
 /* 플레이 볼륨 바 스타일 */
 .play-volume-bars {
   width: 100%;
@@ -620,7 +625,8 @@ body {
   text-overflow: ellipsis;
 }
 
-.tooltip.visible {
+.tooltip.visible,
+.tooltip.must-visible {
   opacity: 1;
 }
 
