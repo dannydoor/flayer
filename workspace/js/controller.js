@@ -53,20 +53,29 @@ class Controller {
     this._onComplete = this._onComplete.bind(this);
     this._playBarHandler = this._playBarHandler.bind(this);
     this._playBarChangeHandler = this._playBarChangeHandler.bind(this);
+    this._repeatButtonHandler = this._repeatButtonHandler.bind(this);
+    this._shuffleButtonHandler = this._shuffleButtonHandler.bind(this);
     this._muteButtonHandler = this._muteButtonHandler.bind(this);
 
     this.setupPlayer(initObj, initContext);
 
-    this.prevButton.onmouseover = this._onMouseOverTooltip;
-    this.nextButton.onmouseover = this._onMouseOverTooltip;
-    this.openPlaylistButton.onmouseover = this._onMouseOverTooltip;
-    this.prevButton.onmouseleave = this._onMouseLeaveTooltip;
-    this.nextButton.onmouseleave = this._onMouseLeaveTooltip;
-    this.openPlaylistButton.onmouseleave = this._onMouseLeaveTooltip;
-    this.prevButton.onmousedown = this._onMouseDownSeekForeward;
-    this.nextButton.onmousedown = this._onMouseDownSeekBackward;
-    this.prevButton.onmouseup = this._onMouseUpSeek;
-    this.nextButton.onmouseup = this._onMouseUpSeek;
+    this.prevButton.onmouseover = returnBindFree(this._onMouseOverTooltip);
+    this.nextButton.onmouseover = returnBindFree(this._onMouseOverTooltip);
+    this.openPlaylistButton.onmouseover = returnBindFree(
+      this._onMouseOverTooltip
+    );
+    this.prevButton.onmouseleave = returnBindFree(this._onMouseLeaveTooltip);
+    this.nextButton.onmouseleave = returnBindFree(this._onMouseLeaveTooltip);
+    this.openPlaylistButton.onmouseleave = returnBindFree(
+      this._onMouseLeaveTooltip
+    );
+    this.prevButton.onmousedown = returnBindFree(this._onMouseDownSeekForeward);
+    this.nextButton.onmousedown = returnBindFree(this._onMouseDownSeekBackward);
+    this.prevButton.onmouseup = returnBindFree(this._onMouseUpSeek);
+    this.nextButton.onmouseup = returnBindFree(this._onMouseUpSeek);
+    this.repeatButton.onclick = returnBindFree(this._repeatButtonHandler);
+    this.shuffleButton.onclick = returnBindFree(this._shuffleButtonHandler);
+    this.muteButton.onclick = returnBindFree(this._muteButtonHandler);
 
     let playInput = this._playBarHandler;
     let playChange = this._playBarChangeHandler;
@@ -75,9 +84,6 @@ class Controller {
     this.playBar.addEventListener("input", playInput);
     this.playBar.addEventListener("change", playChange);
     this.playBar.dispatchEvent(inputEvent);
-
-    let muteHandler = this._muteButtonHandler;
-    this.muteButton.onclick = muteHandler;
   }
 
   setupPlayer(obj, context) {
@@ -145,7 +151,6 @@ class Controller {
 
     this._updatePlayerHandler();
     this._updateControlBar();
-    this._updateTooltip(true, true, true);
   }
 
   _letIncreaseStop() {
@@ -161,7 +166,7 @@ class Controller {
     function increase() {
       this.playBar.stepUp();
       [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
-        this._timeFormatter(this.playBar.value);
+        this._timeFormatter(this.playBar.value, this.duration);
     }
   }
 
@@ -495,6 +500,11 @@ class Controller {
 
     // 툴팁 정보 업데이트
     this._updateTooltip(true, true, true);
+
+    let isFirst = queueManager.isPlayingElementFirst();
+    if (isFirst) {
+      if (!this.isRepeat) jwplayer().stop();
+    }
   }
 
   _onMouseOverTooltip(e) {
@@ -558,6 +568,30 @@ class Controller {
     target.classList.remove("seeking");
     clearTimeout(target.timerID);
     clearInterval(target.timerID2);
+  }
+
+  _repeatButtonHandler() {
+    if (!this.isRepeat) {
+      this.isRepeat = true;
+      this.repeatButton.classList.add("active");
+    } else if (this.isRepeat == "one") {
+      this.isRepeat = false;
+      this.repeatButton.classList.remove("active");
+      this.repeatButton.classList.remove("one");
+    } else {
+      this.isRepeat = "one";
+      this.repeatButton.classList.add("one");
+    }
+  }
+
+  _shuffleButtonHandler() {
+    this.isShuffled = !this.isShuffled;
+    this.shuffleButton.classList.toggle("active");
+    if (this.isShuffled) {
+      queueManager.shuffleQueue();
+    } else {
+      queueManager.restoreQueue();
+    }
   }
 
   _muteButtonHandler() {
@@ -664,4 +698,9 @@ class Controller {
 
     return [currentTime, remainingTime];
   }
+}
+
+function returnBindFree(func) {
+  let newFunc = func;
+  return newFunc;
 }
