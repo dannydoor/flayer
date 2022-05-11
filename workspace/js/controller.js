@@ -139,6 +139,26 @@ class Controller {
     this.volumeBar.dispatchEvent(inputEvent);
   }
 
+  playMusic() {
+    let [upToElement, upToObj, upToContext] = queueManager.getFirstInfo();
+
+    this.loadMusic(upToObj, upToContext);
+    let musicID = this.musicID;
+    document.querySelectorAll(`[music-id=${musicID}]`).forEach((item) => {
+      item.classList.add("playing");
+    });
+
+    // next, prev 속성 업데이트
+
+    let newNextElement = upToElement.nextElementSibling;
+    if (newPrevElement) newPrevElement.classList.add("next");
+
+    queueManager.correctAttribute();
+
+    // 툴팁 정보 업데이트
+    this._updateTooltip(true, true, true);
+  }
+
   loadMusic(obj, context) {
     jwplayer().off("time");
     this._updateProperties(obj, context);
