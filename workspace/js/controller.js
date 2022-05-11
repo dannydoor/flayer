@@ -151,7 +151,7 @@ class Controller {
     // next, prev 속성 업데이트
 
     let newNextElement = upToElement.nextElementSibling;
-    if (newPrevElement) newPrevElement.classList.add("next");
+    if (newNextElement) newNextElement.classList.add("next");
 
     queueManager.correctAttribute();
 
@@ -513,8 +513,8 @@ class Controller {
       prevElement.classList.remove("prev");
     }
 
-    if (newPrevElement) newPrevElement.classList.add("next");
-    if (newNextElement) newNextElement.classList.add("prev");
+    if (newPrevElement) newPrevElement.classList.add("prev");
+    if (newNextElement) newNextElement.classList.add("next");
 
     queueManager.correctAttribute();
 
