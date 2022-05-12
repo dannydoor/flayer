@@ -90,7 +90,10 @@ class Controller {
     if (obj) {
       // 마지막 세션 세팅
       this._updateProperties(obj, context);
-      this._setupOptions.file = this.URL;
+      this._setupOptions.file =
+        "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" +
+        this.URL +
+        "/playlist.m3u8";
 
       let options = this._setupOptions;
       let update = this._updateControlBar;
@@ -164,7 +167,12 @@ class Controller {
     this._updateProperties(obj, context);
 
     let startTime = this.startTime;
-    let file = { file: this.URL };
+    let file = {
+      file:
+        "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" +
+        this.URL +
+        "/playlist.m3u8",
+    };
 
     jwplayer().once("beforePlay", () => jwplayer().seek(startTime));
     jwplayer().load(file);
