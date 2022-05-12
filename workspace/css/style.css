@@ -46,7 +46,7 @@
   box-sizing: border-box;
   margin: 0;
   user-select: none;
-  transition: box-shadow 150ms ease-in-out, opacity 150ms ease-in-out, background 150ms ease-in-out;
+  transition: box-shadow 150ms ease-in-out, opacity 150ms ease-in-out;
 }
 
 a {
@@ -501,7 +501,7 @@ body {
   background-color: var(--color-base, #fff);
 }
 
-.song-info {
+.curr-song-info {
   width: calc(100% - 120px);
   flex-grow: 1;
   flex-shrink: 1;

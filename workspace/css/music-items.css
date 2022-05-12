@@ -1,0 +1,193 @@
+@import url('style.css');
+
+.music-item {
+  display: flex;
+  position: relative;
+  align-items: center;
+  width: 320px;
+  height: 56px;
+  margin: 0;
+  padding: 12px 16px 12px 4px;
+  background-color: var(--color-base-blurred, rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(32px);
+  cursor: pointer;
+}
+
+.music-item::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 272px;
+  height: 1px;
+  background-color: var(--color-base-1, #f5f5f5);
+  right: 16px;
+  bottom: 0;
+}
+
+.music-item:hover {
+  background-color: var(--color-base-1-blurred, rgba(245, 245, 245, 0.7));
+}
+
+.music-item:active {
+  background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
+}
+
+.music-item .front-indicator {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  font: var(--font-small-bold, 700 12px/1.333333333 'NotoSans');
+  color: var(--color-ceil-2, #A9A9A9);
+  content: attr(data-index);
+  width: 24px;
+  height: 24px;
+}
+
+.music-item.library:not(.playing):hover .front-indicator,
+.music-item.playlist:not(.playing):hover .front-indicator,
+.music-item.queue:not(.playing):hover .front-indicator{
+  background: url("../assets/img/16px/Play.svg") no-repeat center/16px;
+  color: transparent;
+}
+
+.music-item.playing .front-indicator {
+  background: url("../assets/img/24px/Note.svg") no-repeat center/24px;
+  color: transparent;
+}
+
+.music-item.library.playing .song-title,
+.music-item.library.playing .song-artist,
+.music-item.playlist.playing .song-title,
+.music-item.playlist.playing .song-artist{
+  color: var(--color-primary, #595ae2);
+}
+
+.music-item .song-info {
+  display: block;
+  position: relative;
+  width: 208px;
+  height: 32px;
+  margin-left: 4px;
+}
+
+.music-item .song-title {
+  display: block;
+  width: 208px;
+  height: 17px;
+  font: var(--font-medium-bold, 700 14px/1.142857142857143 'NotoSans');
+  letter-spacing: -0.01em;
+  color: var(--color-ceil, #262626);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+
+.music-item .song-artist {
+  display: block;
+  width: 208px;
+  height: 13px;
+  font: var(--font-artist, 400 12px/1 'NotoSans');
+  letter-spacing: -0.01em;
+  color: var(--color-ceil-1, #707070);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-item .button-field {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 56px;
+  height: 24px;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.music-item .button-field button:not(.music-select) {
+  visibility: hidden;
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.music-item:hover .button-field button {
+  visibility: visible;
+}
+
+.music-item .music-meatballs {
+  background: url("../assets/img/24px/Meatballs-g.svg") no-repeat center/24px;
+  margin-left: 8px;
+}
+
+.music-item .music-meatballs:hover  {
+  visibility: visible;
+  background: url("../assets/img/24px/Meatballs-gd.svg") no-repeat center/24px;
+  background-color: var(--color-base-2, #F5F5F5);
+  background-blend-mode: multiply;
+}
+
+.music-item .music-meatballs:active {
+  visibility: visible;
+  background-color: var(--color-base-3, #EBEBEB);
+}
+
+.music-item .music-add {
+  background: url("../assets/img/24px/Add-gd.svg") no-repeat center/24px;
+}
+
+.music-item .music-add:hover {
+  visibility: visible;
+  background: url("../assets/img/24px/Add-p.svg") no-repeat center/24px;
+  background-color: var(--color-base-2, #F5F5F5);
+  background-blend-mode: multiply;
+}
+
+.music-item .music-add:active {
+  visibility: visible;
+  background-color: var(--color-base-3, #EBEBEB);
+}
+
+.music-item .music-drag {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background: url("../assets/img/24px/Drag.svg") no-repeat center/24px;
+  margin-left: 8px;
+}
+
+.music-item .music-delete {
+  background: url("../assets/img/24px/Delete-gd.svg") no-repeat center/24px;
+}
+
+.music-item .music-delete:hover {
+  visibility: visible;
+  background: url("../assets/img/24px/Delete-s.svg") no-repeat center/24px;
+}
+
+.music-item .music-delete:active {
+  visibility: visible;
+  background: url("../assets/img/24px/Delete-sd.svg") no-repeat center/24px;
+}
+
+.music-item.selected * {
+  color: var(--color-primary, #595ae2);
+}
+
+.music-item .music-select {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background: url("../assets/img/24px/Add-g.svg") no-repeat center/24px;
+  margin-left: 8px;
+}
+
+.music-item.selected .music-select {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background: url("../assets/img/24px/Done-p.svg") no-repeat center/24px;
+}
