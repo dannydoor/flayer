@@ -132,16 +132,17 @@ class Controller {
         "/playlist.m3u8";
 
       let options = this._setupOptions;
-      let update = this._updateControlBar;
+      let updateMediaSession = this._updateMediaSession;
       let startTime = this.startTime;
 
       jwplayer("video").setup(options);
       jwplayer().once("beforePlay", () => {
         jwplayer().seek(startTime);
-        update();
+        updateMediaSession();
       });
 
       this.setPlayerHandlers();
+      this._updateControlBar();
       this._updatePlayerHandler();
       this._updateTooltip(true, true, true);
     } else {
