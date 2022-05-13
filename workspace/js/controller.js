@@ -30,16 +30,52 @@ class Controller {
     this.isShuffled = initShuffle;
     this.isRepeat = initRepeat;
     this.timerID = null;
-    this.tooltipTImerID = null;
     this._setupOptions = {
       autostart: true,
       width: "100%",
       mute: false,
       controls: false,
     };
+    this._mediaSessionObj = {
+      title,
+      artist,
+      artwork: [
+        {
+          src: "../assets/img/artworks/artwork@96px.png",
+          sizes: "96x96",
+          type: "image/png",
+        },
+        {
+          src: "../assets/img/artworks/artwork@128px.png",
+          sizes: "128x128",
+          type: "image/png",
+        },
+        {
+          src: "../assets/img/artworks/artwork@192px.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "../assets/img/artworks/artwork@256px.png",
+          sizes: "256x256",
+          type: "image/png",
+        },
+        {
+          src: "../assets/img/artworks/artwork@384px.png",
+          sizes: "384x382",
+          type: "image/png",
+        },
+        {
+          src: "../assets/img/artworks/artwork@512px.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+    };
 
     this._updatePlayBar = this._updatePlayBar.bind(this);
     this._updateMuteState = this._updateMuteState.bind(this);
+    this._updateMediaSession = this._updateMediaSession.bind(this);
     this._updateControlBar = this._updateControlBar.bind(this);
     this._updateVolumeBar = this._updateVolumeBar.bind(this);
     this._updateProperties = this._updateProperties.bind(this);
@@ -107,6 +143,7 @@ class Controller {
 
       this.setPlayerHandlers();
       this._updatePlayerHandler();
+      this._updateTooltip(true, true, true);
     } else {
       // 초기화
       this._setupOptions.file =
@@ -131,6 +168,7 @@ class Controller {
 
       // 핸들러 달기
       this.setPlayerHandlers();
+      this._updateTooltip(true, true, true);
     }
     let volumeInput = this._volumeBarHandler;
     let volumeChange = this._volumeBarChangeHandler;
@@ -174,7 +212,12 @@ class Controller {
         "/playlist.m3u8",
     };
 
-    jwplayer().once("beforePlay", () => jwplayer().seek(startTime));
+    let updateMediaSession = this._updateMediaSession;
+
+    jwplayer().once("beforePlay", () => {
+      jwplayer().seek(startTime);
+      updateMediaSession();
+    });
     jwplayer().load(file);
 
     this._updatePlayerHandler();
@@ -240,6 +283,30 @@ class Controller {
     else {
       this.volumeBar.setAttribute("mute", currMuteState);
       this._toggleVolumeBarMuteState(currMuteState);
+    }
+  }
+
+  _updateMediaSession() {
+    this._mediaSessionObj.title = this.title;
+    this._mediaSessionObj.artist = this.artist;
+    metadata = this._mediaSessionObj;
+
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata(metadata);
+      navigator.mediaSession.setActionHandler("play", () => {
+        jwplayer().play();
+        navigator.mediaSession.playbackState = "playing";
+      });
+      navigator.mediaSession.setActionHandler("pause", () => {
+        jwplayer().pause();
+        navigator.mediaSession.playbackState = "paused";
+      });
+      navigator.mediaSession.setActionHandler("previoustrack", () =>
+        window("prev-button").click()
+      );
+      navigator.mediaSession.setActionHandler("nexttrack", () =>
+        window("next-button").click()
+      );
     }
   }
 
@@ -430,7 +497,7 @@ class Controller {
     }
   }
 
-  _onBuffer(e) {
+  _onBuffer() {
     this._toggleControlStatus();
   }
 
@@ -438,9 +505,14 @@ class Controller {
     let startTime = this.startTime;
     if (this.isRepeat == "one") jwplayer().seek(startTime);
     else this.nextButton.click();
+    this.nextButton.querySelector(".tooltip").classList.remove("must-visible");
   }
 
   _onPrev() {
+    let currPostion = this.playBar.value;
+
+    if (currPostion < 10) return;
+
     // 이전 곡이 없다면 시작 시간으로 이동.
     let [prevElement, prevObj, prevContext] = queueManager.getPrevInfo();
     let newPrevElement = prevElement.previousElementSibling;
@@ -586,6 +658,7 @@ class Controller {
 
       function seeking() {
         position -= SEEK_TERM;
+        position = position < 0 ? 0 : position;
         jwplayer().seek(position);
       }
     }
@@ -656,6 +729,7 @@ class Controller {
   _playBarHandler(e) {
     let value = e.target.value;
     value = (value / this.duration) * 100;
+    value = value < 0 ? 0 : value;
     e.target.style.background =
       "linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) " +
       value +
@@ -667,42 +741,6 @@ class Controller {
   _playBarChangeHandler(e) {
     let position = this.startTime + e.target.value;
     jwplayer().seek(position);
-  }
-
-  _debounce(func, ms) {
-    let timeout;
-    return function () {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, arguments), ms);
-    };
-  }
-
-  _throttle(func, ms) {
-    let isThrottled = false,
-      savedArgs,
-      savedThis;
-
-    function wrapper() {
-      if (isThrottled) {
-        savedArgs = arguments;
-        savedThis = this;
-        return;
-      }
-
-      func.apply(this, arguments);
-
-      isThrottled = true;
-
-      setTimeout(function () {
-        isThrottled = false;
-        if (savedArgs) {
-          wrapper.apply(savedThis, savedArgs);
-          savedArgs = savedThis = null;
-        }
-      }, ms);
-    }
-
-    return wrapper;
   }
 
   _timeFormatter(current, duration) {
