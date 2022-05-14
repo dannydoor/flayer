@@ -453,7 +453,7 @@
 
 .tooltip {
   position: absolute;
-  display: flex;
+  display: none;
   max-width: 240px;
   flex-direction: column;
   align-items: center;
@@ -471,6 +471,7 @@
 
 .tooltip.visible,
 .tooltip.must-visible {
+  display: flex;
   opacity: 1;
 }
 

@@ -200,12 +200,6 @@ body {
   overflow-y: auto;
 }
 
-.scrollable::-webkit-scrollbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
 .queue-item-header{
   display: flex;
   justify-content: space-between;
@@ -217,6 +211,7 @@ body {
   height: 56px;
   padding: 0 32px;
   background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
+  backdrop-filter: blur(32px);
 }
 
 .queue-desc {
