@@ -1,7 +1,7 @@
-import canUseDOM from "./can-use-dom";
+import canUseDOM from "./can-use-dom.js";
 
-import SimpleBar from "./simplebar";
-import { getOptions } from "./helpers";
+import SimpleBar from "./simplebar.js";
+import { getOptions } from "./helpers.js";
 
 SimpleBar.initDOMLoadedElements = function () {
   document.removeEventListener("DOMContentLoaded", this.initDOMLoadedElements);
@@ -99,7 +99,7 @@ SimpleBar.getOptions = getOptions;
  * HTML API
  * Called only in a browser env.
  */
-if (canUseDOM) {
+if (canUseDOM()) {
   SimpleBar.initHtmlApi();
 }
 

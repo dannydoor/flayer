@@ -1,9 +1,9 @@
-import throttle from "./lodash/throttle";
-import debounce from "./lodash/debounce";
-import memoize from "./lodash/memoize";
-import canUseDOM from "./can-use-dom";
-import scrollbarWidth from "./scrollbar-width";
-import { getElementWindow, getElementDocument } from "./helpers";
+import throttle from "./lodash/throttle.js";
+import debounce from "./lodash/debounce.js";
+import memoize from "./lodash/memoize.js";
+import canUseDOM from "./can-use-dom.js";
+import scrollbarWidth from "./scrollbar-width.js";
+import { getElementWindow, getElementDocument } from "./helpers.js";
 
 export default class SimpleBar {
   constructor(element, options) {
@@ -152,7 +152,7 @@ export default class SimpleBar {
     SimpleBar.instances.set(this.el, this);
 
     // We stop here on server-side
-    if (canUseDOM) {
+    if (canUseDOM()) {
       this.initDOM();
 
       this.setAccessibilityAttributes();
