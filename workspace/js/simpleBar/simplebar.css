@@ -140,9 +140,10 @@
 .simplebar-scrollbar:before {
   position: absolute;
   content: '';
-  background: black;
-  border-radius: 7px;
-  left: 2px;
+  background-color: #d9d9d9;
+  mix-blend-mode: multiply;
+  border-radius: 12px;
+  left: 10px;
   right: 2px;
   opacity: 0;
   transition: opacity 0.2s linear;
@@ -151,17 +152,25 @@
 .simplebar-scrollbar.simplebar-visible:before {
   /* When hovered, remove all transitions from drag handle */
   opacity: 0.5;
-  transition: opacity 0s linear;
+  transition: opacity 0s linear, left 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
 .simplebar-track.simplebar-vertical {
   top: 0;
-  width: 11px;
+  width: 16px;
 }
 
 .simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
   top: 2px;
   bottom: 2px;
+}
+
+.simplebar-scrollbar.simplebar-hover:before {
+  background-color: #a9a9a9;
+}
+
+.simplebar-dragging .simplebar-scrollbar:before {
+  left: 6px;
 }
 
 .simplebar-track.simplebar-horizontal {
