@@ -1,11 +1,58 @@
-import throttle from "./lodash/throttle.js";
-import debounce from "./lodash/debounce.js";
-import memoize from "./lodash/memoize.js";
-import canUseDOM from "./can-use-dom.js";
-import scrollbarWidth from "./scrollbar-width.js";
-import { getElementWindow, getElementDocument } from "./helpers.js";
+const getOptions = function (obj) {
+  const options = Array.prototype.reduce.call(
+    obj,
+    (acc, attribute) => {
+      const option = attribute.name.match(/data-simplebar-(.+)/);
+      if (option) {
+        const key = option[1].replace(/\W+(.)/g, (x, chr) => chr.toUpperCase());
+        switch (attribute.value) {
+          case "true":
+            acc[key] = true;
+            break;
+          case "false":
+            acc[key] = false;
+            break;
+          case undefined:
+            acc[key] = true;
+            break;
+          default:
+            acc[key] = attribute.value;
+        }
+      }
+      return acc;
+    },
+    {}
+  );
+  return options;
+};
 
-export default class SimpleBar {
+function getElementWindow(element) {
+  if (
+    !element ||
+    !element.ownerDocument ||
+    !element.ownerDocument.defaultView
+  ) {
+    return window;
+  }
+  return element.ownerDocument.defaultView;
+}
+
+function getElementDocument(element) {
+  if (!element || !element.ownerDocument) {
+    return document;
+  }
+  return element.ownerDocument;
+}
+
+function canUseDOM() {
+  return !!(
+    typeof window !== "undefined" &&
+    window.document &&
+    window.document.createElement
+  );
+}
+
+class SimpleBar {
   constructor(element, options) {
     this.el = element;
     this.minScrollbarWidth = 20;
@@ -942,3 +989,355 @@ export default class SimpleBar {
     )[0];
   }
 }
+
+SimpleBar.initDOMLoadedElements = function () {
+  document.removeEventListener("DOMContentLoaded", this.initDOMLoadedElements);
+  window.removeEventListener("load", this.initDOMLoadedElements);
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll("[data-simplebar]"),
+    (el) => {
+      if (
+        el.getAttribute("data-simplebar") !== "init" &&
+        !SimpleBar.instances.has(el)
+      )
+        new SimpleBar(el, getOptions(el.attributes));
+    }
+  );
+};
+
+SimpleBar.removeObserver = function () {
+  this.globalObserver.disconnect();
+};
+
+SimpleBar.initHtmlApi = function () {
+  this.initDOMLoadedElements = this.initDOMLoadedElements.bind(this);
+
+  // MutationObserver is IE11+
+  if (typeof MutationObserver !== "undefined") {
+    // Mutation observer to observe dynamically added elements
+    this.globalObserver = new MutationObserver(SimpleBar.handleMutations);
+
+    this.globalObserver.observe(document, { childList: true, subtree: true });
+  }
+
+  // Taken from jQuery `ready` function
+  // Instantiate elements already present on the page
+  if (
+    document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+  ) {
+    // Handle it asynchronously to allow scripts the opportunity to delay init
+    window.setTimeout(this.initDOMLoadedElements);
+  } else {
+    document.addEventListener("DOMContentLoaded", this.initDOMLoadedElements);
+    window.addEventListener("load", this.initDOMLoadedElements);
+  }
+};
+
+SimpleBar.handleMutations = (mutations) => {
+  mutations.forEach((mutation) => {
+    Array.prototype.forEach.call(mutation.addedNodes, (addedNode) => {
+      if (addedNode.nodeType === 1) {
+        if (addedNode.hasAttribute("data-simplebar")) {
+          !SimpleBar.instances.has(addedNode) &&
+            document.documentElement.contains(addedNode) &&
+            new SimpleBar(addedNode, getOptions(addedNode.attributes));
+        } else {
+          Array.prototype.forEach.call(
+            addedNode.querySelectorAll("[data-simplebar]"),
+            function (el) {
+              if (
+                el.getAttribute("data-simplebar") !== "init" &&
+                !SimpleBar.instances.has(el) &&
+                document.documentElement.contains(el)
+              )
+                new SimpleBar(el, getOptions(el.attributes));
+            }
+          );
+        }
+      }
+    });
+
+    Array.prototype.forEach.call(mutation.removedNodes, (removedNode) => {
+      if (removedNode.nodeType === 1) {
+        if (removedNode.getAttribute("data-simplebar") === "init") {
+          SimpleBar.instances.has(removedNode) &&
+            !document.documentElement.contains(removedNode) &&
+            SimpleBar.instances.get(removedNode).unMount();
+        } else {
+          Array.prototype.forEach.call(
+            removedNode.querySelectorAll('[data-simplebar="init"]'),
+            (el) => {
+              SimpleBar.instances.has(el) &&
+                !document.documentElement.contains(el) &&
+                SimpleBar.instances.get(el).unMount();
+            }
+          );
+        }
+      }
+    });
+  });
+};
+
+SimpleBar.getOptions = getOptions;
+
+/**
+ * HTML API
+ * Called only in a browser env.
+ */
+if (canUseDOM()) {
+  SimpleBar.initHtmlApi();
+}
+
+let cachedScrollbarWidth = null;
+let cachedDevicePixelRatio = null;
+
+if (canUseDOM()) {
+  window.addEventListener("resize", () => {
+    if (cachedDevicePixelRatio !== window.devicePixelRatio) {
+      cachedDevicePixelRatio = window.devicePixelRatio;
+      cachedScrollbarWidth = null;
+    }
+  });
+}
+
+function scrollbarWidth(el) {
+  if (cachedScrollbarWidth === null) {
+    const document = getElementDocument(el);
+
+    if (typeof document === "undefined") {
+      cachedScrollbarWidth = 0;
+      return cachedScrollbarWidth;
+    }
+    const body = document.body;
+    const box = document.createElement("div");
+
+    box.classList.add("simplebar-hide-scrollbar");
+
+    body.appendChild(box);
+
+    const width = box.getBoundingClientRect().right;
+
+    body.removeChild(box);
+
+    cachedScrollbarWidth = width;
+  }
+
+  return cachedScrollbarWidth;
+}
+
+function throttle(func, wait, options) {
+  let leading = true;
+  let trailing = true;
+
+  if (typeof func !== "function") {
+    throw new TypeError("Expected a function");
+  }
+  if (isObject(options)) {
+    leading = "leading" in options ? !!options.leading : leading;
+    trailing = "trailing" in options ? !!options.trailing : trailing;
+  }
+  return debounce(func, wait, {
+    leading,
+    trailing,
+    maxWait: wait,
+  });
+}
+
+function debounce(func, wait, options) {
+  let lastArgs, lastThis, maxWait, result, timerId, lastCallTime;
+
+  let lastInvokeTime = 0;
+  let leading = false;
+  let maxing = false;
+  let trailing = true;
+
+  // Bypass `requestAnimationFrame` by explicitly setting `wait=0`.
+  const useRAF =
+    !wait && wait !== 0 && typeof root.requestAnimationFrame === "function";
+
+  if (typeof func !== "function") {
+    throw new TypeError("Expected a function");
+  }
+  wait = +wait || 0;
+  if (isObject(options)) {
+    leading = !!options.leading;
+    maxing = "maxWait" in options;
+    maxWait = maxing ? Math.max(+options.maxWait || 0, wait) : maxWait;
+    trailing = "trailing" in options ? !!options.trailing : trailing;
+  }
+
+  function invokeFunc(time) {
+    const args = lastArgs;
+    const thisArg = lastThis;
+
+    lastArgs = lastThis = undefined;
+    lastInvokeTime = time;
+    result = func.apply(thisArg, args);
+    return result;
+  }
+
+  function startTimer(pendingFunc, wait) {
+    if (useRAF) {
+      root.cancelAnimationFrame(timerId);
+      return root.requestAnimationFrame(pendingFunc);
+    }
+    return setTimeout(pendingFunc, wait);
+  }
+
+  function cancelTimer(id) {
+    if (useRAF) {
+      return root.cancelAnimationFrame(id);
+    }
+    clearTimeout(id);
+  }
+
+  function leadingEdge(time) {
+    // Reset any `maxWait` timer.
+    lastInvokeTime = time;
+    // Start the timer for the trailing edge.
+    timerId = startTimer(timerExpired, wait);
+    // Invoke the leading edge.
+    return leading ? invokeFunc(time) : result;
+  }
+
+  function remainingWait(time) {
+    const timeSinceLastCall = time - lastCallTime;
+    const timeSinceLastInvoke = time - lastInvokeTime;
+    const timeWaiting = wait - timeSinceLastCall;
+
+    return maxing
+      ? Math.min(timeWaiting, maxWait - timeSinceLastInvoke)
+      : timeWaiting;
+  }
+
+  function shouldInvoke(time) {
+    const timeSinceLastCall = time - lastCallTime;
+    const timeSinceLastInvoke = time - lastInvokeTime;
+
+    // Either this is the first call, activity has stopped and we're at the
+    // trailing edge, the system time has gone backwards and we're treating
+    // it as the trailing edge, or we've hit the `maxWait` limit.
+    return (
+      lastCallTime === undefined ||
+      timeSinceLastCall >= wait ||
+      timeSinceLastCall < 0 ||
+      (maxing && timeSinceLastInvoke >= maxWait)
+    );
+  }
+
+  function timerExpired() {
+    const time = Date.now();
+    if (shouldInvoke(time)) {
+      return trailingEdge(time);
+    }
+    // Restart the timer.
+    timerId = startTimer(timerExpired, remainingWait(time));
+  }
+
+  function trailingEdge(time) {
+    timerId = undefined;
+
+    // Only invoke if we have `lastArgs` which means `func` has been
+    // debounced at least once.
+    if (trailing && lastArgs) {
+      return invokeFunc(time);
+    }
+    lastArgs = lastThis = undefined;
+    return result;
+  }
+
+  function cancel() {
+    if (timerId !== undefined) {
+      cancelTimer(timerId);
+    }
+    lastInvokeTime = 0;
+    lastArgs = lastCallTime = lastThis = timerId = undefined;
+  }
+
+  function flush() {
+    return timerId === undefined ? result : trailingEdge(Date.now());
+  }
+
+  function pending() {
+    return timerId !== undefined;
+  }
+
+  function debounced(...args) {
+    const time = Date.now();
+    const isInvoking = shouldInvoke(time);
+
+    lastArgs = args;
+    lastThis = this;
+    lastCallTime = time;
+
+    if (isInvoking) {
+      if (timerId === undefined) {
+        return leadingEdge(lastCallTime);
+      }
+      if (maxing) {
+        // Handle invocations in a tight loop.
+        timerId = startTimer(timerExpired, wait);
+        return invokeFunc(lastCallTime);
+      }
+    }
+    if (timerId === undefined) {
+      timerId = startTimer(timerExpired, wait);
+    }
+    return result;
+  }
+  debounced.cancel = cancel;
+  debounced.flush = flush;
+  debounced.pending = pending;
+  return debounced;
+}
+
+function memoize(func, resolver) {
+  if (
+    typeof func !== "function" ||
+    (resolver != null && typeof resolver !== "function")
+  ) {
+    throw new TypeError("Expected a function");
+  }
+  const memoized = function (...args) {
+    const key = resolver ? resolver.apply(this, args) : args[0];
+    const cache = memoized.cache;
+
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const result = func.apply(this, args);
+    memoized.cache = cache.set(key, result) || cache;
+    return result;
+  };
+  memoized.cache = new (memoize.Cache || Map)();
+  return memoized;
+}
+
+memoize.Cache = Map;
+
+function isObject(value) {
+  const type = typeof value;
+  return value != null && (type === "object" || type === "function");
+}
+
+const freeGlobal =
+  typeof global === "object" &&
+  global !== null &&
+  global.Object === Object &&
+  global;
+
+const freeGlobalThis =
+  typeof globalThis === "object" &&
+  globalThis !== null &&
+  globalThis.Object == Object &&
+  globalThis;
+
+/** Detect free variable `self`. */
+const freeSelf =
+  typeof self === "object" && self !== null && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+const root =
+  freeGlobalThis || freeGlobal || freeSelf || Function("return this")();

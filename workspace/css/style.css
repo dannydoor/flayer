@@ -194,6 +194,7 @@ body {
 
 .content {
   width: 100%;
+  height: calc(100% - 40px);
   flex-grow: 1;
 }
 

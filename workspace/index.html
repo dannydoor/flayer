@@ -16,7 +16,6 @@
     <script type="text/javascript" src="./js/music-items.js"></script>
     <script type="text/javascript" src="./js/controller.js"></script>
     <script type="text/javascript" src="./js/queue-manager.js"></script>
-    <script type="module" src="./js/simpleBar/simplebar.js"></script>
     <title>flayer</title>
   </head>
   <body>
@@ -29,7 +28,7 @@
             <button class="close-button"></button>
           </div>
           <div class="content">
-            <div data-simplebar>
+            <div class="scrollable" data-simplebar>
               <div class="queue-item-header record">
                 <span class="queue-desc">기록</span>
                 <span id="clear-record" class="queue-desc-sub">비우기</span>
@@ -125,5 +124,9 @@
         <button id="fullscreen-button" data-tooltip="전체화면"></button>
       </div>
     </div>
+    <script src="./js/simpleBar/simplebar.js"></script>
+    <script>
+      new SimpleBar(document.querySelector('.scrollable'))
+    </script>
   </body>
 </html>
