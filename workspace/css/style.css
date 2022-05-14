@@ -210,6 +210,7 @@ body {
   padding: 0 32px;
   background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
   backdrop-filter: blur(32px);
+  scroll-snap-align: start;
 }
 
 .queue-desc {
