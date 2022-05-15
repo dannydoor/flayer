@@ -86,8 +86,8 @@ let context = "fromis_9";
 for (let i = 0; i < 5; i++) {
   let obj = testObjArray[i];
   let type = itemType[i];
-
   let item = document.createElement("div", { is: `${type}-item` });
+
   item.setup(obj, context, i + 1);
   window["test-div"].append(item);
 }

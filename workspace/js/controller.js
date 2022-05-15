@@ -547,7 +547,7 @@ class Controller {
     });
 
     // next prev 속성 업데이트
-    let nextElement = queueManager.getNextInfo();
+    let [nextElement, ,] = queueManager.getNextInfo();
     if (nextElement) {
       nextElement.classList.remove("next");
     }
@@ -589,7 +589,7 @@ class Controller {
     });
 
     // next, prev 속성 업데이트
-    let prevElement = queueManager.getPrevInfo();
+    let [prevElement, ,] = queueManager.getPrevInfo();
     if (prevElement) {
       prevElement.classList.remove("prev");
     }

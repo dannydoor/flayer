@@ -41,7 +41,7 @@ class MusicItem extends HTMLDivElement {
     });
   }
 
-  static get musicItem() {
+  static get musicObj() {
     return this.referencedObj;
   }
 
