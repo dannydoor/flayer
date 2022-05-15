@@ -221,12 +221,13 @@ class QueueItem extends MusicItem {
     this.oncontextmenu = this._openContextMenu.bind(this);
   }
 
-  setup(obj, context) {
+  setup(obj, context, index = 0) {
     super.setup(obj);
 
     if (obj.isPlaying) this.classList.add("playing");
     this.context = context;
     this.classList.add("queue");
+    this.index = index;
   }
 
   _clickToPlay(e) {

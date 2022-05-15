@@ -73,15 +73,15 @@ class Controller {
       ],
     };
 
+    this.updateMusicToPlay = this.updateMusicToPlay.bind(this);
     this._updatePlayBar = this._updatePlayBar.bind(this);
     this._updateMuteState = this._updateMuteState.bind(this);
     this._updateMediaSession = this._updateMediaSession.bind(this);
-    this._updateMusicToPlay = this._updateMusicToPlay.bind(this);
     this._updateControlBar = this._updateControlBar.bind(this);
     this._updateVolumeBar = this._updateVolumeBar.bind(this);
     this._updateProperties = this._updateProperties.bind(this);
     this._updatePrevAndNext = this._updatePrevAndNext.bind(this);
-    this._updateTooltip = this._updateTooltip.bind(this);
+    this.updateTooltip = this.updateTooltip.bind(this);
     this._letIncreaseStop = this._letIncreaseStop.bind(this);
     this._letPlaybarIncrease = this._letPlaybarIncrease.bind(this);
     this._onPlay = this._onPlay.bind(this);
@@ -146,7 +146,7 @@ class Controller {
       this.setPlayerHandlers();
       this._updateControlBar();
       this._updatePlayerHandler();
-      this._updateTooltip(true, true, true);
+      this.updateTooltip(true, true, true);
     } else {
       // 초기화
       this._setupOptions.file =
@@ -171,7 +171,7 @@ class Controller {
 
       // 핸들러 달기
       this.setPlayerHandlers();
-      this._updateTooltip(true, true, true);
+      this.updateTooltip(true, true, true);
     }
     let volumeInput = this._volumeBarHandler;
     let volumeChange = this._volumeBarChangeHandler;
@@ -186,15 +186,8 @@ class Controller {
   playMusic() {
     let musicToPlay = queueManager.queue.firstElementChild;
 
-    musicToPlay.classList.add("current");
-    this.loadMusic(musicToPlay.referencedObj, musicToPlay.context);
-    let musicID = this.musicID;
-    document.querySelectorAll(`[music-id=${musicID}]`).forEach((item) => {
-      item.classList.add("playing");
-    });
-
-    this._updateMusicToPlay(musicToPlay);
-    this._updateTooltip(true, true, true);
+    this.updateMusicToPlay(musicToPlay);
+    this.updateTooltip(true, true, true);
     queueManager.setPlaylistName();
   }
 
@@ -273,7 +266,7 @@ class Controller {
     this.volumeBar.value = currVolume;
   }
 
-  _updateMusicToPlay(musicToPlay) {
+  updateMusicToPlay(musicToPlay) {
     this.referencedObj.isPlaying = false;
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
@@ -339,7 +332,7 @@ class Controller {
     }
   }
 
-  _updateTooltip(prev = false, next = false, playlist = false) {
+  updateTooltip(prev = false, next = false, playlist = false) {
     if (prev) {
       let prevObj = this.prevMusic?.referencedObj;
       if (prevObj) {
@@ -555,8 +548,8 @@ class Controller {
       queueManager.pushRecordStack(this.referencedObj);
     }
 
-    this._updateMusicToPlay(musicToPlay);
-    this._updateTooltip(true, true, true);
+    this.updateMusicToPlay(musicToPlay);
+    this.updateTooltip(true, true, true);
     queueManager.setPlaylistName();
   }
 
@@ -576,8 +569,8 @@ class Controller {
       queueManager.pushRecordStack(this.referencedObj);
     }
 
-    this._updateMusicToPlay(musicToPlay);
-    this._updateTooltip(true, true, true);
+    this.updateMusicToPlay(musicToPlay);
+    this.updateTooltip(true, true, true);
     queueManager.setPlaylistName();
 
     if (mustStopped) jwplayer().stop();
@@ -652,13 +645,13 @@ class Controller {
       this.isRepeat = true;
       this.repeatButton.classList.add("active");
       this._updatePrevAndNext(this.currentMusic);
-      this._updateTooltip(true, true);
+      this.updateTooltip(true, true);
     } else if (this.isRepeat == "one") {
       this.isRepeat = false;
       this.repeatButton.classList.remove("active");
       this.repeatButton.classList.remove("one");
       this._updatePrevAndNext(this.currentMusic);
-      this._updateTooltip(true, true);
+      this.updateTooltip(true, true);
     } else {
       this.isRepeat = "one";
       this.repeatButton.classList.add("one");
@@ -671,11 +664,11 @@ class Controller {
     if (this.isShuffled) {
       queueManager.shuffleQueue();
       this._updatePrevAndNext(this.currentMusic);
-      this._updateTooltip(true, true);
+      this.updateTooltip(true, true);
     } else {
       queueManager.restoreQueue();
       this._updatePrevAndNext(this.currentMusic);
-      this._updateTooltip(true, true);
+      this.updateTooltip(true, true);
     }
   }
 

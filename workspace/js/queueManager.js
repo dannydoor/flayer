@@ -110,8 +110,10 @@ class QueueManager {
     }
   }
 
-  playQueue() {
-    // 큐 아이템 클릭 시.... 음...
+  playQueue(elem) {
+    controller.updateMusicToPlay(elem);
+    controller.updateTooltip(true, true, true);
+    this.setPlaylistName();
   }
 
   _applyToQueue(obj, context) {
