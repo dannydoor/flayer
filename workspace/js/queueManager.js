@@ -33,6 +33,8 @@ class QueueManager {
     });
   }
 
+  addAfterQueue(obj, context) {}
+
   _clearRecord() {}
 
   getFirstInfo() {
@@ -67,11 +69,15 @@ class QueueManager {
 
   shuffleQueue() {}
 
-  restoreQueue() {}
+  restoreQueue() {
+    this.clearQueue();
+    let clonedReservoir = this.queueReservoir.cloneNode(true);
+    this.queue.append(clonedReservoir);
+    this.correctAttribute();
+  }
 
-  playThis() {
+  playThis(obj, context) {
     let isExistedOneKept = false;
-    let tempReservoir = new DocumentFragment();
 
     if (!this.queueStatus) {
       let howToHandleExistingQueue = modalManager.createModal("queue-play");
@@ -83,9 +89,73 @@ class QueueManager {
         isExistedOneKept = true;
       }
     }
+
+    if (isExistedOneKept) {
+      if (this._contextChecker(context) == "library") {
+        // 라이브러리 요소의 경우 그 음악만 나중에 재생.
+        this.addToRightNext(obj, context);
+        controller.nextButton.click();
+        return;
+      } else {
+        // 플레이리스트는 컨텍스트의 음악을 한꺼번에 나중에 재생.
+        let contextMusics = playlistManager.getContextList(context);
+        this.addToRightNext(
+          contextMusics,
+          context,
+          controller.isShuffled,
+          obj.id
+        );
+        return;
+      }
+    }
+
+    controller.referencedObj.isPlaying = false;
+    document.querySelectorAll(".playing").forEach((item) => {
+      item.classList.remove("playing");
+    });
+    document.querySelector(".current").classList.remove("current");
+
+    if (this._contextChecker(context) == "library") {
+      let nextObj;
+      if (!controller.isShuffled) {
+        nextObj = libraryManager.getNextMusic(obj);
+      } else {
+        nextObj = this._chooseRandom();
+      }
+      let arr = [obj, nextObj];
+      this._applyToQueue(arr, context);
+      controller.playMusic();
+      return;
+    } else {
+      let contextMusics = playlistManager.getContextList(context);
+      this._applyToQueue(contextMusics, context);
+      if (controller.isShuffled) this._shuffleQueue();
+      controller.playMusic();
+      return;
+    }
   }
 
-  playQueue() {}
+  playQueue() {
+    // 큐 아이템 클릭 시.... 음...
+  }
+
+  _applyToQueue(obj, context) {
+    this._reservoirBuilder(obj, context);
+    let clonedReservoir = this.queueReservoir.cloneNode(true);
+    this.queue.append(clonedReservoir);
+  }
+
+  _chooseRandom() {
+    // 라이브러리에서 무작위로 골라 큐에 없는 곡을 반환하는 메소드.
+  }
+
+  _contextChecker(context) {
+    return context.startsWith("Library")
+      ? "library"
+      : context.startsWith("Playlist")
+      ? "playlist"
+      : null;
+  }
 
   _setPlaylistName() {
     let playing = this.queue.querySelector(".playing");
@@ -99,6 +169,11 @@ class QueueManager {
     } else {
       this.currPlaylistName.innerHTML = "";
     }
+  }
+
+  _shuffleQueue(whole = true) {
+    // 실질적으로 섞는 메소드.
+    // whole 파라미터에 따라 일부분만 섞을 수도, 다 섞어버릴 수도 있음.
   }
 
   updateQueueStatus(bool) {

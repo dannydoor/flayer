@@ -184,6 +184,7 @@ class Controller {
   playMusic() {
     let [upToElement, upToObj, upToContext] = queueManager.getFirstInfo();
 
+    upToElement.classList.add("current");
     this.loadMusic(upToObj, upToContext);
     let musicID = this.musicID;
     document.querySelectorAll(`[music-id=${musicID}]`).forEach((item) => {
@@ -537,11 +538,13 @@ class Controller {
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
+    document.querySelector(".current").classList.remove("current");
 
     // 이전 곡 불러오기
     this.loadMusic(prevObj, prevContext);
     let prevID = this.musicID;
     prevElement.classList.remove("prev");
+    prevElement.classList.add("current");
     document.querySelectorAll(`[music-id=${prevID}]`).forEach((item) => {
       item.classList.add("playing");
     });
@@ -575,6 +578,7 @@ class Controller {
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
+    document.querySelector(".current").classList.remove("current");
 
     // next 속성 곡 정보 불러오기
     let [nextElement, nextObj, nextContext] = queueManager.getNextInfo();
@@ -584,6 +588,7 @@ class Controller {
     this.loadMusic(nextObj, nextContext);
     let nextID = this.musicID;
     nextElement.classList.remove("next");
+    nextElement.classList.add("current");
     document.querySelectorAll(`[music-id=${nextID}]`).forEach((item) => {
       item.classList.add("playing");
     });

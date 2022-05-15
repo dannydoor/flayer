@@ -122,8 +122,9 @@ class PlayableItem extends MusicItem {
 
   __clickToPlay(e) {
     if (e.defaultPrevented) return;
+    let [obj, context] = [this.referencedObj, this.context];
 
-    this._sendToPlay(this.referencedObj, this.context);
+    queueManager.playThis(obj, context);
   }
 
   _addToPlaylistForButton(e) {
@@ -131,17 +132,12 @@ class PlayableItem extends MusicItem {
 
     // playlistManager.addToPlaylist([this.referencedObj]); // 플레이리스트 매니저의 플레이리스트 추가 함수
   }
-
-  _sendToPlay(obj, context) {
-    // 재생 대기열에 정보를 보내는 메소드.
-    // queueManager.playThis(obj, context);
-    console.log("sended");
-  }
 }
 
 class LibraryItem extends PlayableItem {
   constructor() {
     super();
+    this._recordPlay = this._recordPlay.bind(this);
   }
 
   setup(obj, isRecord = false) {
@@ -152,12 +148,20 @@ class LibraryItem extends PlayableItem {
       this.context = "Library";
     } else {
       this.context = "Record";
+      this.onclick = this._recordPlay;
     }
 
     const meatballs = this.querySelector(".music-meatballs");
     let contextMenu = this._openContextMenu.bind(this);
     meatballs.onclick = contextMenu;
     this.oncontextmenu = contextMenu;
+  }
+
+  _recordPlay(e) {
+    if (e.defaultPrevented) return;
+    let [obj, context] = [this.referencedObj, this.context];
+
+    queueManager.addToRightNext(obj, context);
   }
 
   _openContextMenu(e) {
