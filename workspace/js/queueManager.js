@@ -59,11 +59,31 @@ class QueueManager {
     return playing == first;
   }
 
+  clearQueue() {
+    this.queue.children.forEach((child) => {
+      child.remove();
+    });
+  }
+
   shuffleQueue() {}
 
   restoreQueue() {}
 
-  playThis() {}
+  playThis() {
+    let isExistedOneKept = false;
+    let tempReservoir = new DocumentFragment();
+
+    if (!this.queueStatus) {
+      let howToHandleExistingQueue = modalManager.createModal("queue-play");
+      if (howToHandleExistingQueue == "canceled") return;
+      else if (howToHandleExistingQueue == "clear") {
+        this.updateQueueStatus(true);
+        this.clearQueue();
+      } else if (howToHandleExistingQueue == "keep") {
+        isExistedOneKept = true;
+      }
+    }
+  }
 
   playQueue() {}
 
@@ -79,6 +99,11 @@ class QueueManager {
     } else {
       this.currPlaylistName.innerHTML = "";
     }
+  }
+
+  updateQueueStatus(bool) {
+    this.queueStatus = bool;
+    this.statusIndicator.setAttribute("data-sync", bool);
   }
 
   pushRecordStack(obj) {
