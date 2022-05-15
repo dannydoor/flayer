@@ -76,9 +76,11 @@ class Controller {
     this._updatePlayBar = this._updatePlayBar.bind(this);
     this._updateMuteState = this._updateMuteState.bind(this);
     this._updateMediaSession = this._updateMediaSession.bind(this);
+    this._updateMusicToPlay = this._updateMusicToPlay.bind(this);
     this._updateControlBar = this._updateControlBar.bind(this);
     this._updateVolumeBar = this._updateVolumeBar.bind(this);
     this._updateProperties = this._updateProperties.bind(this);
+    this._updatePrevAndNext = this._updatePrevAndNext.bind(this);
     this._updateTooltip = this._updateTooltip.bind(this);
     this._letIncreaseStop = this._letIncreaseStop.bind(this);
     this._letPlaybarIncrease = this._letPlaybarIncrease.bind(this);
@@ -182,24 +184,18 @@ class Controller {
   }
 
   playMusic() {
-    let [upToElement, upToObj, upToContext] = queueManager.getFirstInfo();
+    let musicToPlay = queueManager.queue.firstElementChild;
 
-    upToElement.classList.add("current");
-    this.loadMusic(upToObj, upToContext);
+    musicToPlay.classList.add("current");
+    this.loadMusic(musicToPlay.referencedObj, musicToPlay.context);
     let musicID = this.musicID;
     document.querySelectorAll(`[music-id=${musicID}]`).forEach((item) => {
       item.classList.add("playing");
     });
 
-    // next, prev 속성 업데이트
-
-    let newNextElement = upToElement.nextElementSibling;
-    if (newNextElement) newNextElement.classList.add("next");
-
-    queueManager.correctAttribute();
-
-    // 툴팁 정보 업데이트
+    this._updateMusicToPlay(musicToPlay);
     this._updateTooltip(true, true, true);
+    queueManager.setPlaylistName();
   }
 
   loadMusic(obj, context) {
@@ -277,6 +273,37 @@ class Controller {
     this.volumeBar.value = currVolume;
   }
 
+  _updateMusicToPlay(musicToPlay) {
+    this.referencedObj.isPlaying = false;
+    document.querySelectorAll(".playing").forEach((item) => {
+      item.classList.remove("playing");
+    });
+    document.querySelector(".current").classList.remove("current");
+
+    this.loadMusic(musicToPlay.referencedObj, musicToPlay.context);
+    let musicID = this.musicID;
+    musicToPlay.classList.add("current");
+    document.querySelectorAll(`[music-id=${musicID}]`).forEach((item) => {
+      item.classList.add("playing");
+    });
+
+    this.currentMusic = musicToPlay;
+    this._updatePrevAndNext(musicToPlay);
+  }
+
+  _updatePrevAndNext(currentMusic) {
+    this.prevMusic = currentMusic.previousElementSibling
+      ? currentMusic.previousElementSibling
+      : this.isRepeat
+      ? queueManager.queue.lastElementChild
+      : undefined;
+    this.nextMusic = currentMusic.nextElementSibling
+      ? currentMusic.nextElementSibling
+      : this.isRepeat
+      ? queueManager.queue.firstElementChild
+      : undefined;
+  }
+
   _updateMuteState() {
     let currMuteState = jwplayer().getMute();
     let userMuteState = this.volumeBar.getAttribute("mute");
@@ -314,7 +341,7 @@ class Controller {
 
   _updateTooltip(prev = false, next = false, playlist = false) {
     if (prev) {
-      let [, prevObj] = queueManager.getPrevInfo();
+      let prevObj = this.prevMusic?.referencedObj;
       if (prevObj) {
         [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
           prevObj.title,
@@ -329,7 +356,7 @@ class Controller {
     }
 
     if (next) {
-      let [, nextObj] = queueManager.getNextInfo();
+      let nextObj = this.nextMusic?.referencedObj;
       if (nextObj) {
         [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
           nextObj.title,
@@ -513,18 +540,13 @@ class Controller {
   _onPrev() {
     let currPostion = this.playBar.value;
 
-    if (currPostion < 10) return;
-
-    // 이전 곡이 없다면 시작 시간으로 이동.
-    let [prevElement, prevObj, prevContext] = queueManager.getPrevInfo();
-    let newPrevElement = prevElement.previousElementSibling;
-    let newNextElement = prevElement.nextElementSibling;
-
-    if (!prevElement) {
+    if (currPostion < 10 || !this.prevMusic) {
       jwplayer().seek(this.startTime);
       return;
     }
 
+    let musicToPlay = this.prevMusic;
+
     let isItPlayedEnough = this._isItPlayedEnough();
 
     // 1분 이상 재생 시 재생 횟수 더하고, 기록 스택에 추가
@@ -533,38 +555,19 @@ class Controller {
       queueManager.pushRecordStack(this.referencedObj);
     }
 
-    // 현재 곡 playing 속성 제거
-    this.referencedObj.isPlaying = false;
-    document.querySelectorAll(".playing").forEach((item) => {
-      item.classList.remove("playing");
-    });
-    document.querySelector(".current").classList.remove("current");
-
-    // 이전 곡 불러오기
-    this.loadMusic(prevObj, prevContext);
-    let prevID = this.musicID;
-    prevElement.classList.remove("prev");
-    prevElement.classList.add("current");
-    document.querySelectorAll(`[music-id=${prevID}]`).forEach((item) => {
-      item.classList.add("playing");
-    });
-
-    // next prev 속성 업데이트
-    let [nextElement, ,] = queueManager.getNextInfo();
-    if (nextElement) {
-      nextElement.classList.remove("next");
-    }
-
-    if (newPrevElement) newPrevElement.classList.add("prev");
-    if (newNextElement) newNextElement.classList.add("next");
-
-    queueManager.correctAttribute();
-
-    // 툴팁 업데이트
+    this._updateMusicToPlay(musicToPlay);
     this._updateTooltip(true, true, true);
+    queueManager.setPlaylistName();
   }
 
   _onNext() {
+    let mustStopped = false;
+    let musicToPlay = this.nextMusic;
+    if (!musicToPlay) {
+      mustStopped = true;
+      musicToPlay = queueManager.queue.firstElementChild;
+    }
+
     let isItPlayedEnough = this._isItPlayedEnough();
 
     // 1분 이상 재생 시 재생 횟수 더하고, 기록 스택에 추가
@@ -573,44 +576,11 @@ class Controller {
       queueManager.pushRecordStack(this.referencedObj);
     }
 
-    // 현재 곡 playing 속성 제거
-    this.referencedObj.isPlaying = false;
-    document.querySelectorAll(".playing").forEach((item) => {
-      item.classList.remove("playing");
-    });
-    document.querySelector(".current").classList.remove("current");
-
-    // next 속성 곡 정보 불러오기
-    let [nextElement, nextObj, nextContext] = queueManager.getNextInfo();
-    let newPrevElement = nextElement.previousElementSibling;
-    let newNextElement = nextElement.nextElementSibling;
-
-    this.loadMusic(nextObj, nextContext);
-    let nextID = this.musicID;
-    nextElement.classList.remove("next");
-    nextElement.classList.add("current");
-    document.querySelectorAll(`[music-id=${nextID}]`).forEach((item) => {
-      item.classList.add("playing");
-    });
-
-    // next, prev 속성 업데이트
-    let [prevElement, ,] = queueManager.getPrevInfo();
-    if (prevElement) {
-      prevElement.classList.remove("prev");
-    }
-
-    if (newPrevElement) newPrevElement.classList.add("prev");
-    if (newNextElement) newNextElement.classList.add("next");
-
-    queueManager.correctAttribute();
-
-    // 툴팁 정보 업데이트
+    this._updateMusicToPlay(musicToPlay);
     this._updateTooltip(true, true, true);
+    queueManager.setPlaylistName();
 
-    let isFirst = queueManager.isPlayingElementFirst();
-    if (isFirst) {
-      if (!this.isRepeat) jwplayer().stop();
-    }
+    if (mustStopped) jwplayer().stop();
   }
 
   _onMouseOverTooltip(e) {
@@ -681,10 +651,14 @@ class Controller {
     if (!this.isRepeat) {
       this.isRepeat = true;
       this.repeatButton.classList.add("active");
+      this._updatePrevAndNext(this.currentMusic);
+      this._updateTooltip(true, true);
     } else if (this.isRepeat == "one") {
       this.isRepeat = false;
       this.repeatButton.classList.remove("active");
       this.repeatButton.classList.remove("one");
+      this._updatePrevAndNext(this.currentMusic);
+      this._updateTooltip(true, true);
     } else {
       this.isRepeat = "one";
       this.repeatButton.classList.add("one");
@@ -696,8 +670,12 @@ class Controller {
     this.shuffleButton.classList.toggle("active");
     if (this.isShuffled) {
       queueManager.shuffleQueue();
+      this._updatePrevAndNext(this.currentMusic);
+      this._updateTooltip(true, true);
     } else {
       queueManager.restoreQueue();
+      this._updatePrevAndNext(this.currentMusic);
+      this._updateTooltip(true, true);
     }
   }
 
@@ -773,6 +751,5 @@ class Controller {
 }
 
 function returnBindFree(func) {
-  let newFunc = func;
-  return newFunc;
+  return func;
 }

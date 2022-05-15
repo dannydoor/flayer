@@ -33,35 +33,11 @@ class QueueManager {
     });
   }
 
-  addAfterQueue(obj, context) {}
+  addToRightNext(obj, context) {}
 
   _clearRecord() {}
 
-  getFirstInfo() {
-    let first = this.queue.firstElementChild;
-    if (!first) return [null, null, null];
-    else return [first, first.musicObj, first.context];
-  }
-
-  getPrevInfo() {
-    let prev = this.queue.querySelector(".prev");
-    if (!prev) return [null, null, null];
-    else return [prev, prev.musicObj, prev.context];
-  }
-
-  getNextInfo() {
-    let next = this.queue.querySelector(".next");
-    if (!next) return [null, null, null];
-    else return [next, next.musicObj, next.context];
-  }
-
-  isPlayingElementFirst() {
-    let playing = this.queue.querySelector(".playing");
-    let first = this.queue.firstElementChild;
-    return playing == first;
-  }
-
-  clearQueue() {
+  _clearQueue() {
     this.queue.children.forEach((child) => {
       child.remove();
     });
@@ -70,10 +46,9 @@ class QueueManager {
   shuffleQueue() {}
 
   restoreQueue() {
-    this.clearQueue();
+    this._clearQueue();
     let clonedReservoir = this.queueReservoir.cloneNode(true);
     this.queue.append(clonedReservoir);
-    this.correctAttribute();
   }
 
   playThis(obj, context) {
@@ -84,7 +59,7 @@ class QueueManager {
       if (howToHandleExistingQueue == "canceled") return;
       else if (howToHandleExistingQueue == "clear") {
         this.updateQueueStatus(true);
-        this.clearQueue();
+        this._clearQueue();
       } else if (howToHandleExistingQueue == "keep") {
         isExistedOneKept = true;
       }
@@ -113,12 +88,12 @@ class QueueManager {
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
-    document.querySelector(".current").classList.remove("current");
+    controller.currentMusic.classList.remove("current");
 
     if (this._contextChecker(context) == "library") {
       let nextObj;
       if (!controller.isShuffled) {
-        nextObj = libraryManager.getNextMusic(obj);
+        nextObj = libraryManager.getNextMusic(obj); // 라이브러리 매니저가 정렬 조건에 따라 알아서 골라줌.
       } else {
         nextObj = this._chooseRandom();
       }
@@ -157,8 +132,8 @@ class QueueManager {
       : null;
   }
 
-  _setPlaylistName() {
-    let playing = this.queue.querySelector(".playing");
+  setPlaylistName() {
+    let playing = controller.currentMusic;
 
     if (!playing) return;
 
@@ -186,6 +161,4 @@ class QueueManager {
     newRecordElem.setup(obj, true);
     this.record.append(newRecordElem);
   }
-
-  correctAttribute() {}
 }
