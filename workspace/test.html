@@ -21,7 +21,7 @@
   </style>
 </head>
 <body>
-  <div class="container" id="container" data-simplebar>
+  <div class="container" id="container" data-simplebar data-simplebar-auto-hide="false">
     <div class="item"></div>
     <div class="item"></div>
     <div class="item"></div>
@@ -34,5 +34,12 @@
     <div class="item"></div>
   </div>
   <script src="./js/simpleBar/simplebar.js"></script>
+  <script>
+    function itemMaker() {
+      let newDiv = document.createElement('div');
+      newDiv.className = 'item';
+      return newDiv;
+    }
+  </script>
 </body>
 </html>
