@@ -13,7 +13,6 @@ class QueueManager {
     this.queueReservoir = queueReservoir;
     this.queueStatus = queueStatus;
     this._clearRecord = this._clearRecord.bind(this);
-    this._musicMap = new Map();
 
     if (!recordStack) this.record.append(recordStack);
     if (!queue) this.queue.append(queue);
@@ -22,30 +21,28 @@ class QueueManager {
   }
 
   _reservoirBuilder(contextArr = []) {
+    // 큐가 조작되지 않은채 라이브러리 재생 중에는 null;
     if (typeof contextArr != "Array")
       throw new TypeError("매개변수가 배열로 주어져야 합니다");
-
-    this._musicMap.clear();
 
     this.queueReservoir = new DocumentFragment();
 
     contextArr.forEach((item) => {
       let elem = document.createElement("div", { is: "queue-item" });
       elem.setup(item.musicObj, item.context);
-      this.mapManager(item, "set");
       this.queueReservoir.append(elem);
     });
   }
 
-  mapManager(item, method = "set") {
-    let key = { id: item.musicId, context: item.context };
+  /* mapManager(item, method = "set") {
+    let key = item.key;
 
     switch (method) {
       case "set":
-        this._musicMap.set(key, true);
+        setter();
         break;
       case "delete":
-        this._musicMap.delete(key);
+        deleter();
         break;
       case "check":
         let isExisting = this._musicMap.has(key);
@@ -54,11 +51,29 @@ class QueueManager {
         return;
     }
     return;
-  }
+
+    function setter() {
+      let num = this._musicMap.get(key);
+      if (!num) this._musicMap.set(key, 1);
+      else this._musicMap.set(key, ++num);
+    }
+
+    function deleter() {
+      let num = this._musicMap.get(key);
+      if (num > 1) this._musicMap.set(key, --num);
+      else this._musicMap.delete(key);
+    }
+  } */
 
   addToRightNext(obj, context) {}
 
-  _clearRecord() {}
+  _clearRecord() {
+    let sureToDelete = modalManager.createModal("clear-record");
+    if (!sureToDelete) return;
+    this.record.children.forEach((child) => {
+      child.remove();
+    });
+  }
 
   _clearQueue() {
     this.queue.children.forEach((child) => {
@@ -116,16 +131,17 @@ class QueueManager {
     if (this._contextChecker(context) == "library") {
       let nextObj;
       if (!controller.isShuffled) {
-        nextObj = libraryManager.getNextMusic(obj); // 라이브러리 매니저가 정렬 조건에 따라 알아서 골라줌.
+        nextObj = libraryManager.getNextObj(obj.id); // 라이브러리 매니저가 정렬 조건에 따라 알아서 골라줌.
       } else {
         nextObj = this._chooseRandom();
       }
       let arr = [obj, nextObj];
       this._applyToQueue(arr, context);
+      this.queueReservoir = null;
       controller.playMusic();
       return;
     } else {
-      let contextMusics = playlistManager.getContextList(context);
+      let contextMusics = playlistManager.getPlaylistContents(context);
       this._applyToQueue(contextMusics, context);
       if (controller.isShuffled) this._shuffleQueue();
       controller.playMusic();
@@ -137,6 +153,54 @@ class QueueManager {
     controller.updateMusicToPlay(elem);
     controller.updateTooltip(true, true, true);
     this.setPlaylistName();
+  }
+
+  makeUpLibraryItem() {
+    let isLibrary =
+      this._contextChecker(controller.currentInfo.context) === "library";
+    let doesNeedMakeUp = !controller.prevMusic || !controller.nextMusic;
+
+    if (!isLibrary || !doesNeedMakeUp || !this.queueStatus) return;
+
+    let target = controller.currentMusic;
+    let isShuffled = controller.isShuffled;
+
+    if (isShuffled) {
+      if (!controller.prevMusic) {
+        let newPrevObj = this._chooseRandom();
+        addBefore(newPrevObj);
+      }
+      if (!controller.nextMusic) {
+        let newNextObj = this._chooseRandom();
+        addAfter(newNextObj);
+      }
+    } else {
+      if (!controller.prevMusic) {
+        let newPrevObj = libraryManager.getPrevObj(target.musicId);
+        addBefore(newPrevObj);
+      }
+      if (!controller.nextMusic) {
+        let newNextObj = libraryManager.getNextObj(target.musicId);
+        addAfter(newNextObj);
+      }
+    }
+
+    controller.updatePrevAndNext();
+    controller.updateTooltip(true, true);
+
+    function addBefore(obj) {
+      let newPrevMusic = document.createElement("div", { is: "queue-item" });
+      newPrevMusic.setup(obj, "Library");
+
+      target.before(newPrevMusic);
+    }
+
+    function addAfter(obj) {
+      let newNextMusic = document.createElement("div", { is: "queue-item" });
+      newNextMusic.setup(obj, "Library");
+
+      target.after(newNextMusic);
+    }
   }
 
   _applyToQueue(arr, context) {
@@ -154,7 +218,7 @@ class QueueManager {
       ? "library"
       : context.startsWith("Playlist")
       ? "playlist"
-      : null;
+      : undefined;
   }
 
   setPlaylistName() {

@@ -112,7 +112,7 @@ class PlayableItem extends MusicItem {
     const addButton = this.querySelector(".music-add");
 
     addButton.onclick = this._addToPlaylistForButton.bind(this);
-    this.onclick = this.__clickToPlay.bind(this);
+    this.onclick = this.onClick.bind(this);
   }
 
   setup(obj) {
@@ -120,11 +120,10 @@ class PlayableItem extends MusicItem {
     if (obj.isPlaying) this.classList.add("playing");
   }
 
-  __clickToPlay(e) {
+  onClick(e) {
     if (e.defaultPrevented) return;
-    let [obj, context] = [this.referencedObj, this.context];
 
-    queueManager.playThis(obj, context);
+    queueManager.playThis(this.referencedObj, this.context);
   }
 
   _addToPlaylistForButton(e) {
@@ -137,39 +136,53 @@ class PlayableItem extends MusicItem {
 class LibraryItem extends PlayableItem {
   constructor() {
     super();
-    this._recordPlay = this._recordPlay.bind(this);
   }
 
-  setup(obj, isRecord = false) {
+  setup(obj) {
     super.setup(obj);
     this.classList.add("library");
 
-    if (!isRecord) {
-      this.context = "Library";
-    } else {
-      this.context = "Record";
-      this.onclick = this._recordPlay;
-    }
-
     const meatballs = this.querySelector(".music-meatballs");
-    let contextMenu = this._openContextMenu.bind(this);
+    let contextMenu = this.onContextMenu.bind(this);
     meatballs.onclick = contextMenu;
     this.oncontextmenu = contextMenu;
   }
 
-  _recordPlay(e) {
-    if (e.defaultPrevented) return;
-    let [obj, context] = [this.referencedObj, this.context];
-
-    queueManager.addToRightNext(obj, context);
-  }
-
-  _openContextMenu(e) {
+  onContextMenu(e) {
     e.preventDefault();
 
     /* let contextMenu = document.createElement("library-context");
     contextMenu.setup(this);
     this.append(contextMenu); */ // 컨텍스트 메뉴 만들어 추가.
+  }
+}
+
+class RecordItem extends PlayableItem {
+  constructor() {
+    super();
+    this.onclick = this.onClick.bind(this);
+  }
+
+  setup(obj) {
+    super.setup(obj);
+    this.classList.add("record");
+
+    this.context = "Record";
+    const meatballs = this.querySelector(".music-meatballs");
+    let contextMenu = this.onContextMenu.bind(this);
+    meatballs.onclick = contextMenu;
+    this.oncontextmenu = contextMenu;
+  }
+
+  onClick(e) {
+    if (e.defaultPrevented) return;
+
+    queueManager.playRecord(this.referencedObj);
+  }
+
+  onContextMenu(e) {
+    e.preventDefault();
+    // 컨텍스트 메뉴
   }
 }
 
@@ -189,7 +202,7 @@ class PlaylistItem extends PlayableItem {
     this.classList.add("playlist");
 
     let meatballs = this.querySelector(".music-meatballs");
-    let contextMenu = this._openContextMenu.bind(this);
+    let contextMenu = this.onContextMenu.bind(this);
     meatballs.onclick = contextMenu;
     this.oncontextmenu = contextMenu;
   }
@@ -200,7 +213,7 @@ class PlaylistItem extends PlayableItem {
     this.querySelector(".front-indicator").innerHTML = index;
   }
 
-  _openContextMenu(e) {
+  onContextMenu(e) {
     e.preventDefault();
 
     /* let contextMenu = document.createElement("playlist-context");
@@ -217,23 +230,23 @@ class QueueItem extends MusicItem {
     let deleteButton = this.querySelector(".music-delete");
 
     deleteButton.onclick = this._deleteMusic.bind(this);
-    this.onclick = this._clickToPlay.bind(this);
-    this.oncontextmenu = this._openContextMenu.bind(this);
+    this.onclick = this.onClick.bind(this);
+    this.oncontextmenu = this.onContextMenu.bind(this);
   }
 
   setup(obj, context, index = 0) {
     super.setup(obj);
 
-    if (obj.isPlaying) this.classList.add("playing");
     this.context = context;
     this.classList.add("queue");
-    this.index = index;
+    this.key = { id: this.musicId, context: this.context };
+    this.index = Date.now();
   }
 
-  _clickToPlay(e) {
+  onClick(e) {
     if (e.defaultPrevented) return;
 
-    // queueManager.playQueue(this.referencedObj, this.context); // 큐매니저에서 재생을 맡김.
+    queueManager.playQueue(this);
   }
 
   _deleteMusic(e) {
@@ -242,7 +255,7 @@ class QueueItem extends MusicItem {
     this.remove();
   }
 
-  _openContextMenu(e) {
+  onContextMenu(e) {
     e.preventDefault();
 
     /* let contextMenu = document.createElement("queue-context");
@@ -296,5 +309,6 @@ class SelectableItem extends MusicItem {
 customElements.define("library-item", LibraryItem, { extends: "div" });
 customElements.define("playlist-item", PlaylistItem, { extends: "div" });
 customElements.define("queue-item", QueueItem, { extends: "div" });
+customElements.define("record-item", RecordItem, { extends: "div" });
 customElements.define("editing-item", EditingItem, { extends: "div" });
 customElements.define("selectable-item", SelectableItem, { extends: "div" });

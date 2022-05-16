@@ -47,12 +47,14 @@
 
 .music-item.library:not(.playing):hover .front-indicator,
 .music-item.playlist:not(.playing):hover .front-indicator,
+.music-item.record:not(.playing):hover .front-indicator,
 .music-item.queue:not(.playing):hover .front-indicator{
   background: url("../assets/img/16px/Play.svg") no-repeat center/16px;
   color: transparent;
 }
 
-.music-item.playing .front-indicator {
+.music-item.library.playing .front-indicator,
+.music-item.playlist.playing .front-indicator {
   background: url("../assets/img/24px/Note.svg") no-repeat center/24px;
   color: transparent;
 }
