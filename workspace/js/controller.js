@@ -36,6 +36,19 @@ class Controller {
       mute: false,
       controls: false,
     };
+    this.currentInfo = {
+      id,
+      title,
+      artist,
+      context,
+      url,
+      startTime,
+      endTime,
+      duration,
+      isLiked,
+      reference,
+    };
+
     this._mediaSessionObj = {
       title,
       artist,
@@ -130,12 +143,12 @@ class Controller {
       this._updateProperties(obj, context);
       this._setupOptions.file =
         "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" +
-        this.URL +
+        this.currentInfo.url +
         "/playlist.m3u8";
 
       let options = this._setupOptions;
       let updateMediaSession = this._updateMediaSession;
-      let startTime = this.startTime;
+      let startTime = this.currentInfo.startTime;
 
       jwplayer("video").setup(options);
       jwplayer().once("beforePlay", () => {
@@ -195,7 +208,7 @@ class Controller {
     jwplayer().off("time");
     this._updateProperties(obj, context);
 
-    let startTime = this.startTime;
+    let startTime = this.currentInfo.startTime;
     let file = {
       file:
         "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" +
@@ -218,6 +231,7 @@ class Controller {
   _letIncreaseStop() {
     if (!this.timerID) return;
     clearInterval(this.timerID);
+    this.timerID = null;
   }
 
   _letPlaybarIncrease() {
@@ -228,22 +242,24 @@ class Controller {
     function increase() {
       this.playBar.stepUp();
       [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
-        this._timeFormatter(this.playBar.value, this.duration);
+        this._timeFormatter(this.playBar.value, this.currentInfo.duration);
     }
   }
 
   _updateControlBar() {
-    let isLiked = this.isLiked ? "liked" : "";
-    let isContextValid = this.context.startsWith("playlist:") ? true : false;
+    let isLiked = this.currentInfo.isLiked ? "liked" : "";
+    let isContextValid = this.currentInfo.context.startsWith("playlist:")
+      ? true
+      : false;
 
-    this.playBar.setAttribute("max", parseInt(this.duration));
+    this.playBar.setAttribute("max", parseInt(this.currentInfo.duration));
     this.playBar.value = 0;
     [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
-      this._timeFormatter(0, this.duration);
+      this._timeFormatter(0, this.currentInfo.duration);
     this.volumeBar.value = jwplayer().getVolume();
 
-    this.songTitleSection.innerHTML = this.title;
-    this.songArtistSection.innerHTML = this.artist;
+    this.songTitleSection.innerHTML = this.currentInfo.title;
+    this.songArtistSection.innerHTML = this.currentInfo.artist;
 
     this.likeButton.className = isLiked;
 
@@ -253,11 +269,11 @@ class Controller {
   }
 
   _updatePlayBar() {
-    let currTime = jwplayer().getPosition() - this.startTime;
+    let currTime = jwplayer().getPosition() - this.currentInfo.startTime;
     if (this.playBar.value == currTime) return;
     this.playBar.value = currTime;
     [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
-      this._timeFormatter(currTime, this.duration);
+      this._timeFormatter(currTime, this.currentInfo.duration);
   }
 
   _updateVolumeBar() {
@@ -267,14 +283,14 @@ class Controller {
   }
 
   updateMusicToPlay(musicToPlay) {
-    this.referencedObj.isPlaying = false;
+    this.currentInfo.reference.isPlaying = false;
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
     document.querySelector(".current").classList.remove("current");
 
-    this.loadMusic(musicToPlay.referencedObj, musicToPlay.context);
-    let musicID = this.musicID;
+    this.loadMusic(musicToPlay.musicObj, musicToPlay.context);
+    let musicID = this.currentInfo.id;
     musicToPlay.classList.add("current");
     document.querySelectorAll(`[music-id=${musicID}]`).forEach((item) => {
       item.classList.add("playing");
@@ -309,8 +325,8 @@ class Controller {
   }
 
   _updateMediaSession() {
-    this._mediaSessionObj.title = this.title;
-    this._mediaSessionObj.artist = this.artist;
+    this._mediaSessionObj.title = this.currentInfo.title;
+    this._mediaSessionObj.artist = this.currentInfo.artist;
     metadata = this._mediaSessionObj;
 
     if ("mediaSession" in navigator) {
@@ -334,7 +350,7 @@ class Controller {
 
   updateTooltip(prev = false, next = false, playlist = false) {
     if (prev) {
-      let prevObj = this.prevMusic?.referencedObj;
+      let prevObj = this.prevMusic?.musicObj;
       if (prevObj) {
         [this.prevSongTitle.innerHTML, this.prevSongArtist.innerHTML] = [
           prevObj.title,
@@ -349,7 +365,7 @@ class Controller {
     }
 
     if (next) {
-      let nextObj = this.nextMusic?.referencedObj;
+      let nextObj = this.nextMusic?.musicObj;
       if (nextObj) {
         [this.nextSongTitle.innerHTML, this.nextSongArtist.innerHTML] = [
           nextObj.title,
@@ -364,7 +380,9 @@ class Controller {
     }
 
     if (playlist) {
-      let currPlaylistName = playlistManager.getPlaylistName(this.context);
+      let currPlaylistName = playlistManager.getPlaylistName(
+        this.currentInfo.context
+      );
       if (currPlaylistName) {
         this.currentPlaylist.innerHTML = currPlaylistName;
       } else {
@@ -379,21 +397,21 @@ class Controller {
   }
 
   _updateProperties(obj, context) {
-    this.musicID = obj.id;
-    this.title = obj.title;
-    this.artist = obj.artist;
-    this.context = context;
-    this.URL =
+    this.currentInfo.id = obj.id;
+    this.currentInfo.title = obj.title;
+    this.currentInfo.artist = obj.artist;
+    this.currentInfo.context = context;
+    this.currentInfo.url =
       "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" +
       obj.src +
       "/playlist.m3u8";
     // this.URL = 'http://media.dema.mnd.mil:1935/vod/_definst_/mp4:DIMOS/' + obj.src + '/playlist.m3u8'; 인트라넷 버전
-    this.startTime = obj.startTime;
-    this.endTime = obj.endTime;
-    this.duration = obj.duration;
-    this.isLiked = obj.isLiked;
-    this.referencedObj = obj;
-    this.referencedObj.isPlaying = true;
+    this.currentInfo.startTime = obj.startTime;
+    this.currentInfo.endTime = obj.endTime;
+    this.currentInfo.duration = obj.duration;
+    this.currentInfo.isLiked = obj.isLiked;
+    this.currentInfo.reference = obj;
+    this.currentInfo.reference.isPlaying = true;
   }
 
   setPlayerHandlers() {
@@ -502,8 +520,8 @@ class Controller {
   }
 
   _onTime(e) {
-    let startTime = this.startTime;
-    let endTime = this.endTime;
+    let startTime = this.currentInfo.startTime;
+    let endTime = this.currentInfo.endTime;
     let currTime = e.position;
 
     if (currTime < startTime) {
@@ -524,7 +542,7 @@ class Controller {
   }
 
   _onComplete() {
-    let startTime = this.startTime;
+    let startTime = this.currentInfo.startTime;
     if (this.isRepeat == "one") jwplayer().seek(startTime);
     else this.nextButton.click();
     this.nextButton.querySelector(".tooltip").classList.remove("must-visible");
@@ -534,7 +552,7 @@ class Controller {
     let currPostion = this.playBar.value;
 
     if (currPostion < 10 || !this.prevMusic) {
-      jwplayer().seek(this.startTime);
+      jwplayer().seek(this.currentInfo.startTime);
       return;
     }
 
@@ -544,8 +562,8 @@ class Controller {
 
     // 1분 이상 재생 시 재생 횟수 더하고, 기록 스택에 추가
     if (isItPlayedEnough) {
-      this.referencedObj.playedTime++;
-      queueManager.pushRecordStack(this.referencedObj);
+      this.currentInfo.reference.playedTime++;
+      queueManager.pushRecordStack(this.currentInfo.reference);
     }
 
     this.updateMusicToPlay(musicToPlay);
@@ -565,8 +583,8 @@ class Controller {
 
     // 1분 이상 재생 시 재생 횟수 더하고, 기록 스택에 추가
     if (isItPlayedEnough) {
-      this.referencedObj.playedTime++;
-      queueManager.pushRecordStack(this.referencedObj);
+      this.currentInfo.reference.playedTime++;
+      queueManager.pushRecordStack(this.currentInfo.reference);
     }
 
     this.updateMusicToPlay(musicToPlay);
@@ -588,7 +606,7 @@ class Controller {
 
   _onMouseLeaveTooltip(e) {
     clearTimeout(e.target.timerID);
-
+    e.target.timerID = null;
     e.target.querySelector(".tooltip").classList.remove("visible");
   }
 
@@ -638,6 +656,8 @@ class Controller {
     target.classList.remove("seeking");
     clearTimeout(target.timerID);
     clearInterval(target.timerID2);
+    target.timerID = null;
+    target.timerID2 = null;
   }
 
   _repeatButtonHandler() {
@@ -705,7 +725,7 @@ class Controller {
 
   _playBarHandler(e) {
     let value = e.target.value;
-    value = (value / this.duration) * 100;
+    value = (value / this.currentInfo.duration) * 100;
     value = value < 0 ? 0 : value;
     e.target.style.background =
       "linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) " +
@@ -716,7 +736,7 @@ class Controller {
   }
 
   _playBarChangeHandler(e) {
-    let position = this.startTime + e.target.value;
+    let position = this.currentInfo.startTime + e.target.value;
     jwplayer().seek(position);
   }
 

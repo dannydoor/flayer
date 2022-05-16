@@ -13,6 +13,7 @@ class QueueManager {
     this.queueReservoir = queueReservoir;
     this.queueStatus = queueStatus;
     this._clearRecord = this._clearRecord.bind(this);
+    this._musicMap = new Map();
 
     if (!recordStack) this.record.append(recordStack);
     if (!queue) this.queue.append(queue);
@@ -22,15 +23,37 @@ class QueueManager {
 
   _reservoirBuilder(contextArr = []) {
     if (typeof contextArr != "Array")
-      throw new Error("매개변수가 배열로 주어져야 합니다");
+      throw new TypeError("매개변수가 배열로 주어져야 합니다");
+
+    this._musicMap.clear();
 
     this.queueReservoir = new DocumentFragment();
 
     contextArr.forEach((item) => {
       let elem = document.createElement("div", { is: "queue-item" });
-      elem.setup(item.obj, item.context);
+      elem.setup(item.musicObj, item.context);
+      this.mapManager(item, "set");
       this.queueReservoir.append(elem);
     });
+  }
+
+  mapManager(item, method = "set") {
+    let key = { id: item.musicId, context: item.context };
+
+    switch (method) {
+      case "set":
+        this._musicMap.set(key, true);
+        break;
+      case "delete":
+        this._musicMap.delete(key);
+        break;
+      case "check":
+        let isExisting = this._musicMap.has(key);
+        return isExisting;
+      default:
+        return;
+    }
+    return;
   }
 
   addToRightNext(obj, context) {}
@@ -84,7 +107,7 @@ class QueueManager {
       }
     }
 
-    controller.referencedObj.isPlaying = false;
+    controller.currentInfo.reference.isPlaying = false;
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
@@ -116,8 +139,8 @@ class QueueManager {
     this.setPlaylistName();
   }
 
-  _applyToQueue(obj, context) {
-    this._reservoirBuilder(obj, context);
+  _applyToQueue(arr, context) {
+    this._reservoirBuilder(arr, context);
     let clonedReservoir = this.queueReservoir.cloneNode(true);
     this.queue.append(clonedReservoir);
   }

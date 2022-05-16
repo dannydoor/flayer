@@ -171,6 +171,7 @@
 
 .simplebar-dragging .simplebar-scrollbar:before {
   left: 6px;
+  background-color: #a9a9a9;
 }
 
 .simplebar-track.simplebar-horizontal {
