@@ -280,7 +280,29 @@ class QueueManager {
 
   _shuffleQueue(whole = true) {
     // 실질적으로 섞는 메소드.
-    // whole 파라미터에 따라 일부분만 섞을 수도, 다 섞어버릴 수도 있음.
+    let shuffleTarget = new DocumentFragment();
+    if (whole) {
+      while (this.queue.firstElementChild) {
+        shuffleTarget.append(this.queue.firstElementChild);
+      }
+    } else {
+      while (controller.currentMusic.nextElementSibling) {
+        shuffleTarget.append(controller.correntMusic.nextElementSibling);
+      }
+    }
+
+    let shuffleArr = Array.from(shuffleTarget);
+    // 피셔-에이츠 알고리즘
+    for (let i = shuffleArr.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [shuffleArr[i], shuffleArr[j]] = [shuffleArr[j], shuffleArr[i]];
+    }
+
+    shuffleArr.forEach((item) => {
+      this.queue.append(item);
+    });
+    // documentFragment를 지우기.
+    shuffleTarget = null;
   }
 
   updateQueueStatus(bool) {
