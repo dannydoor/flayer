@@ -14,11 +14,14 @@ class QueueManager {
     this.queueStatus = queueStatus;
     this._clearRecord = this._clearRecord.bind(this);
     this.onReorder = this.onReorder.bind(this);
+    this._musicMap = new Map();
 
     if (!recordStack) this.record.append(recordStack);
     if (!queue) this.queue.append(queue);
     this.statusIndicator.setAttribute("data-sync", queueStatus);
     this.clearButton.onclick = this._clearRecord;
+
+    this.setupQueueSlip();
   }
 
   _reservoirBuilder(contextArr = []) {
@@ -40,19 +43,18 @@ class QueueManager {
 
     switch (method) {
       case "set":
-        setter();
+        this._musicMap.set(key, true);
         break;
       case "delete":
-        deleter();
+        this._musicMap.delete(key);
         break;
       case "check":
-        let isExisting = this._musicMap.has(key);
-        return isExisting;
+        return this._musicMap.has(key);
       default:
         return;
     }
     return;
-
+    
     function setter() {
       let num = this._musicMap.get(key);
       if (!num) this._musicMap.set(key, 1);
@@ -63,8 +65,8 @@ class QueueManager {
       let num = this._musicMap.get(key);
       if (num > 1) this._musicMap.set(key, --num);
       else this._musicMap.delete(key);
-    }
-  } */
+    } 
+  }*/
 
   addToRightNext(obj, context) {}
 
@@ -94,6 +96,8 @@ class QueueManager {
     this.queue.addEventListener("slip:reorder", function (e) {
       this.onReorder(e.target, e.detail.insertBefore);
     });
+
+    new Slip(this.queue);
   }
 
   onReorder(elem, newNextElem) {
@@ -128,9 +132,11 @@ class QueueManager {
   shuffleQueue() {}
 
   restoreQueue() {
+    let currentKey = this.queue.querySelector(".current").key;
     this._clearQueue();
     let clonedReservoir = this.queueReservoir.cloneNode(true);
     this.queue.append(clonedReservoir);
+    this.queue.querySelector(`[key=${currentKey}]`).classList.add("current");
   }
 
   playThis(obj, context) {
@@ -234,6 +240,7 @@ class QueueManager {
     function addBefore(obj) {
       let newPrevMusic = document.createElement("div", { is: "queue-item" });
       newPrevMusic.setup(obj, "Library");
+      this._musicMap(newPrevMusic.key, "set");
 
       target.before(newPrevMusic);
     }
@@ -241,6 +248,7 @@ class QueueManager {
     function addAfter(obj) {
       let newNextMusic = document.createElement("div", { is: "queue-item" });
       newNextMusic.setup(obj, "Library");
+      this._musicMap(newNextMusic.key, "set");
 
       target.after(newNextMusic);
     }
@@ -254,6 +262,7 @@ class QueueManager {
 
   _chooseRandom() {
     // 라이브러리에서 무작위로 골라 큐에 없는 곡을 반환하는 메소드.
+    libraryManager.objArray;
   }
 
   _contextChecker(context) {

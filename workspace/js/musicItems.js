@@ -241,6 +241,7 @@ class QueueItem extends MusicItem {
     this.classList.add("queue");
     this.key = { id: this.musicId, context: this.context };
     this.index = Date.now();
+    this.setAttribute("key", this.key);
     this.setAttribute("index", this.index);
   }
 
