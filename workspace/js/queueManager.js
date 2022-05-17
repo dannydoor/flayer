@@ -13,6 +13,7 @@ class QueueManager {
     this.queueReservoir = queueReservoir;
     this.queueStatus = queueStatus;
     this._clearRecord = this._clearRecord.bind(this);
+    this.onReorder = this.onReorder.bind(this);
 
     if (!recordStack) this.record.append(recordStack);
     if (!queue) this.queue.append(queue);
@@ -70,15 +71,58 @@ class QueueManager {
   _clearRecord() {
     let sureToDelete = modalManager.createModal("clear-record");
     if (!sureToDelete) return;
-    this.record.children.forEach((child) => {
-      child.remove();
-    });
+    this.record.innerHTML = "";
   }
 
   _clearQueue() {
-    this.queue.children.forEach((child) => {
-      child.remove();
+    this.queue.innerHTML = "";
+  }
+
+  setupQueueSlip() {
+    this.queue.addEventListener("slip:beforeswipe", function (e) {
+      e.preventDefault();
     });
+
+    this.queue.addEventListener("slip:swipe", function (e) {
+      e.preventDefault();
+    });
+
+    this.queue.addEventListener("slip:beforewait", function (e) {
+      if (e.target.classList.contains("music-drag")) e.preventDefault();
+    });
+
+    this.queue.addEventListener("slip:reorder", function (e) {
+      this.onReorder(e.target, e.detail.insertBefore);
+    });
+  }
+
+  onReorder(elem, newNextElem) {
+    let origNextElem = elem.nextElementSibling;
+    if (origNextElem == newNextElem) return;
+
+    if (this.queueStatus) this.updateQueueStatus(false);
+
+    let elemIndex = elem.index;
+    let nextIndex = newNextElem.index;
+
+    if (!this.queueReservoir) {
+      // 저장고가 비워져있을 경우 큐를 복사해서 새로 만들어줌.
+      this.queueReservoir = new DocumentFragment();
+      let clonedQueue = this.queue.cloneNode(true);
+      this.queueReservoir.append(clonedQueue);
+    }
+
+    let reservoirElem = this.queueReservoir.querySelector(
+      `[index=${elemIndex}]`
+    );
+    let reservoirNext = this.queueReservoir.querySelector(
+      `[index=${nextIndex}]`
+    );
+
+    newNextElem.before(elem);
+    reservoirNext.before(reservoirElem);
+
+    this.updateController();
   }
 
   shuffleQueue() {}
@@ -185,8 +229,7 @@ class QueueManager {
       }
     }
 
-    controller.updatePrevAndNext();
-    controller.updateTooltip(true, true);
+    this.updateController();
 
     function addBefore(obj) {
       let newPrevMusic = document.createElement("div", { is: "queue-item" });
@@ -243,6 +286,11 @@ class QueueManager {
   updateQueueStatus(bool) {
     this.queueStatus = bool;
     this.statusIndicator.setAttribute("data-sync", bool);
+  }
+
+  updateController() {
+    controller.updatePrevAndNext();
+    controller.updateTooltip(true, true);
   }
 
   pushRecordStack(obj) {
