@@ -297,6 +297,7 @@ class Controller {
     });
 
     this.currentMusic = musicToPlay;
+    queueManager.makeUpLibraryItem();
     this._updatePrevAndNext(musicToPlay);
   }
 
@@ -415,21 +416,13 @@ class Controller {
   }
 
   setPlayerHandlers() {
-    let onSeekedHandler = this._updatePlayBar;
-    let onPlayHandler = this._onPlay;
-    let onPauseHandler = this._onPause;
-    let onBufferHandler = this._onBuffer;
-    let onCompleteHandler = this._onComplete;
-    let onVolumeHandler = this._updateVolumeBar;
-    let onMuteHandler = this._updateMuteState;
-
-    jwplayer().on("seeked", onSeekedHandler);
-    jwplayer().on("play", onPlayHandler);
-    jwplayer().on("pause", onPauseHandler);
-    jwplayer().on("buffer", onBufferHandler);
-    jwplayer().on("complete", onCompleteHandler);
-    jwplayer().on("volume", onVolumeHandler);
-    jwplayer().on("mute", onMuteHandler);
+    jwplayer().on("seeked", this._updatePlayBar);
+    jwplayer().on("play", this._onPlay);
+    jwplayer().on("pause", this._onPause);
+    jwplayer().on("buffer", this._onBuffer);
+    jwplayer().on("complete", this._onComplete);
+    jwplayer().on("volume", this._updateVolumeBar);
+    jwplayer().on("mute", this._updateMuteState);
   }
 
   _isItPlayedEnough() {
@@ -572,10 +565,10 @@ class Controller {
   }
 
   _onNext() {
-    let mustStopped = false;
+    let mustStop = false;
     let musicToPlay = this.nextMusic;
     if (!musicToPlay) {
-      mustStopped = true;
+      mustStop = true;
       musicToPlay = queueManager.queue.firstElementChild;
     }
 
@@ -591,7 +584,7 @@ class Controller {
     this.updateTooltip(true, true, true);
     queueManager.setPlaylistName();
 
-    if (mustStopped) jwplayer().stop();
+    if (mustStop) jwplayer().stop();
   }
 
   _onMouseOverTooltip(e) {
