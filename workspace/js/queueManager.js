@@ -15,6 +15,7 @@ class QueueManager {
     this._clearRecord = this._clearRecord.bind(this);
     this.onReorder = this.onReorder.bind(this);
     this.makeUpLibraryItem = this.makeUpLibraryItem.bind(this);
+    this.mapManager = this.mapManager.bind(this);
     this._musicMap = new Map();
 
     if (!recordStack) this.record.append(recordStack);
@@ -35,20 +36,20 @@ class QueueManager {
     contextArr.forEach((item) => {
       let elem = document.createElement("div", { is: "queue-item" });
       elem.setup(item.musicObj, item.context);
-      this._musicMap.set(elem.musicId, true);
+      this.mapManager(item.musicObj, "set");
       this.queueReservoir.append(elem);
     });
   }
 
-  /* mapManager(item, method = "set") {
-    let key = item.musicId;
+  mapManager(obj, method = "set") {
+    let key = obj.id;
 
     switch (method) {
       case "set":
-        this._musicMap.set(key, true);
+        setter();
         break;
       case "delete":
-        this._musicMap.delete(key);
+        deleter();
         break;
       case "check":
         return this._musicMap.has(key);
@@ -56,7 +57,7 @@ class QueueManager {
         return;
     }
     return;
-    
+
     function setter() {
       let num = this._musicMap.get(key);
       if (!num) this._musicMap.set(key, 1);
@@ -67,8 +68,8 @@ class QueueManager {
       let num = this._musicMap.get(key);
       if (num > 1) this._musicMap.set(key, --num);
       else this._musicMap.delete(key);
-    } 
-  }*/
+    }
+  }
 
   addToRightNext(obj, context) {}
 
@@ -108,9 +109,6 @@ class QueueManager {
 
     if (this.queueStatus) this.updateQueueStatus(false);
 
-    let elemIndex = elem.index;
-    let nextIndex = newNextElem.index;
-
     if (!this.queueReservoir) {
       // 저장고가 비워져있을 경우 큐를 복사해서 새로 만들어줌.
       this.queueReservoir = new DocumentFragment();
@@ -123,9 +121,50 @@ class QueueManager {
     this.updateController();
   }
 
-  shuffleQueue() {}
+  clearBeforeAfter() {
+    while (controller.currentMusic.nextElementSibling) {
+      // 다음 음악 비우기
+      let target = controller.correntMusic.nextElementSibling;
+      this.mapManager(target.musicObj, "delete");
+      target.remove();
+    }
+
+    while (controller.currentMusic.prevElementSibling) {
+      // 이전 음악 비우기
+      let target = controller.correntMusic.prevElementSibling;
+      this.mapManager(target.musicObj, "delete");
+      target.remove();
+    }
+  }
+
+  shuffleQueue() {
+    if (!this.queueReservoir) {
+      // 온전히 라이브러리 재생 중이라는 뜻.
+      this.clearBeforeAfter();
+      this.makeUpLibraryItem();
+      return;
+    }
+
+    if (!controller.isRepeat) {
+      this._shuffleQueue(false);
+    } else {
+      this._shuffleQueue(true);
+      let currentMusic = this.queue.querySelector(".current");
+      this.queue.prepend(currentMusic);
+      controller.currentMusic = currentMusic;
+    }
+
+    this.updateController();
+  }
 
   restoreQueue() {
+    if (!this.queueReservoir) {
+      // 온전히 라이브러리 재생 중이라는 뜻.
+      this.clearBeforeAfter();
+      this.makeUpLibraryItem();
+      return;
+    }
+
     let currentIndex = this.queue.querySelector(".current").index;
     this._clearQueue();
     let clonedReservoir = this.queueReservoir.cloneNode(true);
@@ -133,6 +172,7 @@ class QueueManager {
     this.queue
       .querySelector(`[index=${currentIndex}]`)
       .classList.add("current");
+    controller.currentMusic = this.queue.querySelector(".current");
     this.updateController();
   }
 
@@ -144,7 +184,7 @@ class QueueManager {
       if (howToHandleExistingQueue == "canceled") return;
       else if (howToHandleExistingQueue == "clear") {
         Array.prototype.forEach.call(this.queue.children, (elem) => {
-          this._musicMap.delete(elem.musicId);
+          this.mapManager(elem.musicObj, "delete");
         });
         this.updateQueueStatus(true);
         this._clearQueue();
@@ -153,7 +193,7 @@ class QueueManager {
       }
     } else {
       Array.prototype.forEach.call(this.queue.children, (elem) => {
-        this._musicMap.delete(elem.musicId);
+        this.mapManager(elem.musicObj, "delete");
       });
       this._clearQueue();
     }
@@ -228,7 +268,7 @@ class QueueManager {
       this._contextChecker(controller.currentInfo.context) === "library";
     let doesNeedMakeUp = !controller.prevMusic || !controller.nextMusic;
 
-    if (!isLibrary || !doesNeedMakeUp || !this.queueStatus) return;
+    if (!isLibrary || !doesNeedMakeUp || this.queueStatus) return;
 
     let target = controller.currentMusic;
     let isShuffled = controller.isShuffled;
@@ -258,7 +298,7 @@ class QueueManager {
     function addBefore(obj) {
       let newPrevMusic = document.createElement("div", { is: "queue-item" });
       newPrevMusic.setup(obj, "Library");
-      this._musicMap.set(newPrevMusic.musicId);
+      this.mapManager(newPrevMusic.musicObj, "set");
 
       target.before(newPrevMusic);
     }
@@ -266,7 +306,7 @@ class QueueManager {
     function addAfter(obj) {
       let newNextMusic = document.createElement("div", { is: "queue-item" });
       newNextMusic.setup(obj, "Library");
-      this._musicMap.set(newNextMusic.musicId);
+      this.mapManager(newNextMusic.musicObj, "set");
 
       target.after(newNextMusic);
     }
@@ -287,7 +327,7 @@ class QueueManager {
 
     while (!caught) {
       let target = arr[Math.floor(Math.random * length)];
-      if (this._musicMap.has(target.id)) {
+      if (this.mapManager(target, "check")) {
         continue;
       } else {
         caught = true;

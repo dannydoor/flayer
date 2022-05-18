@@ -287,7 +287,9 @@ class Controller {
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
-    document.querySelector(".current").classList.remove("current");
+    document.querySelectorAll(".current").forEach((item) => {
+      item.classList.remove("current");
+    });
 
     this.loadMusic(musicToPlay.musicObj, musicToPlay.context);
     let musicID = this.currentInfo.id;
