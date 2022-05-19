@@ -142,6 +142,8 @@ class LibraryItem extends PlayableItem {
     super.setup(obj);
     this.classList.add("library");
 
+    this.context = "Library";
+    this.setAttribute("context", this.context);
     const meatballs = this.querySelector(".music-meatballs");
     let contextMenu = this.onContextMenu.bind(this);
     meatballs.onclick = contextMenu;
@@ -168,6 +170,7 @@ class RecordItem extends PlayableItem {
     this.classList.add("record");
 
     this.context = "Record";
+    this.setAttribute("context", this.context);
     const meatballs = this.querySelector(".music-meatballs");
     let contextMenu = this.onContextMenu.bind(this);
     meatballs.onclick = contextMenu;
@@ -199,6 +202,7 @@ class PlaylistItem extends PlayableItem {
     this.context += context;
     this.index = index;
     this.querySelector(".front-indicator").innerHTML = index;
+    this.setAttribute("context", this.context);
     this.classList.add("playlist");
 
     let meatballs = this.querySelector(".music-meatballs");
@@ -241,6 +245,7 @@ class QueueItem extends MusicItem {
     this.classList.add("queue");
     this.key = { id: this.musicId, context: this.context };
     this.index = Date.now();
+    this.setAttribute("context", this.context);
     this.setAttribute("key", this.key);
     this.setAttribute("index", this.index);
   }
