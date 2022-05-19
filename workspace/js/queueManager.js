@@ -1,7 +1,7 @@
 class QueueManager {
   constructor(
     recordStack = null,
-    queueReservoir = null,
+    queueRepository = null,
     queue = null,
     queueStatus = true
   ) {
@@ -10,7 +10,7 @@ class QueueManager {
     this.statusIndicator = document.querySelector("#queue-status");
     this.clearButton = document.querySelector("#clear-record");
     this.currPlaylistName = document.querySelector("#curr-playlist-name");
-    this.queueReservoir = queueReservoir;
+    this.queueRepository = queueRepository;
     this.queueStatus = queueStatus;
     this._clearRecord = this._clearRecord.bind(this);
     this.onReorder = this.onReorder.bind(this);
@@ -18,11 +18,11 @@ class QueueManager {
     this.mapManager = this.mapManager.bind(this);
     this._musicMap = new Map();
 
-    if (!recordStack) this.record.append(recordStack);
-    if (!queue) this.queue.append(queue);
-    this.statusIndicator.setAttribute("data-sync", queueStatus);
+    if (recordStack) this.record.append(recordStack);
+    if (queue) this.queue.append(queue);
     this.clearButton.onclick = this._clearRecord;
 
+    this.updateQueueStatus(queueStatus);
     this.setupQueueSlip();
   }
 
@@ -30,22 +30,30 @@ class QueueManager {
     return this.queue.querySelector(".current");
   }
 
-  _reservoirBuilder(target, context) {
+  static get queueFirstChild() {
+    return this.queue.firstElementChild;
+  }
+
+  static get queueLastChild() {
+    return this.queue.lastElementChild;
+  }
+
+  _repositoryBuilder(target, context) {
     // 큐가 조작되지 않은채 라이브러리 재생 중에는 null;
-    this.queueReservoir = new DocumentFragment();
+    this.queueRepository = new DocumentFragment();
 
     if (Array.isArray(target)) {
       target.forEach((itemObj) => {
         let elem = document.createElement("div", { is: "queue-item" });
         elem.setup(itemObj, context);
         this.mapManager(itemObj, "set");
-        this.queueReservoir.append(elem);
+        this.queueRepository.append(elem);
       });
     } else {
       let elem = document.createElement("div", { is: "queue-item" });
       elem.setup(target, context);
       this.mapManager(target, "set");
-      this.queueReservoir.append(elem);
+      this.queueRepository.append(elem);
     }
   }
 
@@ -79,7 +87,62 @@ class QueueManager {
     }
   }
 
-  addToRightNext(target, context, isShuffled = false, startId) {
+  playRightNext(target, context, isShuffled = false, startId = null) {
+    if (this.queueStatus) this.updateQueueStatus(false);
+
+    let currentMusicInQueue = this.currentMusic;
+    let currentMusicInRepository = this.queueRepository.querySelector(
+      `[index=${currentMusicInQueue.index}]`
+    );
+    let tempFragment = new DocumentFragment();
+
+    if (Array.isArray(target)) {
+      // 배열로 작업
+      target.forEach((itemObj) => {
+        let elem = document.createElement("div", { is: "queue-item" });
+        elem.setup(itemObj, context);
+        this.mapManager(elem.musicObj, "set");
+        tempFragment.append(elem);
+      });
+    } else {
+      // 하나만 작업
+      let elem = document.createElement("div", { is: "queue-item" });
+      elem.setup(target, context);
+      this.mapManager(elem.musicObj, "set");
+      tempFragment.append(elem);
+    }
+
+    currentMusicInRepository.append(tempFragment.cloneNode(true));
+
+    if (isShuffled) {
+      shuffle();
+      if (startId) {
+        let nextMusic = tempFragment.querySelector(`[music-id=${startId}]`);
+        tempFragment.prepend(nextMusic);
+        currentMusicInQueue.after(tempFragment);
+
+        controller.nextButton.click();
+
+        tempFragment = null;
+        return;
+      }
+    }
+
+    currentMusicInQueue.after(tempFragment);
+    tempFragment = null;
+    return;
+
+    function shuffle() {
+      let arr = Array.from(tempFragment);
+      for (let i = arr.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random * (i - 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      arr.forEach((item) => tempFragment.append(item));
+    }
+  }
+
+  playLater(target, context) {
     if (this.queueStatus) this.updateQueueStatus(false);
 
     let tempFragment = new DocumentFragment();
@@ -99,6 +162,11 @@ class QueueManager {
       this.mapManager(elem.musicObj, "set");
       tempFragment.append(elem);
     }
+
+    this.queueRepository.append(tempFragment.cloneNode(true));
+    this.queue.append(tempFragment);
+    tempFragment = null;
+    return;
   }
 
   _clearRecord() {
@@ -157,7 +225,7 @@ class QueueManager {
   }
 
   shuffleQueue() {
-    if (!this.queueReservoir) {
+    if (!this.queueRepository) {
       // 온전히 라이브러리 재생 중이라는 뜻.
       this.clearBeforeAfter();
       this.makeUpLibraryItem();
@@ -174,7 +242,7 @@ class QueueManager {
   }
 
   restoreQueue() {
-    if (!this.queueReservoir) {
+    if (!this.queueRepository) {
       // 온전히 라이브러리 재생 중이라는 뜻.
       this.clearBeforeAfter();
       this.makeUpLibraryItem();
@@ -183,8 +251,8 @@ class QueueManager {
 
     let currentIndex = this.queue.querySelector(".current").index;
     this._clearQueue();
-    let clonedReservoir = this.queueReservoir.cloneNode(true);
-    this.queue.append(clonedReservoir);
+    let clonedRepository = this.queueRepository.cloneNode(true);
+    this.queue.append(clonedRepository);
     this.queue
       .querySelector(`[index=${currentIndex}]`)
       .classList.add("current");
@@ -215,13 +283,13 @@ class QueueManager {
     if (isExistedOneKept) {
       if (this._contextChecker(context) == "library") {
         // 라이브러리 요소의 경우 그 음악만 나중에 재생.
-        this.addToRightNext(obj, context);
+        this.playRightNext(obj, context);
         controller.nextButton.click();
         return;
       } else {
         // 플레이리스트는 컨텍스트의 음악을 한꺼번에 나중에 재생.
         let contextMusics = playlistManager.getContextList(context);
-        this.addToRightNext(
+        this.playRightNext(
           contextMusics,
           context,
           controller.isShuffled,
@@ -248,7 +316,7 @@ class QueueManager {
 
       let arr = [obj, nextObj];
       this._applyToQueue(arr, context);
-      this.queueReservoir = null; // 라이브러리는 저장고를 따로 만들지 않음.
+      this.queueRepository = null; // 라이브러리는 저장고를 따로 만들지 않음.
 
       controller.playMusic();
       return;
@@ -273,7 +341,7 @@ class QueueManager {
   }
 
   playRecord(obj) {
-    this.addToRightNext(obj, "record");
+    this.playRightNext(obj, "record");
     controller.nextButton.click();
   }
 
@@ -307,8 +375,6 @@ class QueueManager {
       }
     }
 
-    this.updateController();
-
     function addBefore(obj) {
       let newPrevMusic = document.createElement("div", { is: "queue-item" });
       newPrevMusic.setup(obj, "Library");
@@ -327,9 +393,9 @@ class QueueManager {
   }
 
   _applyToQueue(arr, context) {
-    this._reservoirBuilder(arr, context);
-    let clonedReservoir = this.queueReservoir.cloneNode(true);
-    this.queue.append(clonedReservoir);
+    this._repositoryBuilder(arr, context);
+    let clonedRepository = this.queueRepository.cloneNode(true);
+    this.queue.append(clonedRepository);
   }
 
   _chooseRandom() {
@@ -408,11 +474,11 @@ class QueueManager {
     this.statusIndicator.setAttribute("data-sync", bool);
 
     if (!bool) {
-      if (!this.queueReservoir) {
+      if (!this.queueRepository) {
         // 저장고가 비워져있을 경우 큐를 복사해서 새로 만들어줌.
-        this.queueReservoir = new DocumentFragment();
+        this.queueRepository = new DocumentFragment();
         let clonedQueue = this.queue.cloneNode(true);
-        this.queueReservoir.append(clonedQueue);
+        this.queueRepository.append(clonedQueue);
       }
     }
   }

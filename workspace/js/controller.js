@@ -197,7 +197,7 @@ class Controller {
   }
 
   playMusic() {
-    let musicToPlay = queueManager.queue.firstElementChild;
+    let musicToPlay = queueManager.queueFirstChild;
 
     this.updateMusicToPlay(musicToPlay);
     this.updateTooltip(true, true, true);
@@ -307,12 +307,12 @@ class Controller {
     this.prevMusic = currentMusic.previousElementSibling
       ? currentMusic.previousElementSibling
       : this.isRepeat
-      ? queueManager.queue.lastElementChild
+      ? queueManager.queueLastChild
       : undefined;
     this.nextMusic = currentMusic.nextElementSibling
       ? currentMusic.nextElementSibling
       : this.isRepeat
-      ? queueManager.queue.firstElementChild
+      ? queueManager.queueFirstChild
       : undefined;
   }
 
@@ -571,7 +571,7 @@ class Controller {
     let musicToPlay = this.nextMusic;
     if (!musicToPlay) {
       mustStop = true;
-      musicToPlay = queueManager.queue.firstElementChild;
+      musicToPlay = queueManager.queueFirstChild;
     }
 
     let isItPlayedEnough = this._isItPlayedEnough();
