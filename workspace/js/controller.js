@@ -675,16 +675,34 @@ class Controller {
 
   _shuffleButtonHandler() {
     this.isShuffled = !this.isShuffled;
-    this.shuffleButton.classList.toggle("active");
     if (this.isShuffled) {
-      queueManager.shuffleQueue();
-      this._updatePrevAndNext(this.currentMusic);
-      this.updateTooltip(true, true);
+      this.shuffleOn();
     } else {
-      queueManager.restoreQueue();
-      this._updatePrevAndNext(this.currentMusic);
-      this.updateTooltip(true, true);
+      this.shuffleOff();
     }
+  }
+
+  shuffleOn() {
+    this.isShuffled = true;
+    this.shuffleButton.classList.add("active");
+    queueManager.shuffleQueue();
+
+    this.updateByQueueChange();
+  }
+
+  shuffleOff() {
+    this.isShuffled = false;
+    this.shuffleButton.classList.remove("active");
+    queueManager.restoreQueue();
+
+    this.updateByQueueChange();
+  }
+
+  updateByQueueChange() {
+    let newCurrMusic = queueManager.currentMusic;
+    this.currentMusic = newCurrMusic;
+    this._updatePrevAndNext(newCurrMusic);
+    this.updateTooltip(true, true);
   }
 
   _muteButtonHandler() {

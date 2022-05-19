@@ -26,19 +26,27 @@ class QueueManager {
     this.setupQueueSlip();
   }
 
-  _reservoirBuilder(contextArr = []) {
-    // 큐가 조작되지 않은채 라이브러리 재생 중에는 null;
-    if (typeof contextArr != "Array")
-      throw new TypeError("매개변수가 배열로 주어져야 합니다");
+  static get currentMusic() {
+    return this.queue.querySelector(".current");
+  }
 
+  _reservoirBuilder(target, context) {
+    // 큐가 조작되지 않은채 라이브러리 재생 중에는 null;
     this.queueReservoir = new DocumentFragment();
 
-    contextArr.forEach((item) => {
+    if (Array.isArray(target)) {
+      target.forEach((itemObj) => {
+        let elem = document.createElement("div", { is: "queue-item" });
+        elem.setup(itemObj, context);
+        this.mapManager(itemObj, "set");
+        this.queueReservoir.append(elem);
+      });
+    } else {
       let elem = document.createElement("div", { is: "queue-item" });
-      elem.setup(item.musicObj, item.context);
-      this.mapManager(item.musicObj, "set");
+      elem.setup(target, context);
+      this.mapManager(target, "set");
       this.queueReservoir.append(elem);
-    });
+    }
   }
 
   mapManager(obj, method = "set") {
@@ -71,7 +79,27 @@ class QueueManager {
     }
   }
 
-  addToRightNext(obj, context) {}
+  addToRightNext(target, context, isShuffled = false, startId) {
+    if (this.queueStatus) this.updateQueueStatus(false);
+
+    let tempFragment = new DocumentFragment();
+
+    if (Array.isArray(target)) {
+      // 배열로 작업
+      target.forEach((itemObj) => {
+        let elem = document.createElement("div", { is: "queue-item" });
+        elem.setup(itemObj, context);
+        this.mapManager(elem.musicObj, "set");
+        tempFragment.append(elem);
+      });
+    } else {
+      // 하나만 작업
+      let elem = document.createElement("div", { is: "queue-item" });
+      elem.setup(target, context);
+      this.mapManager(elem.musicObj, "set");
+      tempFragment.append(elem);
+    }
+  }
 
   _clearRecord() {
     let sureToDelete = modalManager.createModal("clear-record");
@@ -109,16 +137,7 @@ class QueueManager {
 
     if (this.queueStatus) this.updateQueueStatus(false);
 
-    if (!this.queueReservoir) {
-      // 저장고가 비워져있을 경우 큐를 복사해서 새로 만들어줌.
-      this.queueReservoir = new DocumentFragment();
-      let clonedQueue = this.queue.cloneNode(true);
-      this.queueReservoir.append(clonedQueue);
-    }
-
     newNextElem.before(elem);
-
-    this.updateController();
   }
 
   clearBeforeAfter() {
@@ -151,10 +170,7 @@ class QueueManager {
       this._shuffleQueue(true);
       let currentMusic = this.queue.querySelector(".current");
       this.queue.prepend(currentMusic);
-      controller.currentMusic = currentMusic;
     }
-
-    this.updateController();
   }
 
   restoreQueue() {
@@ -172,8 +188,6 @@ class QueueManager {
     this.queue
       .querySelector(`[index=${currentIndex}]`)
       .classList.add("current");
-    controller.currentMusic = this.queue.querySelector(".current");
-    this.updateController();
   }
 
   playThis(obj, context) {
@@ -392,11 +406,15 @@ class QueueManager {
   updateQueueStatus(bool) {
     this.queueStatus = bool;
     this.statusIndicator.setAttribute("data-sync", bool);
-  }
 
-  updateController() {
-    controller.updatePrevAndNext();
-    controller.updateTooltip(true, true);
+    if (!bool) {
+      if (!this.queueReservoir) {
+        // 저장고가 비워져있을 경우 큐를 복사해서 새로 만들어줌.
+        this.queueReservoir = new DocumentFragment();
+        let clonedQueue = this.queue.cloneNode(true);
+        this.queueReservoir.append(clonedQueue);
+      }
+    }
   }
 
   pushRecordStack(obj) {
