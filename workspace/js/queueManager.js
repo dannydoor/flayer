@@ -171,13 +171,15 @@ class QueueManager {
 
   applyPlaylistChanges(fullList = null, context, changes = {}) {
     let newCurrent;
-    let currentDeleted = false;
+    let isCurrentDeleted = false;
+    let currentId = this.currentMusic.musicId;
 
     if (this.queueStatus) {
       // 큐 저장소가 온전히 플레이리스트의 것.
       this._repositoryBuilder(fullList, context);
+      currentDeletionChecker();
+      let newId = newCurrentFinder(true);
 
-      let currentId = this.currentMusic.musicId;
       if (!controller.isShuffled) {
         clearQueueData();
         this.queue.append(this.queueRepository.cloneNode(true));
@@ -190,21 +192,29 @@ class QueueManager {
         clearQueueData();
 
         idArr.forEach((id) => {
+          // 기존의 큐 추가(제거된 건 패스됨)
           let itemToClone = this.queueRepository.querySelector(
             `[music-id=${id}]`
           );
-          this.queue.append(itemToClone.cloneNode(true));
+          if (itemToClone) {
+            this.queue.append(itemToClone.cloneNode(true));
+          }
         });
 
         changes.added.forEach((obj) => {
+          // 추가된 곡 추가
           let itemToClone = this.queueRepository.querySelector(
             `[music-id=${obj.id}]`
           );
           this.queue.append(itemToClone.cloneNode(true));
         });
       }
-      newCurrent = this.queue.querySelector(`[music-id=${currentId}]`); // 제거 사항 제대로 반영토록 수정 필요
-      newCurrent.classList.add("current");
+
+      if (!newId) {
+        newCurrent = this.queueFirstChild;
+      } else {
+        newCurrent = this.queue.querySelector(`[music-id=${newId}]`);
+      }
     } else {
       changes.added.forEach((obj) => {
         let elem = document.createElement("div", { is: "queue-item" });
@@ -215,6 +225,53 @@ class QueueManager {
         this.queue.append(elem.cloneNode(true));
       });
 
+      let [deleteList, deleteListRepo] = currentDeletionChecker();
+
+      deleteList.forEach((item) => {
+        this.mapManager(item.musicObj, "delete");
+        item.remove();
+      });
+      deleteListRepo.forEach((item) => item.remove());
+
+      let foundCurrentElem = newCurrentFinder(false);
+      if (!foundCurrentElem) newCurrent = this.queueFirstChild;
+    }
+
+    controller.updateMusicToPlay(newCurrent);
+
+    function newCurrentFinder(isNew = false) {
+      // isNew는 큐가 갈아엎어졌는지를 알려줌(큐가 온전한지)
+      if (isCurrentDeleted) {
+        let gotcha = false;
+        let targetElem = this.currentMusic;
+
+        while (!gotcha) {
+          if (!targetElem) break;
+
+          if (deleteList.includes(targetElem)) {
+            targetElem = targetElem.nextElementSibling;
+          } else {
+            gotcha = true;
+          }
+        }
+
+        if (!gotcha) return undefined; // 현재 음악을 포함해 뒤 음악도 다 제거됨.
+
+        if (isNew) {
+          return targetElem.musicId;
+        } else {
+          newCurrent = targetElem;
+          newCurrent.classList.add("current");
+          return true;
+        }
+      } else {
+        if (isNew) return currentId;
+        newCurrent = this.currentMusic;
+        return true;
+      }
+    }
+
+    function currentDeletionChecker() {
       let deleteList = [];
       let deleteListRepo = [];
       changes.deleted.forEach((obj) => {
@@ -234,25 +291,11 @@ class QueueManager {
       });
 
       if (deleteList.includes(this.currentMusic)) {
-        currentDeleted = true;
+        isCurrentDeleted = true;
       }
 
-      deleteList.forEach((item) => {
-        this.mapManager(item.musicObj, "delete");
-        item.remove();
-      });
-      deleteListRepo.forEach((item) => item.remove());
-
-      if (currentDeleted) {
-        newCurrent = this.queueFirstChild;
-      } else {
-        newCurrent = this.queue.querySelector(); // 여기 제대로 구현 필요
-      }
-
-      newCurrent.classList.add("current");
+      return [deleteList, deleteListRepo];
     }
-
-    controller.updateMusicToPlay(newCurrent);
 
     function clearQueueData() {
       Array.forEach.call(this.queue.children, (item) => {
