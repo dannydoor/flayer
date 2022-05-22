@@ -1,3 +1,29 @@
+/*
+  flayer의 하단 컨트롤바의 제어를 담당하는 클래스입니다.
+
+  let controller = new Controller(마지막 세션 정보);
+  를 통해 선언해주세요.
+
+  controller.playMusic()
+  플레이어블이 클릭되어 큐가 모두 세팅된 후, 큐 매니저가 호출하는 메소드입니다.
+  큐의 가장 첫번째 음악부터 재생을 시작합니다.
+
+  controller.updateMusicToPlay(음악 요소)
+  전달된 음악 요소를 현재 재생 중인 음악으로 설정하고 불러와 재생합니다.
+  재생 대기열의 음악을 클릭 시 큐 매니저가 호출합니다.
+
+  controller.updateTooltip(이전 및 다음 곡, 플레이리스트)
+  셔플 또는 반복 재생 모드가 변경되거나 큐의 구성이 바뀌어
+  이전 곡과 다음 곡, 또는 현재 재생 중인 음악이 변경되었을 경우
+  해당 툴팁의 내용물을 수정합니다.
+
+  controller.updatebyQueueChange()
+  셔플 재생 모드가 변경되었을 때 자체적으로 호출하며,
+  바로 다음에 재생 또는 나중에 재생 기능이 수행되었을 때
+  큐 매니저가 호출합니다.
+  큐의 변경사항을 반영합니다.
+*/
+
 class Controller {
   constructor(
     initObj = null,
@@ -5,6 +31,7 @@ class Controller {
     initShuffle = false,
     initRepeat = false
   ) {
+    // 컨트롤바 요소와 클래스 프로퍼티 대응
     this.playButton = window["play-or-pause"];
     this.prevButton = window["prev-button"];
     this.prevSongTitle = this.prevButton.querySelector(".tooltip strong");
@@ -27,6 +54,7 @@ class Controller {
     this.likeButton = window["like-this-button"];
     this.meatballsButton = window["meatball-button"];
 
+    // 프로퍼티 초기화
     this.initState = null;
     this.isShuffled = initShuffle;
     this.isRepeat = initRepeat;
@@ -88,8 +116,11 @@ class Controller {
       ],
     };
 
+    // 메소드 바인딩
+    this.playMusic = this.playMusic.bind(this);
     this.updateMusicToPlay = this.updateMusicToPlay.bind(this);
     this.updateTooltip = this.updateTooltip.bind(this);
+    this.updateByQueueChange = this.updateByQueueChange.bind(this);
     for (let key in this.updates) {
       this.handlers[key] = this.handlers[key].bind(this);
     }
@@ -100,8 +131,10 @@ class Controller {
       this.handlers[key] = this.handlers[key].bind(this);
     }
 
-    this.setupPlayer(initObj, initContext);
+    // 플레이어 셋업
+    this._setupPlayer(initObj, initContext);
 
+    // 핸들러 달기
     this.prevButton.onmouseover =
       this.nextButton.onmouseover =
       this.openPlaylistButton.onmouseover =
@@ -118,13 +151,14 @@ class Controller {
     this.shuffleButton.onclick = this.handlers.onClickShuffle;
     this.muteButton.onclick = this.handlers.onClickMute;
 
+    // 플레이바 핸들러 달기
     let inputEvent = new InputEvent("input");
     this.playBar.addEventListener("input", this.handlers.onInputPlayBar);
     this.playBar.addEventListener("change", this.handlers.onChangePlayBar);
     this.playBar.dispatchEvent(inputEvent);
   }
 
-  setupPlayer(obj, context) {
+  _setupPlayer(obj, context) {
     if (obj) {
       // 마지막 세션 세팅
       this.updates.updateProperties(obj, context);
@@ -179,6 +213,7 @@ class Controller {
     this.volumeBar.dispatchEvent(inputEvent);
   }
 
+  // public 메소드
   playMusic() {
     // 클릭한 음악을 재생
     // 플레이어블을 클릭했을 때 큐 매니저에 의해 호출
@@ -271,6 +306,7 @@ class Controller {
     this.updateTooltip(true);
   }
 
+  // private 메소드
   updates = {
     // 컨트롤바의 구성요소들을 업데이트하는 메소드 모음
     updateControlBar: () => {
