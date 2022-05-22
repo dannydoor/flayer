@@ -128,10 +128,7 @@ class Controller {
     if (obj) {
       // 마지막 세션 세팅
       this.updates.updateProperties(obj, context);
-      this._setupOptions.file =
-        "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/" +
-        this.currentInfo.url +
-        "/playlist.m3u8";
+      this._setupOptions.file = this.currentInfo.url;
 
       let options = this._setupOptions;
       let updateMediaSession = this.updates.updateMediaSession;
@@ -143,10 +140,11 @@ class Controller {
         updateMediaSession();
       });
 
-      this.helpers.letPlayBarIncrease();
       this.updates.updateControlBar();
       this.updates.updatePlayerHandler();
-      this.updateTooltip(true, true, true);
+      this.helpers.setPlayerHandlers();
+      this.updateMusicToPlay(queueManager.currentMusic);
+      this.updateTooltip(true, true);
     } else {
       // 초기화
       this._setupOptions.file =
@@ -157,41 +155,50 @@ class Controller {
 
       // 컨트롤바 비활성화
       this.helpers.toggleDisabledStatus("control", true);
-      this.helpers.toggleDisabledStatus("bars", true);
-      this.helpers.toggleDisabledStatus("info", true);
+      this.helpers.toggleDisabledStatus("barsAndOthers", true);
+      this.initState = "init";
 
       // 창 정보 비우기
       this.playBar.setAttribute("min", 0);
       this.playBar.setAttribute("max", 0);
       this.playBar.value = 0;
-      this.currentTime.innerHTML = "00:00";
-      this.remainingTime.innerHTML = "- 00:00";
-      this.songTitleSection.innerHTML = "";
-      this.songArtistSection.innerHTML = "";
+      this.currentTime.innerHTML = "0:00";
+      this.remainingTime.innerHTML = "- 0:00";
+      this.songTitleSection.innerHTML = "재생할 음악을";
+      this.songArtistSection.innerHTML = "선택해주세요";
 
       // 핸들러 달기
-      this.helpers.letPlayBarIncrease();
-      this.updateTooltip(true, true, true);
+      this.helpers.setPlayerHandlers();
+      this.updateTooltip(true, true);
     }
-    let volumeInput = this._volumeBarHandler;
-    let volumeChange = this._volumeBarChangeHandler;
+    // 볼륨바 핸들러 달기
     let inputEvent = new InputEvent("input");
-
     this.volumeBar.setAttribute("mute", false);
-    this.volumeBar.addEventListener("input", volumeInput);
-    this.volumeBar.addEventListener("change", volumeChange);
+    this.volumeBar.addEventListener("input", this.handlers.onInputVolumeBar);
+    this.volumeBar.addEventListener("change", this.handlers.onChangeVolumeBar);
     this.volumeBar.dispatchEvent(inputEvent);
   }
 
   playMusic() {
+    // 클릭한 음악을 재생
+    // 플레이어블을 클릭했을 때 큐 매니저에 의해 호출
     let musicToPlay = queueManager.queueFirstChild;
 
     this.updateMusicToPlay(musicToPlay);
-    this.updateTooltip(true, true, true);
+    this.updateTooltip(true, true);
+
+    if (this.initState) {
+      // 초기화의 일환으로 컨트롤바가 비활성화됐었다면 다시 활성화
+      this.helpers.toggleDisabledStatus("control", false);
+      this.helpers.toggleDisabledStatus("barsAndOthers", false);
+      this.initState = null;
+    }
+
     queueManager.setPlaylistName();
   }
 
   updateMusicToPlay(musicToPlay) {
+    // 컨트롤바의 재생 중인 음악을 전달받은 음악으로 업데이트하고 불러와 재생
     this.currentInfo.reference.isPlaying = false;
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
@@ -201,9 +208,9 @@ class Controller {
     });
 
     this.helpers.loadMusic(musicToPlay.musicObj, musicToPlay.context);
-    let musicID = this.currentInfo.id;
+    let musicId = this.currentInfo.id;
     musicToPlay.classList.add("current");
-    document.querySelectorAll(`[music-id=${musicID}]`).forEach((item) => {
+    document.querySelectorAll(`[music-id=${musicId}]`).forEach((item) => {
       item.classList.add("playing");
     });
 
@@ -256,14 +263,18 @@ class Controller {
   }
 
   updateByQueueChange() {
+    // 컨트롤바의 재생 중인 음악, 이전 곡, 다음 곡을 업데이트하는 메소드
+    // 재생 중인 목록에 변화가 생길 때마다 호출
     let newCurrMusic = queueManager.currentMusic;
     this.currentMusic = newCurrMusic;
     this.updates.updatePrevAndNext(newCurrMusic);
-    this.updateTooltip(true, true);
+    this.updateTooltip(true);
   }
 
   updates = {
+    // 컨트롤바의 구성요소들을 업데이트하는 메소드 모음
     updateControlBar: () => {
+      // loadMusic이 재생을 시작하기 전에 컨트롤바의 정보 업데이트 및 초기화
       let isLiked = this.currentInfo.isLiked ? "liked" : "";
       let isContextValid = this.currentInfo.context.startsWith("playlist:")
         ? true
@@ -276,45 +287,53 @@ class Controller {
       this.volumeBar.value = jwplayer().getVolume();
 
       this.songTitleSection.innerHTML = this.currentInfo.title;
+      this.songTitleSection.setAttribute("title", this.currentInfo.title);
       this.songArtistSection.innerHTML = this.currentInfo.artist;
 
       this.likeButton.className = isLiked;
 
-      if (!isContextValid) {
+      if (isContextValid) {
+        this.helpers.toggleDisabledStatus("playlist", false);
+      } else {
         this.helpers.toggleDisabledStatus("playlist", true);
       }
     },
 
     updatePlayBar: () => {
-      let currTime = jwplayer().getPosition() - this.currentInfo.startTime;
+      let currTime = parseInt(
+        jwplayer().getPosition() - this.currentInfo.startTime
+      );
       if (this.playBar.value == currTime) return;
-      this.playBar.value = currTime;
-      [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
-        this.helpers.timeFormatter(currTime, this.currentInfo.duration);
+      else {
+        this.playBar.value = currTime;
+        [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
+          this.helpers.timeFormatter(currTime, this.currentInfo.duration);
+      }
     },
 
     updateVolumeBar: () => {
       let currVolume = jwplayer().getVolume();
       if (this.volumeBar.value == currVolume) return;
-      this.volumeBar.value = currVolume;
+      else this.volumeBar.value = currVolume;
     },
 
     updatePrevAndNext: (currentMusic) => {
+      // 주어진 음악을 바탕으로 이전 곡과 다음곡을 업데이트
       this.prevMusic = currentMusic.previousElementSibling
         ? currentMusic.previousElementSibling
         : this.isRepeat
         ? queueManager.queueLastChild
-        : undefined;
+        : null;
       this.nextMusic = currentMusic.nextElementSibling
         ? currentMusic.nextElementSibling
         : this.isRepeat
         ? queueManager.queueFirstChild
-        : undefined;
+        : null;
     },
 
     updateMuteState: () => {
       let currMuteState = jwplayer().getMute();
-      let userMuteState = this.volumeBar.getAttribute("mute");
+      let userMuteState = this.volumeBar.mute;
 
       if (userMuteState == currMuteState) return;
       else {
@@ -324,9 +343,10 @@ class Controller {
     },
 
     updateMediaSession: () => {
+      // 미디어세션 API 정보 업데이트
       this._mediaSessionObj.title = this.currentInfo.title;
       this._mediaSessionObj.artist = this.currentInfo.artist;
-      metadata = this._mediaSessionObj;
+      let metadata = this._mediaSessionObj;
 
       if ("mediaSession" in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata(metadata);
@@ -339,20 +359,21 @@ class Controller {
           navigator.mediaSession.playbackState = "paused";
         });
         navigator.mediaSession.setActionHandler("previoustrack", () =>
-          window("prev-button").click()
+          window["prev-button"].click()
         );
         navigator.mediaSession.setActionHandler("nexttrack", () =>
-          window("next-button").click()
+          window["next-button"].click()
         );
       }
     },
 
     updatePlayerHandler: () => {
-      let onTimeHandler = this.handlers.onTime;
-      jwplayer().on("time", onTimeHandler);
+      // 플레이어의 onTime 핸들러를 갈아끼움
+      jwplayer().on("time", this.handlers.onTime);
     },
 
     updateProperties: (obj, context) => {
+      // currentInfo 객체의 프로퍼티를 업데이트
       this.currentInfo.id = obj.id;
       this.currentInfo.title = obj.title;
       this.currentInfo.artist = obj.artist;
@@ -565,7 +586,7 @@ class Controller {
     },
 
     onClickMute: () => {
-      let currMuteState = this.volumeBar.getAttribute("mute");
+      let currMuteState = this.volumeBar.mute;
       currMuteState = !currMuteState;
       this.helpers.toggleVolumeBarMuteState(currMuteState);
     },
@@ -707,24 +728,35 @@ class Controller {
     },
 
     toggleVolumeBarMuteState: (currMuteState) => {
+      // 뮤트 상태에 따라 볼륨바의 인풋 핸들러 교체
       let inputEvent = new InputEvent("input");
       if (currMuteState) {
-        this.volumeBar.removeEventListener("input", this._volumeBarHandler);
-        this.volumeBar.addEventListener("input", this._volumeBarHandlerMuted);
+        this.volumeBar.removeEventListener(
+          "input",
+          this.handlers.onInputVolumeBar
+        );
+        this.volumeBar.addEventListener(
+          "input",
+          this.handlers.onInputVolumeBarMuted
+        );
         this.volumeBar.dispatchEvent(inputEvent);
         this.volumeBar.disabled = true;
       } else {
         this.volumeBar.removeEventListener(
           "input",
-          this._volumeBarHandlerMuted
+          this.handlers.onInputVolumeBarMuted
         );
-        this.volumeBar.addEventListener("input", this._volumeBarHandler);
+        this.volumeBar.addEventListener(
+          "input",
+          this.handlers.onInputVolumeBar
+        );
         this.volumeBar.dispatchEvent(inputEvent);
         this.volumeBar.disabled = false;
       }
     },
 
     toggleDisabledStatus: (node, bool) => {
+      // 버튼을 선택적으로 비활성화
       switch (node) {
         case "control": {
           this.playButton.disabled = bool;
@@ -736,7 +768,6 @@ class Controller {
           this.playBar.disabled = bool;
           this.volumeBar.disabled = bool;
           this.muteButton.disabled = bool;
-          this.openPlaylistButton.disabled = bool;
           this.likeButton.disabled = bool;
           this.meatballsButton.disabled = bool;
         }
@@ -750,24 +781,22 @@ class Controller {
 
     timeFormatter: (current, duration) => {
       let curMin = parseInt(current / 60);
-      let curSec = current % 60;
+      let curSec = parseInt(current % 60);
       let remMin = parseInt((duration - current) / 60);
-      let remSec = (duration - current) % 60;
+      let remSec = parseInt((duration - current) % 60);
 
-      curMin = formatter(curMin);
       curSec = formatter(curSec);
-      remMin = formatter(remMin);
       remSec = formatter(remSec);
 
       let currentTime = curMin + ":" + curSec;
       let remainingTime = "- " + remMin + ":" + remSec;
 
+      return [currentTime, remainingTime];
+
       function formatter(num) {
         if (num < 10) return "0" + num;
         else return num;
       }
-
-      return [currentTime, remainingTime];
     },
   };
 }
