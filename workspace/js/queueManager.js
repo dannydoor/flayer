@@ -6,6 +6,7 @@ class QueueManager {
     map = null,
     queueStatus = true
   ) {
+    // 큐 요소와 프로퍼티 대응
     this.record = window["#record-stack"];
     this.queue = window["#queue-content"];
     this.statusIndicator = window["#queue-status"];
@@ -14,21 +15,33 @@ class QueueManager {
     this.queueRepo = queueRepo;
     this.queueStatus = queueStatus;
 
-    this.onReorder = this.onReorder.bind(this);
+    // 메소드 바인딩
+    this.playNext = this.playNext.bind(this);
+    this.playLater = this.playLater.bind(this);
+    this.playThis = this.playThis.bind(this);
+    this.playQueue = this.playQueue.bind(this);
+    this.playRecord = this.playRecord.bind(this);
+    this.applyPlaylistChanges = this.applyPlaylistChanges.bind(this);
     this.setPlaylistName = this.setPlaylistName.bind(this);
+    this.shuffleQueue = this.shuffleQueue.bind(this);
+    this.restoreQueue = this.restoreQueue.bind(this);
+    this.pushRecordStack = this.pushRecordStack.bind(this);
     this.makeUpLibraryItem = this.makeUpLibraryItem.bind(this);
-    this.mapManager = this.mapManager.bind(this);
+    this.deleteQueueItem = this.deleteQueueItem.bind(this);
+    this._onReorder = this._onReorder.bind(this);
+    this._mapManager = this._mapManager.bind(this);
 
+    // 마지막 세션 적용
     this._musicMap = map || new Map();
-
     if (recordStack) this.record.append(recordStack);
     if (queue) this.queue.append(queue);
     recordStack = null;
     queue = null;
+    this._updateQueueStatus(queueStatus);
 
+    // 핸들러 달기 및 slip.js 적용
     this.clearButton.onclick = this._clearRecord.bind(this);
-    this.updateQueueStatus(queueStatus);
-    this.setupQueueSlip();
+    this._setupQueueSlip();
   }
 
   static get currentMusic() {
@@ -43,55 +56,9 @@ class QueueManager {
     return this.queue.lastElementChild;
   }
 
-  _repositoryBuilder(info, context) {
-    // 큐가 조작되지 않은채 라이브러리 재생 중에는 null;
-    this.queueRepo = new DocumentFragment();
-
-    if (Array.isArray(info)) {
-      info.forEach((obj) => {
-        let elem = this._itembuilder(obj, context);
-        this.queueRepo.append(elem);
-      });
-    } else {
-      let elem = this._itembuilder(obj, context);
-      this.queueRepo.append(elem);
-    }
-  }
-
-  mapManager(obj, method = "set") {
-    let key = obj.id;
-    setter = setter.bind(this);
-    deleter = deleter.bind(this);
-
-    switch (method) {
-      case "set":
-        setter();
-        break;
-      case "delete":
-        deleter();
-        break;
-      case "check":
-        return this._musicMap.has(key);
-      default:
-        return;
-    }
-    return;
-
-    function setter() {
-      let num = this._musicMap.get(key);
-      if (!num) this._musicMap.set(key, 1);
-      else this._musicMap.set(key, ++num);
-    }
-
-    function deleter() {
-      let num = this._musicMap.get(key);
-      if (num > 1) this._musicMap.set(key, --num);
-      else this._musicMap.delete(key);
-    }
-  }
-
+  // public 메소드
   playNext(info, context, isShuffled = false, startId = null) {
-    if (this.queueStatus) this.updateQueueStatus(false);
+    if (this.queueStatus) this._updateQueueStatus(false);
 
     let currentMusicInQueue = this.currentMusic;
     let currentMusicInRepo = this.queueRepo.querySelector(
@@ -139,7 +106,7 @@ class QueueManager {
   }
 
   playLater(info, context) {
-    if (this.queueStatus) this.updateQueueStatus(false);
+    if (this.queueStatus) this._updateQueueStatus(false);
 
     let tempFragment = new DocumentFragment();
 
@@ -222,7 +189,7 @@ class QueueManager {
       let [deleteList, deleteListRepo] = currentDeletionChecker();
 
       deleteList.forEach((item) => {
-        this.mapManager(item.musicObj, "delete");
+        this._mapManager(item.musicObj, "delete");
         item.remove();
       });
       deleteListRepo.forEach((item) => item.remove());
@@ -297,70 +264,16 @@ class QueueManager {
 
     function clearQueueData() {
       Array.prototype.forEach.call(this.queue.children, (item) => {
-        this.mapManager(item.musicObj, "delete");
+        this._mapManager(item.musicObj, "delete");
       });
       this._clearQueue();
-    }
-  }
-
-  _clearRecord() {
-    let sureToDelete = modalManager.createModal("clear-record");
-    // 모달 매니저가 진짜로 기록을 삭제할 건지 모달을 띄우고 사용자의 대답을 받는 프로미스를 생성, 대답을 반환.
-    if (!sureToDelete) return;
-    this.record.innerHTML = "";
-  }
-
-  _clearQueue() {
-    this.queue.innerHTML = "";
-  }
-
-  setupQueueSlip() {
-    this.queue.addEventListener("slip:beforeswipe", function (e) {
-      e.preventDefault();
-    });
-
-    this.queue.addEventListener("slip:beforewait", function (e) {
-      if (e.target.classList.contains("music-drag")) e.preventDefault();
-      else {
-      }
-    });
-
-    this.queue.addEventListener("slip:reorder", function (e) {
-      this.onReorder(e.target, e.detail.insertBefore);
-    });
-
-    new Slip(this.queue);
-  }
-
-  onReorder(elem, newNextElem) {
-    let origNextElem = elem.nextElementSibling;
-    if (origNextElem == newNextElem) return;
-    else {
-      if (this.queueStatus) this.updateQueueStatus(false);
-      newNextElem.before(elem);
-    }
-  }
-
-  clearBeforeAfter() {
-    while (this.currentMusic.nextElementSibling) {
-      // 다음 음악 비우기
-      let target = controller.correntMusic.nextElementSibling;
-      this.mapManager(target.musicObj, "delete");
-      target.remove();
-    }
-
-    while (this.currentMusic.prevElementSibling) {
-      // 이전 음악 비우기
-      let target = controller.correntMusic.prevElementSibling;
-      this.mapManager(target.musicObj, "delete");
-      target.remove();
     }
   }
 
   shuffleQueue() {
     if (!this.queueRepo) {
       // 온전히 라이브러리 재생 중이라는 뜻.
-      this.clearBeforeAfter();
+      this._clearBeforeAfter();
       this.makeUpLibraryItem();
       return;
     } else {
@@ -376,7 +289,7 @@ class QueueManager {
   restoreQueue() {
     if (!this.queueRepo) {
       // 온전히 라이브러리 재생 중이라는 뜻.
-      this.clearBeforeAfter();
+      this._clearBeforeAfter();
       this.makeUpLibraryItem();
       return;
     } else {
@@ -401,7 +314,7 @@ class QueueManager {
         return;
       } else if (howToHandleExistingQueue == "clear") {
         clearQueue();
-        this.updateQueueStatus(true);
+        this._updateQueueStatus(true);
       } else if (howToHandleExistingQueue == "keep") {
         isExistingKept = true;
       }
@@ -457,7 +370,7 @@ class QueueManager {
 
     function clearQueue() {
       Array.prototype.forEach.call(this.queue.children, (elem) => {
-        this.mapManager(elem.musicObj, "delete");
+        this._mapManager(elem.musicObj, "delete");
       });
 
       this._clearQueue();
@@ -517,6 +430,147 @@ class QueueManager {
     }
   }
 
+  pushRecordStack(obj) {
+    let newRecordElem = document.createElement("div", { is: "record-item" });
+    newRecordElem.setup(obj);
+    this.record.append(newRecordElem);
+  }
+
+  setPlaylistName() {
+    let name = playlistManager.getPlaylistName(controller.currentInfo.context);
+
+    if (name) {
+      this.currPlaylistName.innerHTML = name;
+    } else {
+      this.currPlaylistName.innerHTML = "";
+    }
+  }
+
+  deleteQueueItem(elem) {
+    let isCurrent = elem.classList.contains("current");
+    let needUpdate =
+      elem.previousElementSibling.classList.contains("current") ||
+      elem.nextElementSibling.classList.contains("current");
+
+    let elemInRepo = this.queueRepo.querySelector(`[index=${elem.index}]`);
+    this._mapManager(elem.musicObj, "delete");
+    elem.remove();
+    elemInRepo.remove();
+
+    if (isCurrent) {
+      controller.nextButton.click();
+    } else {
+    }
+
+    if (needUpdate) {
+      controller.updateTooltip(true);
+    } else {
+    }
+  }
+
+  // private 메소드
+
+  _repositoryBuilder(info, context) {
+    // 큐가 조작되지 않은채 라이브러리 재생 중에는 null;
+    this.queueRepo = new DocumentFragment();
+
+    if (Array.isArray(info)) {
+      info.forEach((obj) => {
+        let elem = this._itembuilder(obj, context);
+        this.queueRepo.append(elem);
+      });
+    } else {
+      let elem = this._itembuilder(obj, context);
+      this.queueRepo.append(elem);
+    }
+  }
+
+  _mapManager(obj, method = "set") {
+    let key = obj.id;
+    setter = setter.bind(this);
+    deleter = deleter.bind(this);
+
+    switch (method) {
+      case "set":
+        setter();
+        break;
+      case "delete":
+        deleter();
+        break;
+      case "check":
+        return this._musicMap.has(key);
+      default:
+        return;
+    }
+    return;
+
+    function setter() {
+      let num = this._musicMap.get(key);
+      if (!num) this._musicMap.set(key, 1);
+      else this._musicMap.set(key, ++num);
+    }
+
+    function deleter() {
+      let num = this._musicMap.get(key);
+      if (num > 1) this._musicMap.set(key, --num);
+      else this._musicMap.delete(key);
+    }
+  }
+
+  _clearRecord() {
+    let sureToDelete = modalManager.createModal("clear-record");
+    // 모달 매니저가 진짜로 기록을 삭제할 건지 모달을 띄우고 사용자의 대답을 받는 프로미스를 생성, 대답을 반환.
+    if (!sureToDelete) return;
+    this.record.innerHTML = "";
+  }
+
+  _clearQueue() {
+    this.queue.innerHTML = "";
+  }
+
+  _setupQueueSlip() {
+    this.queue.addEventListener("slip:beforeswipe", function (e) {
+      e.preventDefault();
+    });
+
+    this.queue.addEventListener("slip:beforewait", function (e) {
+      if (e.target.classList.contains("music-drag")) e.preventDefault();
+      else {
+      }
+    });
+
+    this.queue.addEventListener("slip:reorder", function (e) {
+      this._onReorder(e.target, e.detail.insertBefore);
+    });
+
+    new Slip(this.queue);
+  }
+
+  _onReorder(elem, newNextElem) {
+    let origNextElem = elem.nextElementSibling;
+    if (origNextElem == newNextElem) return;
+    else {
+      if (this.queueStatus) this._updateQueueStatus(false);
+      newNextElem.before(elem);
+    }
+  }
+
+  _clearBeforeAfter() {
+    while (this.currentMusic.nextElementSibling) {
+      // 다음 음악 비우기
+      let target = controller.correntMusic.nextElementSibling;
+      this._mapManager(target.musicObj, "delete");
+      target.remove();
+    }
+
+    while (this.currentMusic.previousElementSibling) {
+      // 이전 음악 비우기
+      let target = controller.correntMusic.previousElementSibling;
+      this._mapManager(target.musicObj, "delete");
+      target.remove();
+    }
+  }
+
   _applyToQueue(info, context) {
     this._repositoryBuilder(info, context);
     this.queue.append(this.queueRepo.cloneNode(true));
@@ -531,7 +585,7 @@ class QueueManager {
 
     while (!gotcha) {
       let target = arr[Math.floor(Math.random * length)];
-      if (this.mapManager(target, "check")) {
+      if (this._mapManager(target, "check")) {
         continue;
       } else {
         gotcha = true;
@@ -540,16 +594,6 @@ class QueueManager {
     }
 
     return randObj;
-  }
-
-  setPlaylistName() {
-    let name = playlistManager.getPlaylistName(controller.currentInfo.context);
-
-    if (name) {
-      this.currPlaylistName.innerHTML = name;
-    } else {
-      this.currPlaylistName.innerHTML = "";
-    }
   }
 
   _shuffleQueue(whole = true) {
@@ -581,7 +625,7 @@ class QueueManager {
     shuffleFragment = null;
   }
 
-  updateQueueStatus(bool) {
+  _updateQueueStatus(bool) {
     this.queueStatus = bool;
     this.statusIndicator.setAttribute("data-sync", bool);
 
@@ -595,16 +639,10 @@ class QueueManager {
     }
   }
 
-  pushRecordStack(obj) {
-    let newRecordElem = document.createElement("div", { is: "record-item" });
-    newRecordElem.setup(obj);
-    this.record.append(newRecordElem);
-  }
-
   _itembuilder(obj, context) {
     let elem = document.createElement("div", { is: "queue-item" });
     elem.setup(obj, context);
-    this.mapManager(obj, "set");
+    this._mapManager(obj, "set");
     return elem;
   }
 }
