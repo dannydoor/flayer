@@ -39,7 +39,28 @@
                   <span class="queue-desc">재생 대기열</span>
                   <span class="queue-desc-sub" id="curr-playlist-name"></span>
                 </div>
-                <div id="queue-status"></div>
+                <div id="queue-status" class="active">
+                  <div class="tooltip on">
+                    <div class="tooltip-header">
+                      연결됨
+                    </div>
+                    <div class="tooltip-desc">
+                      <p>
+                        재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영됩니다
+                      </p>
+                    </div>
+                  </div>
+                  <div class="tooltip off">
+                    <div class="tooltip-header">
+                      연결해제됨
+                    </div>
+                    <div class="tooltip-desc">
+                      <p>
+                        재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영되지 않습니다
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div id="queue-content">
               </div>

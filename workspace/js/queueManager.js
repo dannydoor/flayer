@@ -40,6 +40,8 @@ class QueueManager {
     this._updateQueueStatus(queueStatus);
 
     // 핸들러 달기 및 slip.js 적용
+    this.statusIndicator.onmouseover = this._onMouseOverTooltip;
+    this.statusIndicator.onmouseleave = this._onMouseLeaveTooltip;
     this.clearButton.onclick = this._clearRecord.bind(this);
     this._setupQueueSlip();
   }
@@ -644,5 +646,25 @@ class QueueManager {
     elem.setup(obj, context);
     this._mapManager(obj, "set");
     return elem;
+  }
+
+  _onMouseOverTooltip(e) {
+    let target = e.target;
+    target.timerId = setTimeout(() => makeTooltipVisible(), 1000);
+
+    function makeTooltipVisible() {
+      target.querySelectorAll(".tooltip").forEach((tooltip) => {
+        tooltip.classList.add("visible");
+      });
+    }
+  }
+
+  _onMouseLeaveTooltip(e) {
+    let target = e.target;
+    clearTimeout(target.timerId);
+    target.timerId = null;
+    target.querySelectorAll(".tooltip").forEach((tooltip) => {
+      tooltip.classList.remove("visible");
+    });
   }
 }

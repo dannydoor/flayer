@@ -307,7 +307,7 @@ class Controller {
   }
 
   // private 메소드
-  updates = {
+  static updates = {
     // 컨트롤바의 구성요소들을 업데이트하는 메소드 모음
     updateControlBar: () => {
       // loadMusic이 재생을 시작하기 전에 컨트롤바의 정보 업데이트 및 초기화
@@ -428,7 +428,7 @@ class Controller {
     },
   };
 
-  handlers = {
+  static handlers = {
     onPlay: (e) => {
       let oldstate = e.oldstate;
       if (oldstate === "buffering") {
@@ -695,7 +695,7 @@ class Controller {
     },
   };
 
-  helpers = {
+  static helpers = {
     loadMusic: (obj, context) => {
       // 음악을 플레이어에 불러오는 메소드
       jwplayer().off("time");
