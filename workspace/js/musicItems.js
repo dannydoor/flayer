@@ -94,9 +94,8 @@ class MusicItem extends HTMLDivElement {
   _timeFormatter(time, type) {
     if (type == "duration") {
       let min = parseInt(time / 60);
-      let sec = time % 60;
+      let sec = parseInt(time % 60);
 
-      if (min < 10) min = "0" + min;
       if (sec < 10) sec = "0" + sec;
 
       return min + ":" + sec;

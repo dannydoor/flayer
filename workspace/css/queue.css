@@ -11,6 +11,7 @@
   background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
   backdrop-filter: blur(32px);
   scroll-snap-align: start;
+  z-index: 99999;
 }
 
 .queue-desc {
