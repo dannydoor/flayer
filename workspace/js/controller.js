@@ -654,7 +654,7 @@ class Controller {
 
     onInputPlayBar: (e) => {
       let value = e.target.value;
-      value = parseInt((value / this.currentInfo.duration) * 100);
+      value = (value / this.currentInfo.duration) * 100;
       value = value < 0 ? 0 : value;
       e.target.style.background =
         "linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) " +

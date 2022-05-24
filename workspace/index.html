@@ -12,10 +12,12 @@
     <script>
       jwplayer.key = 'Bch7bd0cZt0adCRYHGveauTP1LaJlq1EMyrU/IxgfrGDc3gTqZxyPFEKKMI';
     </script>
+    <script type="text/javascript" src="./js/md5.js"></script>
     <script type="text/javascript" src="./js/slip.js"></script>
     <script type="text/javascript" src="./js/musicItems.js"></script>
     <script type="text/javascript" src="./js/controller.js"></script>
     <script type="text/javascript" src="./js/queueManager.js"></script>
+    <script type="text/javascript" src="./js/test2.js"></script>
     <title>flayer</title>
   </head>
   <body>
@@ -140,6 +142,24 @@
     </div>
     <script src="./js/simpleBar/simplebar.js"></script>
     <script>
+      function main() {
+        let initTime = Date.now();
+        let objectFactory = new objectFactory();
+        let objTable = objectFactory.objHashTableBuilder(db);
+        console.log(Date.now() - initTime);
+
+        let [sorted1, sorted2, sorted3, sorted4] = objectFactory.getSortedArr(objTable);
+        console.log(Date.now() - initTime);
+        
+        let recordFragment = new DocumentFragment();
+        let queueFragment = new DocumentFragment();
+        let context = "library";
+
+        for (let item of sorted1) {
+          let recordElem = document.createElement("div", { is: "record-item"});
+          
+        }
+      }
       // new SimpleBar(document.querySelector('.scrollable'))
     </script>
   </body>

@@ -185,3 +185,13 @@
     }
   }
 })();
+
+var strFormatter = function (str) {
+  let reg = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"\s]/gi;
+  str = reg.test(str) ? str.replace(reg, "").toLowerCase() : str.toLowerCase();
+  return str;
+};
+
+var hash = function (str) {
+  return md5(strFormatter(str));
+};
