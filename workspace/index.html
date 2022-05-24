@@ -146,10 +146,10 @@
         let initTime = Date.now();
         let objectFactory = new objectFactory();
         let objTable = objectFactory.objHashTableBuilder(db);
-        console.log(Date.now() - initTime);
+        console.log("객체 생성까지: "+ (Date.now() - initTime));
 
         let [sorted1, sorted2, sorted3, sorted4] = objectFactory.getSortedArr(objTable);
-        console.log(Date.now() - initTime);
+        console.log("배열 정렬까지: "+ (Date.now() - initTime));
         
         let recordFragment = new DocumentFragment();
         let queueFragment = new DocumentFragment();
@@ -157,9 +157,23 @@
 
         for (let item of sorted1) {
           let recordElem = document.createElement("div", { is: "record-item"});
+          let queueElem = document.createElement("div", { is: "queue-item"});
           
+          recordElem.setup(item);
+          queueElem.setup(item, context);
+          
+          recordFragment.append(recordElem);
+          queueFragment.append(queueElem);
         }
+
+        console.log("요소 생성까지: "+ (Date.now() - initTime));
+
+        window["record-stack"].append(recordFragment);
+        window["queue-content"].append(queueFragment);
+        console.log("DOM 렌더링까지: "+ (Date.now() - initTime));
       }
+
+      main();
       // new SimpleBar(document.querySelector('.scrollable'))
     </script>
   </body>
