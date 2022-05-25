@@ -205,6 +205,9 @@ class Controller {
       // 핸들러 달기
       this.helpers.setPlayerHandlers();
       this.updateTooltip(true, true);
+      if (queueManager.queueFirstChild) {
+        this.updateMusicToPlay(queueManager.queueFirstChild);
+      }
     }
     // 볼륨바 핸들러 달기
     let inputEvent = new InputEvent("input");
@@ -235,7 +238,8 @@ class Controller {
 
   updateMusicToPlay(musicToPlay) {
     // 컨트롤바의 재생 중인 음악을 전달받은 음악으로 업데이트하고 불러와 재생
-    this.currentInfo.reference.isPlaying = false;
+    if (this.currentInfo.reference)
+      this.currentInfo.reference.isPlaying = false;
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
@@ -655,7 +659,8 @@ class Controller {
 
     onInputPlayBar: (e) => {
       let value = e.target.value;
-      value = (value / this.currentInfo.duration) * 100;
+      if (this.currentInfo.duration)
+        value = (value / this.currentInfo.duration) * 100;
       value = value < 0 ? 0 : value;
       e.target.style.background =
         "linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) " +

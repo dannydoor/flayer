@@ -46,15 +46,15 @@ class QueueManager {
     this._setupQueueSlip();
   }
 
-  static get currentMusic() {
+  get currentMusic() {
     return this.queue.querySelector(".current");
   }
 
-  static get queueFirstChild() {
+  get queueFirstChild() {
     return this.queue.firstElementChild;
   }
 
-  static get queueLastChild() {
+  get queueLastChild() {
     return this.queue.lastElementChild;
   }
 
