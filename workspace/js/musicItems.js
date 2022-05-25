@@ -51,7 +51,6 @@ class MusicItem extends HTMLDivElement {
     const songInfo = document.createElement("div");
     const buttonField = document.createElement("div");
     frontIndicator.classList.add("front-indicator");
-    frontIndicator.setAttribute("data-index", "");
     songInfo.classList.add("song-info");
     buttonField.classList.add("button-field");
 
@@ -242,10 +241,8 @@ class QueueItem extends MusicItem {
 
     this.context = context;
     this.classList.add("queue");
-    this.key = { id: this.musicId, context: this.context };
     this.index = Date.now();
     this.setAttribute("context", this.context);
-    this.setAttribute("key", this.key);
     this.setAttribute("index", this.index);
   }
 

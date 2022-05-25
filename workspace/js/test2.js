@@ -52,7 +52,7 @@ class ObjectFactory {
     obj.artist = arr[1];
     obj.startTime = arr[2];
     obj.endTime = arr[3];
-    obj.duration = obj.endTime - obj.startTime;
+    obj.duration = parseInt(obj.endTime - obj.startTime);
     obj.src = arr[4];
     obj.isLiked = false;
     obj.isPlaying = false;

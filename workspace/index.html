@@ -158,28 +158,29 @@
 
         for (let item of sorted1) {
           let recordElem = document.createElement("div", { is: "record-item"});
-          let queueElem = document.createElement("div", { is: "queue-item"});
-          
           recordElem.setup(item);
-          queueElem.setup(item, context);
-          
           recordFragment.append(recordElem);
+        }
+        console.log("sorted1 요소 생성까지: "+ (Date.now() - initTime));
+        for (let item of sorted3) {
+          let queueElem = document.createElement("div", { is: "queue-item"});
+          queueElem.setup(item, context);
           queueFragment.append(queueElem);
         }
-
-        console.log("요소 생성까지: "+ (Date.now() - initTime));
+        console.log("sorted2 요소 생성까지: "+ (Date.now() - initTime));
 
         window["record-stack"].append(recordFragment);
         window["queue-content"].append(queueFragment);
         console.log("DOM 렌더링까지: "+ (Date.now() - initTime));
+
+        let scrollHeight = getComputedStyle(window["record-stack"]).height;
+        console.log(scrollHeight);
+        console.log("스크롤 크기 계산까지: "+ (Date.now() - initTime));
+
+        setTimeout(() => {document.querySelector(".simplebar-content-wrapper").scrollTop = parseInt(scrollHeight) + 56}, 200);
       }
 
       main();
-      var scroll = () => {
-          let scrollHeight = getComputedStyle(window["record-stack"]).height;
-          console.log(scrollHeight);
-          document.querySelector(".simplebar-content-wrapper").scrollHeight = parseInt(scrollHeight) + 56 + 'px';
-        };
       // new SimpleBar(document.querySelector('.scrollable'))
     </script>
   </body>
