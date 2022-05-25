@@ -63,3 +63,37 @@ class ObjectFactory {
     return obj;
   }
 }
+
+class ModalManager {
+  constructor() {}
+
+  createModal() {
+    return "clear";
+  }
+}
+
+class PlaylistManager {
+  constructor() {}
+
+  getPlaylistContents() {
+    return [];
+  }
+
+  getPlaylistName() {
+    return null;
+  }
+}
+
+class LibraryManager {
+  constructor() {}
+
+  getPrevObj() {
+    return null;
+  }
+
+  getNextObj() {
+    return null;
+  }
+
+  static musicObjArr = {};
+}

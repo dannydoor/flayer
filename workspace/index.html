@@ -146,7 +146,7 @@
       function main() {
         let initTime = Date.now();
         let objectFactory = new ObjectFactory();
-        let objTable = objectFactory.objHashTableBuilder(db);
+        var objTable = objectFactory.objHashTableBuilder(db);
         console.log("객체 생성까지: "+ (Date.now() - initTime));
 
         let [sorted1, sorted2, sorted3, sorted4] = objectFactory.getSortedArr(objTable);
@@ -178,9 +178,16 @@
         console.log("스크롤 크기 계산까지: "+ (Date.now() - initTime));
 
         setTimeout(() => {document.querySelector(".simplebar-content-wrapper").scrollTop = parseInt(scrollHeight) + 56}, 200);
+        
+        
       }
 
       main();
+      let queueManager = new QueueManager();
+      let modalManager = new ModalManager();
+      let playlistManager = new PlaylistManager();
+      let libraryManager = new LibraryManager();
+      let controller = new Controller();
       // new SimpleBar(document.querySelector('.scrollable'))
     </script>
   </body>

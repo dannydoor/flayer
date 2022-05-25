@@ -44,6 +44,14 @@
   text-overflow: ellipsis;
 }
 
+#queue-content .music-item {
+  display: none;
+}
+
+#queue-content .current ~ .music-item {
+  display: flex;
+}
+
 #queue-status {
   position: relative;
   width: 24px;

@@ -64,24 +64,25 @@ class Controller {
     this._setupOptions = {
       autostart: true,
       width: "100%",
+      height: "100%",
       mute: false,
       controls: false,
     };
     this.currentInfo = {
-      id,
-      title,
-      artist,
-      context,
-      url,
-      startTime,
-      endTime,
-      duration,
-      isLiked,
-      reference,
+      id: undefined,
+      title: undefined,
+      artist: undefined,
+      context: undefined,
+      url: undefined,
+      startTime: undefined,
+      endTime: undefined,
+      duration: undefined,
+      isLiked: undefined,
+      reference: undefined,
     };
     this._mediaSessionObj = {
-      title,
-      artist,
+      title: undefined,
+      artist: undefined,
       artwork: [
         {
           src: "../assets/img/artworks/artwork@96px.png",
@@ -122,13 +123,13 @@ class Controller {
     this.updateTooltip = this.updateTooltip.bind(this);
     this.updateByQueueChange = this.updateByQueueChange.bind(this);
     for (let key in this.updates) {
-      this.handlers[key] = this.handlers[key].bind(this);
+      this.updates[key] = this.updates[key].bind(this);
     }
     for (let key in this.handlers) {
       this.handlers[key] = this.handlers[key].bind(this);
     }
     for (let key in this.helpers) {
-      this.handlers[key] = this.handlers[key].bind(this);
+      this.helpers[key] = this.helpers[key].bind(this);
     }
 
     // 플레이어 셋업
@@ -185,7 +186,7 @@ class Controller {
         "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/202205/9617396921029532/9617396921029532.smil/playlist.m3u8";
       let options = this._setupOptions;
       jwplayer("video").setup(options);
-      jwplayer().once("ready", () => jwplayer().stop());
+      jwplayer().once("beforePlay", () => jwplayer().stop());
 
       // 컨트롤바 비활성화
       this.helpers.toggleDisabledStatus("control", true);
@@ -307,7 +308,7 @@ class Controller {
   }
 
   // private 메소드
-  static updates = {
+  updates = {
     // 컨트롤바의 구성요소들을 업데이트하는 메소드 모음
     updateControlBar: () => {
       // loadMusic이 재생을 시작하기 전에 컨트롤바의 정보 업데이트 및 초기화
@@ -428,13 +429,13 @@ class Controller {
     },
   };
 
-  static handlers = {
+  handlers = {
     onPlay: (e) => {
       let oldstate = e.oldstate;
       if (oldstate === "buffering") {
         this.helpers.toggleControlStatus();
       }
-      this.helpers.letPlayBarIncrease();
+      this.handlers.letPlayBarIncrease();
     },
 
     onPause: (e) => {
@@ -695,7 +696,7 @@ class Controller {
     },
   };
 
-  static helpers = {
+  helpers = {
     loadMusic: (obj, context) => {
       // 음악을 플레이어에 불러오는 메소드
       jwplayer().off("time");

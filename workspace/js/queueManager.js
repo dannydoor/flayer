@@ -7,11 +7,11 @@ class QueueManager {
     queueStatus = true
   ) {
     // 큐 요소와 프로퍼티 대응
-    this.record = window["#record-stack"];
-    this.queue = window["#queue-content"];
-    this.statusIndicator = window["#queue-status"];
-    this.clearButton = window["#clear-record"];
-    this.currPlaylistName = window["#curr-playlist-name"];
+    this.record = window["record-stack"];
+    this.queue = window["queue-content"];
+    this.statusIndicator = window["queue-status"];
+    this.clearButton = window["clear-record"];
+    this.currPlaylistName = window["curr-playlist-name"];
     this.queueRepo = queueRepo;
     this.queueStatus = queueStatus;
 
@@ -642,6 +642,7 @@ class QueueManager {
   }
 
   _itembuilder(obj, context) {
+    if (!obj) return;
     let elem = document.createElement("div", { is: "queue-item" });
     elem.setup(obj, context);
     this._mapManager(obj, "set");
