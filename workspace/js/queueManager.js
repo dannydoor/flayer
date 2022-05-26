@@ -69,7 +69,7 @@ class QueueManager {
   static playNext(info, context, isShuffled = false, startId = null) {
     if (this.queueStatus) this._updateQueueStatus(false);
 
-    let currentMusicInQueue = this.currentMusic;
+    let currentMusicInQueue = QueueManager.currentMusic;
     let currentIndex = currentMusicInQueue.index;
     let currentMusicInRepo = this.queueRepo.querySelector(
       `[index=${currentIndex}]`
@@ -143,7 +143,7 @@ class QueueManager {
   ) {
     let newCurrent;
     let isCurrentDeleted = false;
-    let currentId = this.currentMusic.musicId;
+    let currentId = QueueManager.currentMusic.musicId;
     newCurrentFinder = newCurrentFinder.bind(this);
     currentDeletionChecker = currentDeletionChecker.bind(this);
     clearQueueData = clearQueueData.bind(this);
@@ -183,7 +183,7 @@ class QueueManager {
       }
 
       if (!newId) {
-        newCurrent = this.queueFirstChild;
+        newCurrent = QueueManager.queueFirstChild;
       } else {
         newCurrent = this.queue.querySelector(`[music-id=${newId}]`);
       }
@@ -204,7 +204,7 @@ class QueueManager {
       deleteListRepo.forEach((item) => item.remove());
 
       let foundCurrentElem = newCurrentFinder(false, deleteList);
-      if (!foundCurrentElem) newCurrent = this.queueFirstChild;
+      if (!foundCurrentElem) newCurrent = QueueManager.queueFirstChild;
     }
 
     Controller.updateMusicToPlay(newCurrent);
@@ -214,7 +214,7 @@ class QueueManager {
       // isNew는 큐가 갈아엎어졌는지를 알려줌
       if (isCurrentDeleted) {
         let gotcha = false;
-        let targetElem = this.currentMusic;
+        let targetElem = QueueManager.currentMusic;
 
         while (!gotcha) {
           if (!targetElem) break;
@@ -239,7 +239,7 @@ class QueueManager {
       } else {
         if (isNew) return currentId;
         else {
-          newCurrent = this.currentMusic;
+          newCurrent = QueueManager.currentMusic;
           return true;
         }
       }
@@ -265,7 +265,7 @@ class QueueManager {
         });
       });
 
-      if (deleteList.includes(this.currentMusic)) {
+      if (deleteList.includes(QueueManager.currentMusic)) {
         isCurrentDeleted = true;
       }
 
@@ -291,7 +291,7 @@ class QueueManager {
         this._shuffleQueue(false);
       } else {
         this._shuffleQueue(true);
-        this.queue.prepend(this.currentMusic);
+        this.queue.prepend(QueueManager.currentMusic);
       }
     }
   }
@@ -303,7 +303,7 @@ class QueueManager {
       QueueManager.makeUpLibraryItem();
       return;
     } else {
-      let currentIndex = this.currentMusic.index;
+      let currentIndex = QueueManager.currentMusic.index;
       this._clearQueue();
       this.queue.append(this.queueRepo.cloneNode(true));
       this.queue
@@ -573,14 +573,14 @@ class QueueManager {
   }
 
   _clearBeforeAfter() {
-    while (this.currentMusic.nextElementSibling) {
+    while (QueueManager.currentMusic.nextElementSibling) {
       // 다음 음악 비우기
       let target = controller.correntMusic.nextElementSibling;
       this._mapManager(target.musicObj, "delete");
       target.remove();
     }
 
-    while (this.currentMusic.previousElementSibling) {
+    while (QueueManager.currentMusic.previousElementSibling) {
       // 이전 음악 비우기
       let target = controller.correntMusic.previousElementSibling;
       this._mapManager(target.musicObj, "delete");

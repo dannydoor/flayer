@@ -484,7 +484,7 @@ class Controller {
     onPrev: () => {
       let currPostion = this.playBar.value;
 
-      if (currPostion < 10 || !this.prevMusic) {
+      if (currPostion > 10 || !this.prevMusic) {
         jwplayer().seek(this.currentInfo.startTime);
         return;
       }
@@ -521,7 +521,11 @@ class Controller {
 
       function makeTooltipVisible() {
         let tooltip = target.querySelector(".tooltip");
-        tooltip.classList.add("visible");
+        if (tooltip) {
+          tooltip.classList.add("visible");
+        } else {
+          return;
+        }
       }
     },
 
@@ -633,7 +637,7 @@ class Controller {
     onClickMute: () => {
       let currMuteState = this.volumeBar.mute;
       currMuteState = !currMuteState;
-      jwplayer.setMute(currMuteState);
+      jwplayer().setMute(currMuteState);
       this.helpers.toggleVolumeBarMuteState(currMuteState);
     },
 
