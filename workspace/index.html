@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0" />
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/controller.css">
+    <link rel="stylesheet" href="./css/Controller.css">
     <link rel="stylesheet" href="./css/queue.css">
     <link rel="stylesheet" href="./css/musicItems.css">
     <link rel="stylesheet" href="./js/simpleBar/simplebar.css">
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="./js/md5.js"></script>
     <script type="text/javascript" src="./js/slip.js"></script>
     <script type="text/javascript" src="./js/musicItems.js"></script>
-    <script type="text/javascript" src="./js/controller.js"></script>
+    <script type="text/javascript" src="./js/Controller.js"></script>
     <script type="text/javascript" src="./js/queueManager.js"></script>
     <script type="text/javascript" src="./js/test2.js"></script>
     <script type="text/javascript" src="./js/testDB.js"></script>
@@ -169,6 +169,7 @@
         }
         console.log("sorted2 요소 생성까지: "+ (Date.now() - initTime));
 
+        queueFragment.firstElementChild.classList.add("current");
         window["record-stack"].append(recordFragment);
         window["queue-content"].append(queueFragment);
         console.log("DOM 렌더링까지: "+ (Date.now() - initTime));
@@ -183,11 +184,12 @@
       }
 
       main();
-      let queueManager = new QueueManager();
-      let modalManager = new ModalManager();
-      let playlistManager = new PlaylistManager();
-      let libraryManager = new LibraryManager();
-      let controller = new Controller();
+      var inputEvent = new InputEvent("input");
+      var queueManager = new QueueManager();
+      var modalManager = new ModalManager();
+      var playlistManager = new PlaylistManager();
+      var libraryManager = new LibraryManager();
+      var controller = new Controller();
       // new SimpleBar(document.querySelector('.scrollable'))
     </script>
   </body>

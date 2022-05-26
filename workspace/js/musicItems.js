@@ -121,7 +121,7 @@ class PlayableItem extends MusicItem {
   onClick(e) {
     if (e.defaultPrevented) return;
 
-    queueManager.playThis(this.referencedObj, this.context);
+    QueueManager.playThis(this.referencedObj, this.context);
   }
 
   _addToPlaylistForButton(e) {
@@ -178,7 +178,7 @@ class RecordItem extends PlayableItem {
   onClick(e) {
     if (e.defaultPrevented) return;
 
-    queueManager.playRecord(this.referencedObj);
+    QueueManager.playRecord(this.referencedObj);
   }
 
   onContextMenu(e) {
@@ -249,7 +249,7 @@ class QueueItem extends MusicItem {
   onClick(e) {
     if (e.defaultPrevented) return;
 
-    queueManager.playQueue(this);
+    QueueManager.playQueue(this);
   }
 
   _deleteMusic(e) {

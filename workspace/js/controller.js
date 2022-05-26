@@ -85,32 +85,32 @@ class Controller {
       artist: undefined,
       artwork: [
         {
-          src: "../assets/img/artworks/artwork@96px.png",
+          src: "./assets/img/artworks/artwork@96px.png",
           sizes: "96x96",
           type: "image/png",
         },
         {
-          src: "../assets/img/artworks/artwork@128px.png",
+          src: "./assets/img/artworks/artwork@128px.png",
           sizes: "128x128",
           type: "image/png",
         },
         {
-          src: "../assets/img/artworks/artwork@192px.png",
+          src: "./assets/img/artworks/artwork@192px.png",
           sizes: "192x192",
           type: "image/png",
         },
         {
-          src: "../assets/img/artworks/artwork@256px.png",
+          src: "./assets/img/artworks/artwork@256px.png",
           sizes: "256x256",
           type: "image/png",
         },
         {
-          src: "../assets/img/artworks/artwork@384px.png",
+          src: "./assets/img/artworks/artwork@384px.png",
           sizes: "384x382",
           type: "image/png",
         },
         {
-          src: "../assets/img/artworks/artwork@512px.png",
+          src: "./assets/img/artworks/artwork@512px.png",
           sizes: "512x512",
           type: "image/png",
         },
@@ -118,10 +118,10 @@ class Controller {
     };
 
     // 메소드 바인딩
-    this.playMusic = this.playMusic.bind(this);
-    this.updateMusicToPlay = this.updateMusicToPlay.bind(this);
-    this.updateTooltip = this.updateTooltip.bind(this);
-    this.updateByQueueChange = this.updateByQueueChange.bind(this);
+    Controller.playMusic = Controller.playMusic.bind(this);
+    Controller.updateMusicToPlay = Controller.updateMusicToPlay.bind(this);
+    Controller.updateTooltip = Controller.updateTooltip.bind(this);
+    Controller.updateByQueueChange = Controller.updateByQueueChange.bind(this);
     for (let key in this.updates) {
       this.updates[key] = this.updates[key].bind(this);
     }
@@ -133,9 +133,12 @@ class Controller {
     }
 
     // 플레이어 셋업
-    this._setupPlayer(initObj, initContext);
+    this.setupPlayer(initObj, initContext);
 
     // 핸들러 달기
+    this.playButton.onclick = this.handlers.onClickPlay;
+    this.prevButton.onclick = this.handlers.onPrev;
+    this.nextButton.onclick = this.handlers.onNext;
     this.prevButton.onmouseover =
       this.nextButton.onmouseover =
       this.openPlaylistButton.onmouseover =
@@ -159,7 +162,7 @@ class Controller {
     this.playBar.dispatchEvent(inputEvent);
   }
 
-  _setupPlayer(obj, context) {
+  setupPlayer(obj, context) {
     if (obj) {
       // 마지막 세션 세팅
       this.updates.updateProperties(obj, context);
@@ -171,6 +174,7 @@ class Controller {
 
       jwplayer("video").setup(options);
       jwplayer().once("beforePlay", () => {
+        jwplayer().setMute(false);
         jwplayer().seek(startTime);
         updateMediaSession();
       });
@@ -178,15 +182,18 @@ class Controller {
       this.updates.updateControlBar();
       this.updates.updatePlayerHandler();
       this.helpers.setPlayerHandlers();
-      this.updateMusicToPlay(queueManager.currentMusic);
-      this.updateTooltip(true, true);
+      Controller.updateMusicToPlay(QueueManager.currentMusic);
+      Controller.updateTooltip(true, true);
     } else {
       // 초기화
       this._setupOptions.file =
         "https://media.dema.mil.kr/mediavod/_definst_/smil:dematv/202205/9617396921029532/9617396921029532.smil/playlist.m3u8";
       let options = this._setupOptions;
       jwplayer("video").setup(options);
-      jwplayer().once("beforePlay", () => jwplayer().stop());
+      jwplayer().once("beforePlay", () => {
+        jwplayer().setMute(false);
+        jwplayer().stop();
+      });
 
       // 컨트롤바 비활성화
       this.helpers.toggleDisabledStatus("control", true);
@@ -204,13 +211,9 @@ class Controller {
 
       // 핸들러 달기
       this.helpers.setPlayerHandlers();
-      this.updateTooltip(true, true);
-      if (queueManager.queueFirstChild) {
-        this.updateMusicToPlay(queueManager.queueFirstChild);
-      }
+      Controller.updateTooltip(true, true);
     }
     // 볼륨바 핸들러 달기
-    let inputEvent = new InputEvent("input");
     this.volumeBar.setAttribute("mute", false);
     this.volumeBar.addEventListener("input", this.handlers.onInputVolumeBar);
     this.volumeBar.addEventListener("change", this.handlers.onChangeVolumeBar);
@@ -218,14 +221,18 @@ class Controller {
   }
 
   // public 메소드
-  playMusic() {
+  static playMusic() {
     // 클릭한 음악을 재생
     // 플레이어블을 클릭했을 때 큐 매니저에 의해 호출
-    let musicToPlay = queueManager.queueFirstChild;
+    let musicToPlay = QueueManager.queueFirstChild;
 
-    this.updateMusicToPlay(musicToPlay);
-    this.updateTooltip(true, true);
+    Controller.updateMusicToPlay(musicToPlay);
+    Controller.updateTooltip(true, true);
 
+    QueueManager.setPlaylistName();
+  }
+
+  static updateMusicToPlay(musicToPlay) {
     if (this.initState) {
       // 초기화의 일환으로 컨트롤바가 비활성화됐었다면 다시 활성화
       this.helpers.toggleDisabledStatus("control", false);
@@ -233,10 +240,6 @@ class Controller {
       this.initState = null;
     }
 
-    queueManager.setPlaylistName();
-  }
-
-  updateMusicToPlay(musicToPlay) {
     // 컨트롤바의 재생 중인 음악을 전달받은 음악으로 업데이트하고 불러와 재생
     if (this.currentInfo.reference)
       this.currentInfo.reference.isPlaying = false;
@@ -250,16 +253,16 @@ class Controller {
     this.helpers.loadMusic(musicToPlay.musicObj, musicToPlay.context);
     let musicId = this.currentInfo.id;
     musicToPlay.classList.add("current");
-    document.querySelectorAll(`[music-id=${musicId}]`).forEach((item) => {
+    document.querySelectorAll(`[music-id="${musicId}"]`).forEach((item) => {
       item.classList.add("playing");
     });
 
     this.currentMusic = musicToPlay;
-    queueManager.makeUpLibraryItem();
+    QueueManager.makeUpLibraryItem();
     this.updates.updatePrevAndNext(musicToPlay);
   }
 
-  updateTooltip(prevOrNext = false, playlist = false) {
+  static updateTooltip(prevOrNext = false, playlist = false) {
     if (prevOrNext) {
       let prevObj = this.prevMusic?.musicObj;
       if (prevObj) {
@@ -302,13 +305,13 @@ class Controller {
     }
   }
 
-  updateByQueueChange() {
+  static updateByQueueChange() {
     // 컨트롤바의 재생 중인 음악, 이전 곡, 다음 곡을 업데이트하는 메소드
     // 재생 중인 목록에 변화가 생길 때마다 호출
-    let newCurrMusic = queueManager.currentMusic;
+    let newCurrMusic = QueueManager.currentMusic;
     this.currentMusic = newCurrMusic;
     this.updates.updatePrevAndNext(newCurrMusic);
-    this.updateTooltip(true);
+    Controller.updateTooltip(true);
   }
 
   // private 메소드
@@ -326,6 +329,7 @@ class Controller {
       [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
         this.helpers.timeFormatter(0, this.currentInfo.duration);
       this.volumeBar.value = jwplayer().getVolume();
+      this.volumeBar.dispatchEvent(inputEvent);
 
       this.songTitleSection.innerHTML = this.currentInfo.title;
       this.songTitleSection.setAttribute("title", this.currentInfo.title);
@@ -350,6 +354,7 @@ class Controller {
         [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
           this.helpers.timeFormatter(currTime, this.currentInfo.duration);
       }
+      this.playBar.dispatchEvent(inputEvent);
     },
 
     updateVolumeBar: () => {
@@ -363,12 +368,12 @@ class Controller {
       this.prevMusic = currentMusic.previousElementSibling
         ? currentMusic.previousElementSibling
         : this.isRepeat
-        ? queueManager.queueLastChild
+        ? QueueManager.queueLastChild
         : null;
       this.nextMusic = currentMusic.nextElementSibling
         ? currentMusic.nextElementSibling
         : this.isRepeat
-        ? queueManager.queueFirstChild
+        ? QueueManager.queueFirstChild
         : null;
     },
 
@@ -435,19 +440,13 @@ class Controller {
 
   handlers = {
     onPlay: (e) => {
-      let oldstate = e.oldstate;
-      if (oldstate === "buffering") {
-        this.helpers.toggleControlStatus();
-      }
+      this.helpers.toggleControlStatus();
       this.handlers.letPlayBarIncrease();
     },
 
     onPause: (e) => {
-      let oldstate = e.oldstate;
-      if (oldstate === "buffering") {
-        this.helpers.toggleControlStatus();
-      }
-      this.handers.letIncreaseStop();
+      this.helpers.toggleControlStatus();
+      this.handlers.letIncreaseStop();
       this.updates.updatePlayBar();
     },
 
@@ -492,11 +491,11 @@ class Controller {
 
       let musicToPlay = this.prevMusic;
 
-      this.handlers.isItPlayedEnough();
+      this.helpers.isItPlayedEnough();
 
-      this.updateMusicToPlay(musicToPlay);
-      this.updateTooltip(true, true);
-      queueManager.setPlaylistName();
+      Controller.updateMusicToPlay(musicToPlay);
+      Controller.updateTooltip(true, true);
+      QueueManager.setPlaylistName();
     },
 
     onNext: () => {
@@ -504,14 +503,14 @@ class Controller {
       let musicToPlay = this.nextMusic;
       if (!musicToPlay) {
         mustStop = true;
-        musicToPlay = queueManager.queueFirstChild;
+        musicToPlay = QueueManager.queueFirstChild;
       }
 
-      this.handlers.isItPlayedEnough();
+      this.helpers.isItPlayedEnough();
 
-      this.updateMusicToPlay(musicToPlay);
-      this.updateTooltip(true, true);
-      queueManager.setPlaylistName();
+      Controller.updateMusicToPlay(musicToPlay);
+      Controller.updateTooltip(true, true);
+      QueueManager.setPlaylistName();
 
       if (mustStop) jwplayer().stop();
     },
@@ -580,6 +579,11 @@ class Controller {
       jwplayer().play();
     },
 
+    onClickPlay: () => {
+      jwplayer().playToggle();
+      this.helpers.toggleControlStatus();
+    },
+
     onClickRepeat: () => {
       update = update.bind(this);
 
@@ -599,7 +603,7 @@ class Controller {
 
       function update() {
         this.updates.updatePrevAndNext(this.currentMusic);
-        this.updateTooltip(true);
+        Controller.updateTooltip(true);
       }
     },
 
@@ -617,18 +621,19 @@ class Controller {
         this.isShuffled = isShuffled;
         if (isShuffled) {
           this.shuffleButton.classList.add("active");
-          queueManager.shuffleQueue();
+          QueueManager.shuffleQueue();
         } else {
           this.shuffleButton.classList.remove("active");
-          queueManager.restoreQueue();
+          QueueManager.restoreQueue();
         }
-        this.updateByQueueChange();
+        Controller.updateByQueueChange();
       }
     },
 
     onClickMute: () => {
       let currMuteState = this.volumeBar.mute;
       currMuteState = !currMuteState;
+      jwplayer.setMute(currMuteState);
       this.helpers.toggleVolumeBarMuteState(currMuteState);
     },
 
@@ -692,6 +697,7 @@ class Controller {
 
       function increase() {
         this.playBar.stepUp();
+        this.playBar.dispatchEvent(inputEvent);
         [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
           this.helpers.timeFormatter(
             this.playBar.value,
@@ -739,7 +745,7 @@ class Controller {
       let currTime = this.playBar.value;
       if (currTime > 60) {
         this.currentInfo.reference.playedCounts++;
-        queueManager.pushRecordStack(this.currentInfo.reference);
+        QueueManager.pushRecordStack(this.currentInfo.reference);
       } else {
       }
     },
@@ -771,7 +777,7 @@ class Controller {
 
     toggleVolumeBarMuteState: (currMuteState) => {
       // 뮤트 상태에 따라 볼륨바의 인풋 핸들러 교체
-      let inputEvent = new InputEvent("input");
+      this.volumeBar.mute = currMuteState;
       if (currMuteState) {
         this.volumeBar.removeEventListener(
           "input",
