@@ -140,6 +140,15 @@
       <div id="element-storehouse"></div>
       <div id="modal-storehouse"></div>
       <div id="contextmenu-storehouse"></div>
+      <div id="temp-imgs">
+        <img src="./assets/img/artworks/artwork@96px.png" alt="" id="96">
+        <img src="./assets/img/artworks/artwork@128px.png" alt="" id="128">
+        <img src="./assets/img/artworks/artwork@192px.png" alt="" id="192">
+        <img src="./assets/img/artworks/artwork@256px.png" alt="" id="256">
+        <img src="./assets/img/artworks/artwork@384px.png" alt="" id="384">
+        <img src="./assets/img/artworks/artwork@512px.png" alt="" id="512">
+        <div class="cover"></div>
+      </div>
     </div>
     <script src="./js/simpleBar/simplebar.js"></script>
     <script>
@@ -184,6 +193,23 @@
       }
 
       main();
+      var blob96, blob128, blob192, blob256, blob384, blob512;
+      let blobArr = [96, 128, 192, 256, 384, 512];
+      let canvas = document.createElement("canvas");
+      document.querySelectorAll('img').forEach((item, index) => {
+        /* item.crossOrigin = "Anonymous";
+        item.src += ' '; */
+        canvas.width = item.clientWidth;
+        canvas.height = item.clientHeight;
+        let context = canvas.getContext("2d");
+        context.drawImage(item, 0, 0);
+
+        canvas.toDataURL(function(data) {
+          window['blob' + blobArr[index]] = data;
+        }, 'image/png');
+      });
+      window["temp-imgs"].remove();
+
       var inputEvent = new InputEvent("input");
       var queueManager = new QueueManager();
       var modalManager = new ModalManager();
