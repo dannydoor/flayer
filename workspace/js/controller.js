@@ -482,7 +482,8 @@ class Controller {
         .classList.remove("must-visible");
     },
 
-    onPrev: () => {
+    onPrev: (e) => {
+      if (e.target.isSeeking) return;
       let currPostion = this.playBar.value;
 
       if (currPostion > 10 || !this.prevMusic) {
@@ -499,7 +500,8 @@ class Controller {
       QueueManager.setPlaylistName();
     },
 
-    onNext: () => {
+    onNext: (e) => {
+      if (e.target.isSeeking) return;
       let mustStop = false;
       let musicToPlay = this.nextMusic;
       if (!musicToPlay) {
@@ -556,6 +558,7 @@ class Controller {
 
       let seeking = (e) => {
         let target = e.target;
+        clearTimeout(target.timerId);
         target.querySelector(".tooltip").classList.remove("visible");
         startSeeking = startSeeking.bind(this);
         this.seekStarttimerId = setTimeout(() => {
@@ -564,6 +567,7 @@ class Controller {
         }, 2000);
 
         function startSeeking() {
+          target.isSeeking = true;
           jwplayer().pause();
           let origPos = jwplayer().getPosition();
           pos = origPos;
@@ -663,7 +667,7 @@ class Controller {
     },
 
     onChangeVolumeBar: (e) => {
-      let volume = e.target.value;
+      let volume = parseInt(e.target.value);
       jwplayer().setVolume(volume);
     },
 
@@ -681,7 +685,8 @@ class Controller {
     },
 
     onChangePlayBar: (e) => {
-      let position = this.currentInfo.startTime + e.target.value;
+      let value = parseInt(e.target.value);
+      let position = this.currentInfo.startTime + value;
       jwplayer().seek(position);
     },
 
@@ -812,9 +817,11 @@ class Controller {
       // 버튼을 선택적으로 비활성화
       switch (node) {
         case "control": {
+          this.repeatButton.disabled = bool;
           this.playButton.disabled = bool;
           this.nextButton.disabled = bool;
           this.prevButton.disabled = bool;
+          this.shuffleButton.disabled = bool;
           break;
         }
         case "barsAndOthers": {
