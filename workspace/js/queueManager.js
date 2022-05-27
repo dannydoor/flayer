@@ -1,10 +1,10 @@
 class QueueManager {
   constructor(
+    queueStatus = true,
     recordStack = null,
     queueRepo = null,
     queue = null,
-    map = null,
-    queueStatus = true
+    map = null
   ) {
     // 큐 요소와 프로퍼티 대응
     this.record = window["record-stack"];
@@ -45,6 +45,14 @@ class QueueManager {
     recordStack = null;
     queue = null;
     this._updateQueueStatus(queueStatus);
+
+    let scrollHeight = parseInt(
+      getComputedStyle(window["record-stack"]).height
+    );
+    let timerId = setTimeout(() => {
+      document.querySelector(".simplebar-content-wrapper").scrollTop =
+        scrollHeight + 56;
+    }, 200);
 
     // 핸들러 달기 및 slip.js 적용
     this.statusIndicator.onmouseover = this._onMouseOverTooltip;
@@ -644,7 +652,11 @@ class QueueManager {
 
   _updateQueueStatus(bool) {
     this.queueStatus = bool;
-    this.statusIndicator.setAttribute("data-sync", bool);
+    if (bool) {
+      this.statusIndicator.classList.add("active");
+    } else {
+      this.statusIndicator.classList.remove("active");
+    }
 
     if (!bool) {
       if (!this.queueRepo) {

@@ -56,11 +56,14 @@
   position: relative;
   width: 24px;
   height: 24px;
+}
+
+#queue-status.active {
   background: url("../assets/img/24px/Linked-p.svg") no-repeat center/24px;
 }
 
-#queue-status.disabled {
-  background: url("../assets/img/24px/Linked-g.svg") no-repeat center/24px;
+#queue-status:not(.active) {
+  background: url("../assets/img/24px/Linked-gd.svg") no-repeat center/24px;
 }
 
 #queue-status .tooltip {
@@ -74,9 +77,15 @@
 }
 
 #queue-status.active .tooltip.on.visible,
-#queue-status .tooltip.off.visible {
+#queue-status:not(.active) .tooltip.off.visible {
   visibility: visible;
   opacity: 1;
+}
+
+#queue-status.active .tooltip.off.visible,
+#queue-status:not(.active) .tooltip.on.visible {
+  visibility: hidden;
+  opacity: 0;
 }
 
 #queue-status .tooltip.on .tooltip-header {

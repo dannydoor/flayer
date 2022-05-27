@@ -147,11 +147,12 @@
       function main() {
         let initTime = Date.now();
         let objectFactory = new ObjectFactory();
+        let map = new Map();
         var objTable = objectFactory.objHashTableBuilder(db);
-        console.log("객체 생성까지: "+ (Date.now() - initTime));
+        // console.log("객체 생성까지: "+ (Date.now() - initTime));
 
         let [sorted1, sorted2, sorted3, sorted4] = objectFactory.getSortedArr(objTable);
-        console.log("배열 정렬까지: "+ (Date.now() - initTime));
+        // console.log("배열 정렬까지: "+ (Date.now() - initTime));
         
         let recordFragment = new DocumentFragment();
         let queueFragment = new DocumentFragment();
@@ -160,31 +161,34 @@
         for (let item of sorted1) {
           let recordElem = document.createElement("div", { is: "record-item"});
           recordElem.setup(item);
+          map.set(item.id, 1);
           recordFragment.append(recordElem);
         }
-        console.log("sorted1 요소 생성까지: "+ (Date.now() - initTime));
+        // console.log("sorted1 요소 생성까지: "+ (Date.now() - initTime));
         for (let item of sorted3) {
           let queueElem = document.createElement("div", { is: "queue-item"});
           queueElem.setup(item, context);
           queueFragment.append(queueElem);
         }
-        console.log("sorted2 요소 생성까지: "+ (Date.now() - initTime));
+        // console.log("sorted2 요소 생성까지: "+ (Date.now() - initTime));
 
         queueFragment.firstElementChild.classList.add("current");
-        window["record-stack"].append(recordFragment);
+
+        return [recordFragment, queueFragment, map];
+        /* window["record-stack"].append(recordFragment);
         window["queue-content"].append(queueFragment);
         console.log("DOM 렌더링까지: "+ (Date.now() - initTime));
 
         let scrollHeight = getComputedStyle(window["record-stack"]).height;
         console.log(scrollHeight);
-        console.log("스크롤 크기 계산까지: "+ (Date.now() - initTime));
+        console.log("스크롤 크기 계산까지: "+ (Date.now() - initTime)); */ 
 
-        setTimeout(() => {document.querySelector(".simplebar-content-wrapper").scrollTop = parseInt(scrollHeight) + 56}, 200);
+        ;
         
         
       }
 
-      main();
+      let [recordStack, queueContent, map] = main();
 /*
       async function getFileFromImgUrl(url) {
         const response = await fetch(url);
@@ -217,7 +221,7 @@
       window["temp-imgs"].remove();
 */
       var inputEvent = new InputEvent("input");
-      var queueManager = new QueueManager();
+      var queueManager = new QueueManager(true, recordStack, queueContent, queueContent, map);
       var modalManager = new ModalManager();
       var playlistManager = new PlaylistManager();
       var libraryManager = new LibraryManager();
