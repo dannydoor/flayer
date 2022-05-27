@@ -84,6 +84,7 @@ class Controller {
       title: undefined,
       artist: undefined,
       artwork: [
+        /*
         {
           src: imgData96,
           sizes: "96x96",
@@ -93,12 +94,12 @@ class Controller {
           src: imgData128,
           sizes: "128x128",
           type: "image/png",
-        },
+        }, */
         {
           src: imgData192,
           sizes: "192x192",
           type: "image/png",
-        },
+        } /*
         {
           src: imgData256,
           sizes: "256x256",
@@ -113,7 +114,7 @@ class Controller {
           src: imgData512,
           sizes: "512x512",
           type: "image/png",
-        },
+        }, */,
       ],
     };
 
