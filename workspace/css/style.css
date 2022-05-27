@@ -161,24 +161,6 @@ body {
   display: none;
 }
 
-#temp-imgs {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-}
-
-#temp-imgs .cover {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background: white;
-  z-index: 99999;
-}
-
 .tab-container {
   display: flex;
   flex-direction: column;

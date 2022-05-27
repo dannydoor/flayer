@@ -85,32 +85,32 @@ class Controller {
       artist: undefined,
       artwork: [
         {
-          src: "./assets/img/artworks/artwork@96px.png",
+          src: imgData96,
           sizes: "96x96",
           type: "image/png",
         },
         {
-          src: "./assets/img/artworks/artwork@128px.png",
+          src: imgData128,
           sizes: "128x128",
           type: "image/png",
         },
         {
-          src: "./assets/img/artworks/artwork@192px.png",
+          src: imgData192,
           sizes: "192x192",
           type: "image/png",
         },
         {
-          src: "./assets/img/artworks/artwork@256px.png",
+          src: imgData256,
           sizes: "256x256",
           type: "image/png",
         },
         {
-          src: "./assets/img/artworks/artwork@384px.png",
+          src: imgData384,
           sizes: "384x382",
           type: "image/png",
         },
         {
-          src: "./assets/img/artworks/artwork@512px.png",
+          src: imgData512,
           sizes: "512x512",
           type: "image/png",
         },

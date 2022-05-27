@@ -12,6 +12,7 @@
     <script>
       jwplayer.key = 'Bch7bd0cZt0adCRYHGveauTP1LaJlq1EMyrU/IxgfrGDc3gTqZxyPFEKKMI';
     </script>
+    <script type="text/javascript" src="./js/artworks.js"></script>
     <script type="text/javascript" src="./js/md5.js"></script>
     <script type="text/javascript" src="./js/slip.js"></script>
     <script type="text/javascript" src="./js/musicItems.js"></script>
@@ -140,15 +141,6 @@
       <div id="element-storehouse"></div>
       <div id="modal-storehouse"></div>
       <div id="contextmenu-storehouse"></div>
-      <div id="temp-imgs">
-        <img src="./assets/img/artworks/artwork@96px.png" alt="" id="96">
-        <img src="./assets/img/artworks/artwork@128px.png" alt="" id="128">
-        <img src="./assets/img/artworks/artwork@192px.png" alt="" id="192">
-        <img src="./assets/img/artworks/artwork@256px.png" alt="" id="256">
-        <img src="./assets/img/artworks/artwork@384px.png" alt="" id="384">
-        <img src="./assets/img/artworks/artwork@512px.png" alt="" id="512">
-        <div class="cover"></div>
-      </div>
     </div>
     <script src="./js/simpleBar/simplebar.js"></script>
     <script>
@@ -193,23 +185,37 @@
       }
 
       main();
-      var blob96, blob128, blob192, blob256, blob384, blob512;
-      let blobArr = [96, 128, 192, 256, 384, 512];
-      let canvas = document.createElement("canvas");
-      document.querySelectorAll('img').forEach((item, index) => {
-        /* item.crossOrigin = "Anonymous";
-        item.src += ' '; */
-        canvas.width = item.clientWidth;
-        canvas.height = item.clientHeight;
-        let context = canvas.getContext("2d");
-        context.drawImage(item, 0, 0);
+/*
+      async function getFileFromImgUrl(url) {
+        const response = await fetch(url);
+        const data = await response.blob();
+        return new File([data], url, {
+          type: "image/png",
+        });
+      }
+      var imgData96, imgData128, imgData192, imgData256, imgData384, imgData512;
+      let imgDataArr = [96, 128, 192, 256, 384, 512];
+      function dataUrlConverter() {
+        document.querySelectorAll('img').forEach(async (item, index) => {
+          let file = await getFileFromImgUrl(item.src);
+          console.log(file.result);
+          let reader = new FileReader();
+        
+          reader.onload = (e) => {
+            console.log(reader.result);
+            window["imgData" + imgDataArr[index]] = reader.result;
+          };
 
-        canvas.toDataURL(function(data) {
-          window['blob' + blobArr[index]] = data;
-        }, 'image/png');
-      });
+          reader.onerror = (e) => {
+            throw reader.error;
+          };
+
+          reader.readAsDataURL(file);
+        });
+      }
+      dataUrlConverter();
       window["temp-imgs"].remove();
-
+*/
       var inputEvent = new InputEvent("input");
       var queueManager = new QueueManager();
       var modalManager = new ModalManager();
