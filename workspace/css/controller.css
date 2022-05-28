@@ -303,7 +303,14 @@
   border-radius: 100px;
   margin: 0 8px 0;
   background: linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) 0%, var(--color-base-3, #d9d9d9) 0%, var(--color-base-3, #d9d9d9) 100%);
+}
+
+#volume-bar:not(:disabled) {
   cursor: pointer;
+}
+
+#volume-bar:disabled {
+  cursor: default;
 }
 
 #volume-bar::-webkit-slider-thumb {
@@ -366,6 +373,9 @@
   font: 400 14px/20px 'NotoSans';
   color: var(--color-ceil-1, #707070);
   cursor: pointer;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 #curr-song-artist:hover {
@@ -515,9 +525,13 @@
 }
 
 .tooltip-desc strong {
-  font: var(--font-medium-bold, 700 14px/16px "NotoSans");
-  color: var(--color-ceil, #262626);
-  margin-bottom: 4px;
+  max-width: 208px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: translateY(-2px);
+  font: var(--font-medium-bold, 700 14px/18px "NotoSans");
+  color: var(--color-ceil, #080404);
+  margin-bottom: 2px;
 }
 
 .tooltip-desc strong:last-child {

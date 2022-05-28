@@ -254,8 +254,7 @@ class QueueItem extends MusicItem {
 
   _deleteMusic(e) {
     e.preventDefault();
-
-    this.remove();
+    QueueManager.deleteQueueItem(this);
   }
 
   onContextMenu(e) {

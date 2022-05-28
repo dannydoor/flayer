@@ -326,9 +326,7 @@ class Controller {
         : false;
 
       this.playBar.setAttribute("max", parseInt(this.currentInfo.duration));
-      this.playBar.value = 0;
-      [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
-        this.helpers.timeFormatter(0, this.currentInfo.duration);
+      this.updates.updatePlayBar();
       this.volumeBar.value = jwplayer().getVolume();
       this.volumeBar.dispatchEvent(inputEvent);
 
@@ -347,7 +345,9 @@ class Controller {
 
     updatePlayBar: () => {
       let currTime = parseInt(
-        jwplayer().getPosition() - this.currentInfo.startTime
+        !!jwplayer().getPosition()
+          ? jwplayer().getPosition() - this.currentInfo.startTime
+          : 0
       );
       if (this.playBar.value == currTime) return;
       else {
@@ -384,7 +384,6 @@ class Controller {
 
       if (userMuteState == currMuteState) return;
       else {
-        this.volumeBar.setAttribute("mute", currMuteState);
         this.helpers.toggleVolumeBarMuteState(currMuteState);
       }
     },
@@ -455,22 +454,24 @@ class Controller {
       let startTime = this.currentInfo.startTime;
       let endTime = this.currentInfo.endTime;
       let currTime = e.position;
+      let tooltip = this.nextButton.querySelector(".tooltip");
 
       if (currTime < startTime) {
         jwplayer().seek(startTime);
-      } else if (currTime >= endTime - 10) {
-        this.nextButton.querySelector(".tooltip").classList.add("must-visible");
+      } else if (currTime < endTime - 10) {
+        tooltip.classList.remove("must-visible");
+      } else if (currTime < endTime) {
+        tooltip.classList.add("must-visible");
       } else if (currTime >= endTime) {
         if (this.isRepeat == "one") jwplayer().seek(startTime);
         else this.nextButton.click();
-        this.nextButton
-          .querySelector(".tooltip")
-          .classList.remove("must-visible");
+        tooltip.classList.remove("must-visible");
       }
     },
 
     onBuffer: () => {
       this.helpers.toggleControlStatus();
+      this.handlers.letIncreaseStop();
     },
 
     onComplete: () => {
@@ -483,7 +484,11 @@ class Controller {
     },
 
     onPrev: (e) => {
-      if (e.target.isSeeking) return;
+      if (e.target.isSeeking) {
+        e.target.isSeeking = false;
+        return;
+      }
+      e.target.querySelector(".tooltip").classList.remove("must-visible");
       let currPostion = this.playBar.value;
 
       if (currPostion > 10 || !this.prevMusic) {
@@ -501,7 +506,11 @@ class Controller {
     },
 
     onNext: (e) => {
-      if (e.target.isSeeking) return;
+      if (e.target.isSeeking) {
+        e.target.isSeeking = false;
+        return;
+      }
+      e.target.querySelector(".tooltip").classList.remove("must-visible");
       let mustStop = false;
       let musicToPlay = this.nextMusic;
       if (!musicToPlay) {
@@ -686,6 +695,8 @@ class Controller {
 
     onChangePlayBar: (e) => {
       let value = parseInt(e.target.value);
+      [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
+        this.helpers.timeFormatter(value, this.currentInfo.duration);
       let position = this.currentInfo.startTime + value;
       jwplayer().seek(position);
     },
