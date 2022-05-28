@@ -13,6 +13,8 @@ class QueueManager {
     this.clearButton = window["clear-record"];
     this.currPlaylistName = window["curr-playlist-name"];
     this.queueRepo = queueRepo.cloneNode(true);
+    this.queueRepo.querySelector(".current").classList.remove("current");
+    console.log(this.queueRepo.querySelector(".current"));
     this.queueStatus = queueStatus;
 
     // 메소드 바인딩
@@ -313,7 +315,7 @@ class QueueManager {
       QueueManager.makeUpLibraryItem();
       return;
     } else {
-      let currentIndex = QueueManager.currentMusic.index;
+      let currentIndex = QueueManager.currentMusic.getAttribute("index");
       this._clearQueue();
       this.queue.append(this.queueRepo.cloneNode(true));
       this.queue
@@ -590,14 +592,14 @@ class QueueManager {
   _clearBeforeAfter() {
     while (QueueManager.currentMusic.nextElementSibling) {
       // 다음 음악 비우기
-      let target = controller.correntMusic.nextElementSibling;
+      let target = controller.currentMusic.nextElementSibling;
       this._mapManager(target.musicObj, "delete");
       target.remove();
     }
 
     while (QueueManager.currentMusic.previousElementSibling) {
       // 이전 음악 비우기
-      let target = controller.correntMusic.previousElementSibling;
+      let target = controller.currentMusic.previousElementSibling;
       this._mapManager(target.musicObj, "delete");
       target.remove();
     }
@@ -638,7 +640,7 @@ class QueueManager {
       }
     } else {
       while (controller.currentMusic.nextElementSibling) {
-        shuffleFragment.append(controller.correntMusic.nextElementSibling);
+        shuffleFragment.append(controller.currentMusic.nextElementSibling);
       }
     }
 

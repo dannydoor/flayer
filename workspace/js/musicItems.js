@@ -105,15 +105,14 @@ class MusicItem extends HTMLDivElement {
 class PlayableItem extends MusicItem {
   constructor() {
     super();
+  }
 
+  setup(obj) {
     this._builder("playable");
     const addButton = this.querySelector(".music-add");
 
     addButton.onclick = this._addToPlaylistForButton.bind(this);
     this.onclick = this.onClick.bind(this);
-  }
-
-  setup(obj) {
     super.setup(obj);
     if (obj.isPlaying) this.classList.add("playing");
   }
@@ -227,16 +226,15 @@ class PlaylistItem extends PlayableItem {
 class QueueItem extends MusicItem {
   constructor() {
     super();
+  }
 
+  setup(obj, context, index = 0) {
     this._builder("queue");
     let deleteButton = this.querySelector(".music-delete");
 
     deleteButton.onclick = this._deleteMusic.bind(this);
     this.onclick = this.onClick.bind(this);
     this.oncontextmenu = this.onContextMenu.bind(this);
-  }
-
-  setup(obj, context, index = 0) {
     super.setup(obj);
 
     this.context = context;
@@ -269,14 +267,13 @@ class QueueItem extends MusicItem {
 class EditingItem extends MusicItem {
   constructor() {
     super();
+  }
 
+  setup(obj) {
     this._builder("edit");
     let deleteButton = this.querySelector(".music-delete");
 
     deleteButton.onclick = this._deleteMusic.bind(this);
-  }
-
-  setup(obj) {
     super.setup(obj);
     this.classList.add("editing");
   }
@@ -291,12 +288,12 @@ class EditingItem extends MusicItem {
 class SelectableItem extends MusicItem {
   constructor() {
     super();
-    this._builder("selectable");
-    this.isSelected = false;
-    this.onclick = this._toggleSelectedStatus.bind(this);
   }
 
   setup(obj) {
+    this._builder("selectable");
+    this.isSelected = false;
+    this.onclick = this._toggleSelectedStatus.bind(this);
     super.setup(obj);
     this.classList.add("selectable");
   }
