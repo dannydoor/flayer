@@ -14,7 +14,6 @@ class QueueManager {
     this.currPlaylistName = window["curr-playlist-name"];
     this.queueRepo = queueRepo.cloneNode(true);
     this.queueRepo.querySelector(".current").classList.remove("current");
-    console.log(this.queueRepo.querySelector(".current"));
     this.queueStatus = queueStatus;
 
     // 메소드 바인딩
@@ -48,12 +47,9 @@ class QueueManager {
     queue = null;
     this._updateQueueStatus(queueStatus);
 
-    let scrollHeight = parseInt(
-      getComputedStyle(window["record-stack"]).height
-    );
-    let timerId = setTimeout(() => {
-      document.querySelector(".simplebar-content-wrapper").scrollTop =
-        scrollHeight + 56;
+    setTimeout(() => {
+      this.scrollWrapper = document.querySelector(".simplebar-content-wrapper");
+      this.updateScroll();
     }, 200);
 
     // 핸들러 달기 및 slip.js 적용
@@ -122,6 +118,7 @@ class QueueManager {
 
     currentMusicInQueue.after(tempFragment);
     tempFragment = null;
+    this.updateScroll();
     return;
   }
 
@@ -221,6 +218,7 @@ class QueueManager {
 
     Controller.updateMusicToPlay(newCurrent);
     Controller.updateTooltip(true);
+    this.updateScroll();
 
     function newCurrentFinder(isNew = false, deleteList = []) {
       // isNew는 큐가 갈아엎어졌는지를 알려줌
@@ -306,6 +304,7 @@ class QueueManager {
         this.queue.prepend(QueueManager.currentMusic);
       }
     }
+    this.updateScroll();
   }
 
   static restoreQueue() {
@@ -322,6 +321,7 @@ class QueueManager {
         .querySelector(`[index="${currentIndex}"]`)
         .classList.add("current");
     }
+    this.updateScroll();
   }
 
   static playThis(obj, context) {
@@ -395,6 +395,8 @@ class QueueManager {
 
     Controller.playMusic();
 
+    this.updateScroll();
+
     function clearQueue() {
       Array.prototype.forEach.call(this.queue.children, (elem) => {
         this._mapManager(elem.musicObj, "delete");
@@ -408,11 +410,13 @@ class QueueManager {
     Controller.updateMusicToPlay(elem);
     Controller.updateTooltip(true, true);
     QueueManager.setPlaylistName();
+    this.updateScroll();
   }
 
   static playRecord(obj) {
     QueueManager.playNext(obj, "record");
     controller.nextButton.click();
+    this.updateScroll();
   }
 
   static makeUpLibraryItem() {
@@ -462,6 +466,7 @@ class QueueManager {
     let newRecordElem = document.createElement("div", { is: "record-item" });
     newRecordElem.setup(obj);
     this.record.append(newRecordElem);
+    this.updateScroll();
   }
 
   static setPlaylistName() {
@@ -483,7 +488,6 @@ class QueueManager {
 
     let elemIndex = elem.index;
     let elemInRepo = this.queueRepo.querySelector(`[index="${elemIndex}"]`);
-    console.log(elemInRepo);
     this._mapManager(elem.musicObj, "delete");
     elem.remove();
     if (elemInRepo) {
@@ -499,6 +503,11 @@ class QueueManager {
       Controller.updateByQueueChange();
     } else {
     }
+    this.updateScroll();
+  }
+
+  updateScroll() {
+    this.scrollWrapper.scrollTop = this.queue.scrollHeight;
   }
 
   // private 메소드
