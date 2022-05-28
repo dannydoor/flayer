@@ -68,6 +68,12 @@
   background: url("../assets/img/24px/Repeat-p.svg") no-repeat center/24px;
 }
 
+#repeat-button:disabled,
+#repeat-button.active:disabled,
+#repeat-button.active.one:disabled {
+  background: url("../assets/img/24px/Repeat-g.svg") no-repeat center/24px;
+}
+
 #repeat-button.active {
   background: url("../assets/img/24px/Repeat-w.svg") no-repeat center/24px;
 }
@@ -80,12 +86,17 @@
   background: url("../assets/img/24px/Shuffle-p.svg") no-repeat center/24px;
 }
 
+#shuffle-button:disabled,
+#shuffle-button.active:disabled {
+  background: url("../assets/img/24px/Shuffle-g.svg") no-repeat center/24px;
+}
+
 #shuffle-button.active {
   background: url("../assets/img/24px/Shuffle-w.svg") no-repeat center/24px;
 }
 
-#repeat-button:hover,
-#shuffle-button:hover {
+#repeat-button:hover:not(:disabled),
+#shuffle-button:hover:not(:disabled) {
   background-color: var(--color-base-1, #F5F5F5);
 }
 
@@ -192,7 +203,7 @@
   height: 36px;
   border-radius: 50%;
   background-color: transparent;
-  transition: background-color 150ms ease-in-out, transform 150ms cubic-bezier(0.54, -0.04, 0.35, 2.5);
+  transition: background 150ms ease-in-out, transform 150ms cubic-bezier(0.54, -0.04, 0.35, 2.5);
 }
 
 #prev-button:hover:not(:disabled),
@@ -384,7 +395,7 @@
 
 #open-curr-playlist,
 #like-this-button,
-#meatball-button {
+#meatballs-button {
   width: 24px;
   height: 24px;
   margin-left: 16px;
@@ -438,21 +449,36 @@
   background: url("../assets/img/24px/Liked-g.svg") no-repeat center/24px;
 }
 
-#meatball-button {
+#meatballs-button {
   border-radius: 50%;
-  background: url("../assets/img/24px/Meatballs-g.svg") no-repeat center/24px;
+  background: url("../assets/img/24px/meatballs-g.svg") no-repeat center/24px;
   background-color: var(--color-base, #fff);
 }
 
-#meatball-button:hover {
+#meatballs-button:hover:not(:disabled) {
   background-color: var(--color-base-1, #F5F5F5);
 }
 
-#meatball-button:active {
-  background: url("../assets/img/24px/Meatballs-gd.svg") no-repeat center/24px;
+#meatballs-button:active {
+  background: url("../assets/img/24px/meatballs-gd.svg") no-repeat center/24px;
   background-color: var(--color-base-2, #EBEBEB);
 }
 
+#open-queue,
+#fullscreen-button,
+#repeat-button:not(:disabled),
+#shuffle-button:not(:disabled),
+#prev-button:not(:disabled),
+#play-or-pause:not(:disabled),
+#next-button:not(:disabled),
+#open-curr-playlist:not(:disabled),
+#like-this-button:not(:disabled),
+#meatballs-button:not(:disabled) {
+  cursor: pointer;
+}
+
+
+/* 툴팁 스타일 */
 #prev-button,
 #next-button,
 #open-curr-playlist {

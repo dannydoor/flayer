@@ -47,7 +47,7 @@
   box-sizing: border-box;
   margin: 0;
   user-select: none;
-  transition: box-shadow 150ms ease-in-out, opacity 150ms ease-in-out;
+  transition: box-shadow 150ms ease-in-out, opacity 150ms ease-in-out, background 150ms ease-in-out;
 }
 
 a {

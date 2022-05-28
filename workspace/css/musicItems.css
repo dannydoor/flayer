@@ -11,6 +11,11 @@
   cursor: pointer;
 }
 
+.music-item,
+.music-item * {
+  transition: none;
+}
+
 .music-item::after {
   content: '';
   display: block;

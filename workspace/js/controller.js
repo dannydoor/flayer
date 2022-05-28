@@ -52,7 +52,8 @@ class Controller {
     this.currentPlaylist =
       this.openPlaylistButton.querySelector(".tooltip strong");
     this.likeButton = window["like-this-button"];
-    this.meatballsButton = window["meatball-button"];
+    this.meatballsButton = window["meatballs-button"];
+    this.fullscreenButton = window["fullscreen-button"];
 
     // 프로퍼티 초기화
     this.initState = null;
@@ -155,6 +156,7 @@ class Controller {
     this.repeatButton.onclick = this.handlers.onClickRepeat;
     this.shuffleButton.onclick = this.handlers.onClickShuffle;
     this.muteButton.onclick = this.handlers.onClickMute;
+    this.fullscreenButton.onclick = () => jwplayer().setFullscreen();
 
     // 플레이바 핸들러 달기
     let inputEvent = new InputEvent("input");
@@ -361,7 +363,10 @@ class Controller {
     updateVolumeBar: () => {
       let currVolume = jwplayer().getVolume();
       if (this.volumeBar.value == currVolume) return;
-      else this.volumeBar.value = currVolume;
+      else {
+        this.volumeBar.value = currVolume;
+        this.volumeBar.dispatchEvent(inputEvent);
+      }
     },
 
     updatePrevAndNext: (currentMusic) => {
@@ -529,7 +534,7 @@ class Controller {
 
     onMouseOverTooltip: (e) => {
       let target = e.target;
-      target.timerId = setTimeout(() => makeTooltipVisible(), 1000);
+      target.timerId = setTimeout(() => makeTooltipVisible(), 500);
 
       function makeTooltipVisible() {
         let tooltip = target.querySelector(".tooltip");
@@ -573,14 +578,14 @@ class Controller {
         this.seekStarttimerId = setTimeout(() => {
           target.classList.add("seeking");
           startSeeking();
-        }, 2000);
+        }, 1200);
 
         function startSeeking() {
           target.isSeeking = true;
           jwplayer().pause();
           let origPos = jwplayer().getPosition();
           pos = origPos;
-          this.seektimerId = setInterval(seek, 1000);
+          this.seektimerId = setInterval(seek, 700);
         }
       };
 
@@ -759,6 +764,10 @@ class Controller {
       jwplayer().on("complete", this.handlers.onComplete);
       jwplayer().on("volume", this.updates.updateVolumeBar);
       jwplayer().on("mute", this.updates.updateMuteState);
+      jwplayer().on("fullscreen", (e) => {
+        if (e.fullscreen) jwplayer().setControls(true);
+        else jwplayer().setControls(false);
+      });
     },
 
     isItPlayedEnough: () => {
