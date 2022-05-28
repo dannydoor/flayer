@@ -180,10 +180,9 @@ class Controller {
         updateMediaSession();
       });
 
-      this.updates.updateControlBar();
-      this.updates.updatePlayerHandler();
       this.helpers.setPlayerHandlers();
       Controller.updateMusicToPlay(QueueManager.currentMusic);
+      this.updates.updateControlBar();
       Controller.updateTooltip(true, true);
     } else {
       // 초기화
@@ -347,7 +346,9 @@ class Controller {
 
     updatePlayBar: () => {
       let currTime = parseInt(
-        jwplayer().getPosition() - this.currentInfo.startTime
+        !!jwplayer().getPosition()
+          ? jwplayer().getPosition() - this.currentInfo.startTime
+          : 0
       );
       if (this.playBar.value == currTime) return;
       else {
@@ -455,17 +456,18 @@ class Controller {
       let startTime = this.currentInfo.startTime;
       let endTime = this.currentInfo.endTime;
       let currTime = e.position;
+      let tooltip = this.nextButton.querySelector(".tooltip");
 
       if (currTime < startTime) {
         jwplayer().seek(startTime);
+      } else if (currTime < endTime - 10) {
+        tooltip.classList.remove("must-visible");
       } else if (currTime >= endTime - 10) {
-        this.nextButton.querySelector(".tooltip").classList.add("must-visible");
+        tooltip.classList.add("must-visible");
       } else if (currTime >= endTime) {
         if (this.isRepeat == "one") jwplayer().seek(startTime);
         else this.nextButton.click();
-        this.nextButton
-          .querySelector(".tooltip")
-          .classList.remove("must-visible");
+        tooltip.classList.remove("must-visible");
       }
     },
 
@@ -484,6 +486,7 @@ class Controller {
 
     onPrev: (e) => {
       if (e.target.isSeeking) return;
+      e.target.querySelector(".tooltip").classList.remove("must-visible");
       let currPostion = this.playBar.value;
 
       if (currPostion > 10 || !this.prevMusic) {
@@ -502,6 +505,7 @@ class Controller {
 
     onNext: (e) => {
       if (e.target.isSeeking) return;
+      e.target.querySelector(".tooltip").classList.remove("must-visible");
       let mustStop = false;
       let musicToPlay = this.nextMusic;
       if (!musicToPlay) {
@@ -668,6 +672,7 @@ class Controller {
 
     onChangeVolumeBar: (e) => {
       let volume = parseInt(e.target.value);
+      e.target.dispatchEvent(inputEvent);
       jwplayer().setVolume(volume);
     },
 
@@ -687,6 +692,7 @@ class Controller {
     onChangePlayBar: (e) => {
       let value = parseInt(e.target.value);
       let position = this.currentInfo.startTime + value;
+      this.updates.updatePlayBar();
       jwplayer().seek(position);
     },
 

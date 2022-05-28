@@ -108,8 +108,8 @@
       <div class="play-volume-bars">
         <input type="range" id="play-bar" value="0">
         <div class="timers">
-          <span id="current-time">00:00</span>
-          <span id="remaining-time">- 05:02</span>
+          <span id="current-time"></span>
+          <span id="remaining-time"></span>
         </div>
         <div class="volume-bar-container">
           <div id="mute-button"></div>
@@ -145,7 +145,7 @@
     <script src="./js/simpleBar/simplebar.js"></script>
     <script>
       function main() {
-        let initTime = Date.now();
+        // let initTime = Date.now();
         let objectFactory = new ObjectFactory();
         let map = new Map();
         var objTable = objectFactory.objHashTableBuilder(db);
@@ -220,12 +220,13 @@
       dataUrlConverter();
       window["temp-imgs"].remove();
 */
+      let initObj, initContext;
       var inputEvent = new InputEvent("input");
       var queueManager = new QueueManager(true, recordStack, queueContent, queueContent, map);
       var modalManager = new ModalManager();
       var playlistManager = new PlaylistManager();
       var libraryManager = new LibraryManager();
-      var controller = new Controller();
+      var controller = new Controller(QueueManager.currentMusic.musicObj, 'library');
       // new SimpleBar(document.querySelector('.scrollable'))
     </script>
   </body>
