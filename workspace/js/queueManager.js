@@ -12,7 +12,7 @@ class QueueManager {
     this.statusIndicator = window["queue-status"];
     this.clearButton = window["clear-record"];
     this.currPlaylistName = window["curr-playlist-name"];
-    this.queueRepo = queueRepo;
+    this.queueRepo = queueRepo.cloneNode(true);
     this.queueStatus = queueStatus;
 
     // 메소드 바인딩
@@ -42,7 +42,6 @@ class QueueManager {
     this._musicMap = map || new Map();
     if (recordStack) this.record.append(recordStack);
     if (queue) this.queue.append(queue);
-    if (queueRepo) this.queueRepo = queueRepo.cloneNode(true);
     recordStack = null;
     queue = null;
     this._updateQueueStatus(queueStatus);
