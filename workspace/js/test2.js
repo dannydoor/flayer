@@ -1,7 +1,11 @@
 class ObjectFactory {
-  constructor() {}
+  constructor() {
+    ObjectFactory.objHashTableBuilder =
+      ObjectFactory.objHashTableBuilder.bind(this);
+    ObjectFactory.getSortedArr = ObjectFactory.getSortedArr.bind(this);
+  }
 
-  objHashTableBuilder(arr) {
+  static objHashTableBuilder(arr) {
     let obj = {};
     arr.forEach((item) => {
       let newObj = this._builder(item);
@@ -10,7 +14,7 @@ class ObjectFactory {
     return obj;
   }
 
-  getSortedArr(obj) {
+  static getSortedArr(obj) {
     let arr1 = [];
     let arr2, arr4;
     for (let key in obj) {
@@ -82,18 +86,4 @@ class PlaylistManager {
   getPlaylistName() {
     return null;
   }
-}
-
-class LibraryManager {
-  constructor() {}
-
-  getPrevObj() {
-    return null;
-  }
-
-  getNextObj() {
-    return null;
-  }
-
-  static musicObjArr = {};
 }

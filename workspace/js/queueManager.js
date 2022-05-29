@@ -365,7 +365,9 @@ class QueueManager {
       }
     }
 
-    controller.currentInfo.reference.isPlaying = false;
+    if (controller.currentInfo?.reference) {
+      controller.currentInfo.reference.isPlaying = false;
+    }
     document.querySelectorAll(".playing").forEach((item) => {
       item.classList.remove("playing");
     });
@@ -422,13 +424,12 @@ class QueueManager {
   }
 
   static makeUpLibraryItem() {
-    return;
     let isLibrary = controller.currentInfo.context.startsWith("library");
-    let doesNeedMakeUp = !controller.prevMusic || !controller.nextMusic;
+    let needsMakeUp = !controller.prevMusic || !controller.nextMusic;
     addBefore = addBefore.bind(this);
     addAfter = addAfter.bind(this);
 
-    if (!isLibrary || !doesNeedMakeUp || !this.queueStatus) return;
+    if (!isLibrary || !needsMakeUp || !this.queueStatus) return;
 
     let target = controller.currentMusic;
     let isShuffled = controller.isShuffled;
@@ -454,12 +455,12 @@ class QueueManager {
     }
 
     function addBefore(obj) {
-      let newPrevMusic = this._itembuilder(obj);
+      let newPrevMusic = this._itembuilder(obj, "library");
       target.before(newPrevMusic);
     }
 
     function addAfter(obj) {
-      let newNextMusic = this._itembuilder(obj);
+      let newNextMusic = this._itembuilder(obj, "library");
       target.after(newNextMusic);
     }
   }

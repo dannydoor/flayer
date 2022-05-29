@@ -19,6 +19,7 @@
     <script type="text/javascript" src="./js/musicItems.js"></script>
     <script type="text/javascript" src="./js/controller.js"></script>
     <script type="text/javascript" src="./js/queueManager.js"></script>
+    <script type="text/javascript" src="./js/libraryManager.js"></script>
     <script type="text/javascript" src="./js/test2.js"></script>
     <script type="text/javascript" src="./js/testDB.js"></script>
     <title>flayer</title>
@@ -161,10 +162,10 @@
         let initTime = Date.now();
         let objectFactory = new ObjectFactory();
         let map = new Map();
-        objTable = objectFactory.objHashTableBuilder(db);
+        objTable = ObjectFactory.objHashTableBuilder(db);
         // console.log("객체 생성까지: "+ (Date.now() - initTime));
 
-        let [sorted1, sorted2, sorted3, sorted4] = objectFactory.getSortedArr(objTable);
+        let [sorted1, sorted2, sorted3, sorted4] = ObjectFactory.getSortedArr(objTable);
         // console.log("배열 정렬까지: "+ (Date.now() - initTime));
         
         let recordFragment = new DocumentFragment();
@@ -239,7 +240,7 @@
       var queueManager = new QueueManager(true, recordStack, queueContent, queueContent, map);
       var modalManager = new ModalManager();
       var playlistManager = new PlaylistManager();
-      var libraryManager = new LibraryManager();
+      var libraryManager = new LibraryManager(objTable);
       var controller = new Controller();
       // new SimpleBar(document.querySelector('.scrollable'))
     </script>
