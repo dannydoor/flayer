@@ -210,6 +210,11 @@ class Controller {
         jwplayer().stop();
       });
 
+      // 초기 화면
+      let videoCover = document.createElement("div");
+      videoCover.setAttribute("id", "video-cover");
+      setTimeout(() => window["video"].append(videoCover), 300);
+
       // 컨트롤바 비활성화
       this.helpers.toggleDisabledStatus("control", true);
       this.helpers.toggleDisabledStatus("barsAndOthers", true);
@@ -252,6 +257,7 @@ class Controller {
       // 초기화의 일환으로 컨트롤바가 비활성화됐었다면 다시 활성화
       this.helpers.toggleDisabledStatus("control", false);
       this.helpers.toggleDisabledStatus("barsAndOthers", false);
+      window["video-cover"].remove();
       this.initState = null;
     }
 
