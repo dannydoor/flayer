@@ -164,6 +164,11 @@ class Controller {
     this.likeButton.onclick = this.handlers.onClickLike;
     this.fullscreenButton.onclick = () => jwplayer().setFullscreen();
     this.openQueueButton.onclick = this.handlers.onClickOpenQueue.bind(this);
+    document.body.addEventListener("mouseup", () => {
+      if (document.querySelector(".seeking")) {
+        document.querySelector(".seeking").dispatchEvent(mouseUpEvent);
+      }
+    });
 
     // 플레이바 핸들러 달기
     let inputEvent = new InputEvent("input");
