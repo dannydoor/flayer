@@ -552,6 +552,7 @@
 
 .tooltip-desc strong {
   max-width: 208px;
+  height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
   transform: translateY(-2px);

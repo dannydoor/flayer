@@ -5,6 +5,8 @@ class MusicItem extends HTMLDivElement {
     this._builder = this._builder.bind(this);
     this._setInnerText = this._setInnerText.bind(this);
     this._updateLikeStatus = this._updateLikeStatus.bind(this);
+
+    if (this.getAttribute("music-id")) this.updateProp();
   }
 
   setup(obj) {
@@ -99,6 +101,18 @@ class MusicItem extends HTMLDivElement {
 
       return min + ":" + sec;
     }
+  }
+
+  updateProp() {
+    this.musicId = this.getAttribute("music-id");
+    this.songTitle = this.getAttribute("music-id");
+    this.songArtist = this.getAttribute("music-id");
+    this.duration = this.getAttribute("music-id");
+    this.isLiked = this.getAttribute("music-id");
+    this.isNew = this.getAttribute("music-id");
+    this.context = this.getAttribute("context");
+    if (this.getAttribute("index")) this.index = this.getAttribute("index");
+    this.referencedObj = objTable[this.musicId];
   }
 }
 

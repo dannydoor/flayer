@@ -148,7 +148,7 @@
         let initTime = Date.now();
         let objectFactory = new ObjectFactory();
         let map = new Map();
-        var objTable = objectFactory.objHashTableBuilder(db);
+        objTable = objectFactory.objHashTableBuilder(db);
         // console.log("객체 생성까지: "+ (Date.now() - initTime));
 
         let [sorted1, sorted2, sorted3, sorted4] = objectFactory.getSortedArr(objTable);
@@ -220,6 +220,7 @@
       dataUrlConverter();
       window["temp-imgs"].remove();
 */
+      var objTable;
       var inputEvent = new InputEvent("input");
       var queueManager = new QueueManager(true, recordStack, queueContent, queueContent, map);
       var modalManager = new ModalManager();

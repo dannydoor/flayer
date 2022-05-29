@@ -118,7 +118,6 @@ class QueueManager {
 
     currentMusicInQueue.after(tempFragment);
     tempFragment = null;
-    this.updateScroll();
     return;
   }
 
@@ -466,7 +465,6 @@ class QueueManager {
     let newRecordElem = document.createElement("div", { is: "record-item" });
     newRecordElem.setup(obj);
     this.record.append(newRecordElem);
-    this.updateScroll();
   }
 
   static setPlaylistName() {
@@ -503,11 +501,13 @@ class QueueManager {
       Controller.updateByQueueChange();
     } else {
     }
-    this.updateScroll();
   }
 
   updateScroll() {
-    this.scrollWrapper.scrollTop = this.queue.scrollHeight;
+    this.scrollWrapper.scrollTop =
+      this.scrollWrapper.scrollHeight -
+      this.queue.previousElementSibling.offsetHeight -
+      this.queue.scrollHeight;
   }
 
   // private 메소드
