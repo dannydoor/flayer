@@ -114,21 +114,24 @@ class MusicItem extends HTMLDivElement {
     if (this.getAttribute("index")) this.index = this.getAttribute("index");
     this.referencedObj = objTable[this.musicId];
   }
+
+  bindHandler() {}
 }
 
 class PlayableItem extends MusicItem {
   constructor() {
     super();
+
+    if (this.getAttribute("music-id")) {
+      this.bindHandler();
+    }
   }
 
   setup(obj) {
     this._builder("playable");
-    const addButton = this.querySelector(".music-add");
-
-    addButton.onclick = this._addToPlaylistForButton.bind(this);
-    this.onclick = this.onClick.bind(this);
     super.setup(obj);
     if (obj.isPlaying) this.classList.add("playing");
+    this.bindHandler();
   }
 
   onClick(e) {
@@ -142,11 +145,21 @@ class PlayableItem extends MusicItem {
 
     // playlistManager.addToPlaylist([this.referencedObj]); // 플레이리스트 매니저의 플레이리스트 추가 함수
   }
+
+  bindHandler() {
+    this.onclick = this.onClick.bind(this);
+
+    const addButton = this.querySelector(".music-add");
+    addButton.onclick = this._addToPlaylistForButton.bind(this);
+  }
 }
 
 class LibraryItem extends PlayableItem {
   constructor() {
     super();
+    if (this.getAttribute("music-id")) {
+      this.bindHandler();
+    }
   }
 
   setup(obj) {
@@ -155,10 +168,8 @@ class LibraryItem extends PlayableItem {
 
     this.context = "library";
     this.setAttribute("context", this.context);
-    const meatballs = this.querySelector(".music-meatballs");
-    let contextMenu = this.onContextMenu.bind(this);
-    meatballs.onclick = contextMenu;
-    this.oncontextmenu = contextMenu;
+
+    this.bindHandler();
   }
 
   onContextMenu(e) {
@@ -168,12 +179,22 @@ class LibraryItem extends PlayableItem {
     contextMenu.setup(this);
     this.append(contextMenu); */ // 컨텍스트 메뉴 만들어 추가.
   }
+
+  bindHandler() {
+    super.bindHandler();
+
+    const meatballs = this.querySelector(".music-meatballs");
+    meatballs.onclick = this.onContextMenu.bind(this);
+    this.oncontextmenu = this.onContextMenu.bind(this);
+  }
 }
 
 class RecordItem extends PlayableItem {
   constructor() {
     super();
-    this.onclick = this.onClick.bind(this);
+    if (this.getAttribute("music-id")) {
+      this.bindHandler();
+    }
   }
 
   setup(obj) {
@@ -182,10 +203,8 @@ class RecordItem extends PlayableItem {
 
     this.context = "record";
     this.setAttribute("context", this.context);
-    const meatballs = this.querySelector(".music-meatballs");
-    let contextMenu = this.onContextMenu.bind(this);
-    meatballs.onclick = contextMenu;
-    this.oncontextmenu = contextMenu;
+
+    this.bindHandler();
   }
 
   onClick(e) {
@@ -198,6 +217,16 @@ class RecordItem extends PlayableItem {
     e.preventDefault();
     // 컨텍스트 메뉴
   }
+
+  bindHandler() {
+    super.bindHandler();
+
+    this.onclick = this.onClick.bind(this);
+
+    const meatballs = this.querySelector(".music-meatballs");
+    meatballs.onclick = this.onContextMenu.bind(this);
+    this.oncontextmenu = this.onContextMenu.bind(this);
+  }
 }
 
 class PlaylistItem extends PlayableItem {
@@ -205,6 +234,10 @@ class PlaylistItem extends PlayableItem {
     super();
 
     this.context = "playlist:";
+
+    if (this.getAttribute("music-id")) {
+      this.bindHandler();
+    }
   }
 
   setup(obj, context, index = "") {
@@ -216,10 +249,7 @@ class PlaylistItem extends PlayableItem {
     this.setAttribute("context", this.context);
     this.classList.add("playlist");
 
-    let meatballs = this.querySelector(".music-meatballs");
-    let contextMenu = this.onContextMenu.bind(this);
-    meatballs.onclick = contextMenu;
-    this.oncontextmenu = contextMenu;
+    this.bindHandler();
   }
 
   updateIndex(index) {
@@ -235,27 +265,41 @@ class PlaylistItem extends PlayableItem {
     contextMenu.setup(this);
     this.append(contextMenu); */ // 컨텍스트 메뉴 생성
   }
+
+  bindHandler() {
+    super.bindHandler();
+
+    let meatballs = this.querySelector(".music-meatballs");
+    meatballs.onclick = this.onContextMenu.bind(this);
+    this.oncontextmenu = this.onContextMenu.bind(this);
+  }
 }
 
 class QueueItem extends MusicItem {
   constructor() {
     super();
+
+    if (this.getAttribute("music-id")) {
+      this.bindHandler();
+    }
   }
 
-  setup(obj, context, index = 0) {
+  setup(obj, context, index = null) {
     this._builder("queue");
-    let deleteButton = this.querySelector(".music-delete");
 
-    deleteButton.onclick = this._deleteMusic.bind(this);
-    this.onclick = this.onClick.bind(this);
-    this.oncontextmenu = this.onContextMenu.bind(this);
     super.setup(obj);
 
     this.context = context;
     this.classList.add("queue");
-    this.index = hash(Date.now() + obj.id);
+    if (!index) {
+      this.index = hash(Date.now() + obj.id);
+    } else {
+      this.index = index;
+    }
     this.setAttribute("context", this.context);
     this.setAttribute("index", this.index);
+
+    this.bindHandler();
   }
 
   onClick(e) {
@@ -276,26 +320,46 @@ class QueueItem extends MusicItem {
     contextMenu.setup(this);
     this.append(contextMenu); */
   }
+
+  bindHandler() {
+    super.bindHandler();
+
+    this.onclick = this.onClick.bind(this);
+    this.oncontextmenu = this.onContextMenu.bind(this);
+
+    let deleteButton = this.querySelector(".music-delete");
+    deleteButton.onclick = this._deleteMusic.bind(this);
+  }
 }
 
 class EditingItem extends MusicItem {
   constructor() {
     super();
+
+    if (this.getAttribute("music-id")) {
+      this.bindHandler();
+    }
   }
 
   setup(obj) {
     this._builder("edit");
-    let deleteButton = this.querySelector(".music-delete");
-
-    deleteButton.onclick = this._deleteMusic.bind(this);
     super.setup(obj);
     this.classList.add("editing");
+
+    this.bindHandler();
   }
 
   _deleteMusic(e) {
     e.preventDefault();
 
     this.remove();
+  }
+
+  bindHandler() {
+    super.bindHandler();
+
+    let deleteButton = this.querySelector(".music-delete");
+    deleteButton.onclick = this._deleteMusic.bind(this);
   }
 }
 
@@ -307,15 +371,21 @@ class SelectableItem extends MusicItem {
   setup(obj) {
     this._builder("selectable");
     this.isSelected = false;
-    this.onclick = this._toggleSelectedStatus.bind(this);
     super.setup(obj);
     this.classList.add("selectable");
+
+    this.bindHandler();
   }
 
   _toggleSelectedStatus(e) {
     this.isSelected = !this.isSelected;
     this.classList.toggle("selected");
     // this.index = selectableManager.addOrClear(this.referencedObj, this.index) => 인덱스가 undefined이면 스택에 추가, 새로운 인덱스를 반환, 인덱스가 있으면 해당 인덱스의 아이템 삭제 후 undefined 반환.
+  }
+
+  bindHandler() {
+    super.bindHandler();
+    this.onclick = this._toggleSelectedStatus.bind(this);
   }
 }
 

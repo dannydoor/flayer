@@ -678,7 +678,7 @@ class Controller {
       this.currentInfo.isLiked = likeStatus;
 
       Array.prototype.forEach.call(
-        document.querySelectorAll(`[music-id="${this.currentInfo.musicId}"]`),
+        document.querySelectorAll(`[music-id="${this.currentInfo.id}"]`),
         (item) => {
           item.setAttribute("is-liked", likeStatus);
         }
