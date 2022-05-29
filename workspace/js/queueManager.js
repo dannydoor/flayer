@@ -593,7 +593,12 @@ class QueueManager {
     if (origNextElem == newNextElem) return;
     else {
       if (this.queueStatus) this._updateQueueStatus(false);
+      let elemInRepo = this.queueRepo.querySelector(`[index="${elem.index}"]`);
+      let nextElemInRepo = this.queueRepo.querySelector(
+        `[index="${newNextElem.index}"]`
+      );
       newNextElem.before(elem);
+      nextElemInRepo.before(elemInRepo);
       Controller.updateByQueueChange();
     }
   }

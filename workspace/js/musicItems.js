@@ -329,6 +329,8 @@ class QueueItem extends MusicItem {
 
     let deleteButton = this.querySelector(".music-delete");
     deleteButton.onclick = this._deleteMusic.bind(this);
+    let dragButton = this.querySelector(".music-drag");
+    dragButton.onclick = (e) => e.preventDefault();
   }
 }
 
@@ -360,6 +362,8 @@ class EditingItem extends MusicItem {
 
     let deleteButton = this.querySelector(".music-delete");
     deleteButton.onclick = this._deleteMusic.bind(this);
+    let dragButton = this.querySelector(".music-drag");
+    dragButton.onclick = (e) => e.preventDefault();
   }
 }
 
