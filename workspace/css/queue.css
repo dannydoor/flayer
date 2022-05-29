@@ -111,6 +111,7 @@
   border-style: solid;
   border-width: 12px 7px;
   border-color: transparent transparent white transparent;
+  filter: none;
   z-index: 900;
   bottom: 100%;
   top: auto;

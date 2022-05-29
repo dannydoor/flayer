@@ -132,12 +132,15 @@ body {
   grid-column: 1 / 2;
   grid-row: 1 / 2;
   height: calc(100vh - 72px);
+  box-shadow: 5px 0 10px 0 rgb(0 0 0 / 25%);
+  z-index: 1;
 }
 
 #tab ~ #video {
   display: block;
   grid-column: 2 / 4;
   grid-row: 1 / 2;
+  z-index: 0;
 }
 
 .control-panel {
