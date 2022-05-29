@@ -56,6 +56,8 @@ class QueueManager {
     this.statusIndicator.onmouseover = this._onMouseOverTooltip;
     this.statusIndicator.onmouseleave = this._onMouseLeaveTooltip;
     this.clearButton.onclick = this._clearRecord.bind(this);
+    document.querySelector("#queue-container .close-button").onclick = () =>
+      window["open-queue"].click();
     this._setupQueueSlip();
   }
 
@@ -589,6 +591,7 @@ class QueueManager {
   }
 
   static _onReorder(elem, newNextElem) {
+    elem.reordered = true;
     let origNextElem = elem.nextElementSibling;
     if (origNextElem == newNextElem) return;
     else {

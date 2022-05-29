@@ -54,6 +54,7 @@ class Controller {
     this.likeButton = window["like-this-button"];
     this.meatballsButton = window["meatballs-button"];
     this.fullscreenButton = window["fullscreen-button"];
+    this.openQueueButton = window["open-queue"];
 
     // 프로퍼티 초기화
     this.initState = null;
@@ -158,6 +159,7 @@ class Controller {
     this.muteButton.onclick = this.handlers.onClickMute;
     this.likeButton.onclick = this.handlers.onClickLike;
     this.fullscreenButton.onclick = () => jwplayer().setFullscreen();
+    this.openQueueButton.onclick = this.handlers.onClickOpenQueue.bind(this);
 
     // 플레이바 핸들러 달기
     let inputEvent = new InputEvent("input");
@@ -611,6 +613,12 @@ class Controller {
       this.seekStarttimerId = null;
       this.seektimerId = null;
       jwplayer().play();
+    },
+
+    onClickOpenQueue: () => {
+      this.openQueueButton.classList.toggle("active");
+      window["tab"].classList.toggle("invisible");
+      queueManager.updateScroll();
     },
 
     onClickPlay: () => {

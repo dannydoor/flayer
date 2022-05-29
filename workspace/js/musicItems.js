@@ -304,6 +304,10 @@ class QueueItem extends MusicItem {
 
   onClick(e) {
     if (e.defaultPrevented) return;
+    if (this.reordered) {
+      this.reordered = false;
+      return;
+    }
 
     QueueManager.playQueue(this);
   }
