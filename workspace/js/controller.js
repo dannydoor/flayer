@@ -145,10 +145,14 @@ class Controller {
     this.prevButton.onmouseover =
       this.nextButton.onmouseover =
       this.openPlaylistButton.onmouseover =
+      this.openQueueButton.onmouseover =
+      this.fullscreenButton.onmouseover =
         this.handlers.onMouseOverTooltip;
     this.prevButton.onmouseleave =
       this.nextButton.onmouseleave =
       this.openPlaylistButton.onmouseleave =
+      this.openQueueButton.onmouseleave =
+      this.fullscreenButton.onmouseleave =
         this.handlers.onMouseLeaveTooltip;
     this.prevButton.onmousedown = this.handlers.onMouseDownSeek("prev");
     this.nextButton.onmousedown = this.handlers.onMouseDownSeek("next");
@@ -591,7 +595,7 @@ class Controller {
         this.seekStarttimerId = setTimeout(() => {
           target.classList.add("seeking");
           startSeeking();
-        }, 1200);
+        }, 1000);
 
         function startSeeking() {
           target.isSeeking = true;

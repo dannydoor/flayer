@@ -1,6 +1,7 @@
 /* 양 옆 버튼 스타일 */
 #open-queue,
 #fullscreen-button {
+  position: relative;
   display: block;
   width: 72px;
   height: 72px;
@@ -551,12 +552,15 @@
   padding: 9px 16px 8px;
 }
 
+.tooltip-desc:last-child {
+  padding: 8px 16px 8px;
+}
+
 .tooltip-desc strong {
   max-width: 208px;
   height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
-  transform: translateY(-2px);
   font: var(--font-medium-bold, 700 14px/18px "NotoSans");
   color: var(--color-ceil, #080404);
   margin-bottom: 2px;
@@ -569,4 +573,24 @@
 .tooltip-desc span {
   font: var(--font-artist, 400 12px/1 "NotoSans");
   color: var(--color-ceil-1, #707070);
+}
+
+#open-queue .tooltip {
+  transform: none;
+  left: calc(50% - 15px);
+}
+
+#fullscreen-button .tooltip {
+  transform: none;
+  left: auto;
+  right: calc(50% - 15px);
+}
+
+#open-queue .tooltip::before {
+  left: 8px;
+}
+
+#fullscreen-button .tooltip::before {
+  left: auto;
+  right: 8px;
 }
