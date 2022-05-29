@@ -32,9 +32,9 @@
 - [ ] 임시 플레이리스트 만들고 플레이리스트 메소드 구현
 - [ ] play next 디버그
 - [ ] play later 디버그
-- [ ] 라이브러리 play this 디버그
+- [x] 라이브러리 play this 디버그 + shuffle 디버그
 - [ ] 플레이리스트 play this 디버그
 - [ ] apply playlist change 디버그
-- [ ] makeup library 디버그
+- [x] makeup library 디버그
 
 - [x] --절대 경로를 만들 순 있지만, 이제는 이 경로를 data-url로 바꿔야 함.-- 보안 정책 상 못 만듦. 그러면 무작정 노가다 가야지...

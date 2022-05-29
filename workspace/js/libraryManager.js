@@ -43,4 +43,12 @@ class LibraryManager {
     let index = this.sortedKeyTable[this.sortMode][id];
     return this.sortedValueTable[this.sortMode][index + 1];
   }
+
+  getFirstObj() {
+    return this.sortedValueTable[this.sortMode][0];
+  }
+
+  getLastObj() {
+    return this.sortedValueTable[this.sortMode][this.sortedArr.length - 1];
+  }
 }

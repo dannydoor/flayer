@@ -99,7 +99,7 @@ class QueueManager {
     if (isShuffled) {
       let arr = Array.from(tempFragment);
       for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random * (i - 1));
+        let j = Math.floor(Math.random() * (i - 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
       arr.forEach((item) => tempFragment.append(item));
@@ -384,7 +384,7 @@ class QueueManager {
         nextObj = this._chooseRandom();
       }
 
-      let arr = [obj, nextObj];
+      let arr = nextObj ? [obj, nextObj] : [obj];
       this._applyToQueue(arr, context);
       this.queueRepo = null; // 라이브러리는 저장소를 따로 만들지 않음.
     } else {
@@ -425,32 +425,51 @@ class QueueManager {
 
   static makeUpLibraryItem() {
     let isLibrary = controller.currentInfo.context.startsWith("library");
-    let needsMakeUp = !controller.prevMusic || !controller.nextMusic;
+    let noPrev = controller.currentMusic == QueueManager.queueFirstChild;
+    let noNext = controller.currentMusic == QueueManager.queueLastChild;
+    let needsMakeUp = noPrev || noNext;
     addBefore = addBefore.bind(this);
     addAfter = addAfter.bind(this);
 
     if (!isLibrary || !needsMakeUp || !this.queueStatus) return;
 
     let target = controller.currentMusic;
+    let targetId = target.getAttribute("music-id");
     let isShuffled = controller.isShuffled;
 
     if (isShuffled) {
-      if (!controller.prevMusic) {
+      if (noPrev) {
         let newPrevObj = this._chooseRandom();
         addBefore(newPrevObj);
       }
-      if (!controller.nextMusic) {
+      if (noNext) {
         let newNextObj = this._chooseRandom();
         addAfter(newNextObj);
       }
     } else {
-      if (!controller.prevMusic) {
-        let newPrevObj = libraryManager.getPrevObj(target.musicId);
-        addBefore(newPrevObj);
+      if (noPrev) {
+        let newPrevObj = libraryManager.getPrevObj(targetId);
+        if (newPrevObj) {
+          addBefore(newPrevObj);
+        } else {
+          if (controller.isRepeat) {
+            newPrevObj = libraryManager.getLastObj();
+            addBefore(newPrevObj);
+          } else {
+          }
+        }
       }
-      if (!controller.nextMusic) {
-        let newNextObj = libraryManager.getNextObj(target.musicId);
-        addAfter(newNextObj);
+      if (noNext) {
+        let newNextObj = libraryManager.getNextObj(targetId);
+        if (newNextObj) {
+          addAfter(newNextObj);
+        } else {
+          if (controller.isRepeat) {
+            newNextObj = libraryManager.getFirstObj();
+            addAfter(newNextObj);
+          } else {
+          }
+        }
       }
     }
 
@@ -532,7 +551,8 @@ class QueueManager {
   }
 
   _mapManager(obj, method = "set") {
-    let key = obj.id;
+    let key = obj?.id;
+    if (!key) return undefined;
     setter = setter.bind(this);
     deleter = deleter.bind(this);
 
@@ -643,7 +663,7 @@ class QueueManager {
     let randObj;
 
     while (!gotcha) {
-      let target = arr[Math.floor(Math.random * length)];
+      let target = arr[Math.floor(Math.random() * length)];
       if (this._mapManager(target, "check")) {
         continue;
       } else {

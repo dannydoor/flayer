@@ -663,6 +663,7 @@ class Controller {
       }
 
       function update() {
+        QueueManager.makeUpLibraryItem();
         this.updates.updatePrevAndNext(this.currentMusic);
         Controller.updateTooltip(true);
       }
