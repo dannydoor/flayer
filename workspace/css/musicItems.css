@@ -7,7 +7,7 @@
   margin: 0;
   padding: 12px 16px 12px 4px;
   background-color: var(--color-base-blurred, rgba(255, 255, 255, 0.7));
-  backdrop-filter: blur(32px);
+  backdrop-filter: blur(16px);
   cursor: pointer;
 }
 
