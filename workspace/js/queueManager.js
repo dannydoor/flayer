@@ -120,6 +120,8 @@ class QueueManager {
 
     currentMusicInQueue.after(tempFragment);
     tempFragment = null;
+
+    Controller.updateByQueueChange();
     return;
   }
 
@@ -217,8 +219,7 @@ class QueueManager {
       if (!foundCurrentElem) newCurrent = QueueManager.queueFirstChild;
     }
 
-    Controller.updateMusicToPlay(newCurrent);
-    Controller.updateTooltip(true);
+    Controller.updateByQueueChange();
     this.updateScroll();
 
     function newCurrentFinder(isNew = false, deleteList = []) {

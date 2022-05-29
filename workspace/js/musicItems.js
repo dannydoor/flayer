@@ -210,7 +210,7 @@ class RecordItem extends PlayableItem {
   onClick(e) {
     if (e.defaultPrevented) return;
 
-    QueueManager.playRecord(this.referencedObj);
+    QueueManager.playRecord(this.musicObj);
   }
 
   onContextMenu(e) {

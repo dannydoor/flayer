@@ -318,7 +318,9 @@ class Controller {
   static updateByQueueChange() {
     // 컨트롤바의 재생 중인 음악, 이전 곡, 다음 곡을 업데이트하는 메소드
     // 재생 중인 목록에 변화가 생길 때마다 호출
-    let newCurrMusic = QueueManager.currentMusic;
+    let newCurrMusic = QueueManager.currentMusic
+      ? QueueManager.currentMusic
+      : QueueManager.queueFirstChild;
     this.currentMusic = newCurrMusic;
     this.updates.updatePrevAndNext(newCurrMusic);
     Controller.updateTooltip(true);
@@ -521,6 +523,7 @@ class Controller {
       Controller.updateMusicToPlay(musicToPlay);
       Controller.updateTooltip(true, true);
       QueueManager.setPlaylistName();
+      queueManager.updateScroll();
     },
 
     onNext: (e) => {
@@ -541,6 +544,7 @@ class Controller {
       Controller.updateMusicToPlay(musicToPlay);
       Controller.updateTooltip(true, true);
       QueueManager.setPlaylistName();
+      queueManager.updateScroll();
 
       if (mustStop) {
         jwplayer().stop();
