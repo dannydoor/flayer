@@ -45,7 +45,7 @@
 }
 
 #queue-content {
-  min-height: calc(100% - 56px);
+  min-height: calc(100vh - 168px);
 }
 
 #queue-content .music-item {

@@ -156,6 +156,7 @@ class Controller {
     this.repeatButton.onclick = this.handlers.onClickRepeat;
     this.shuffleButton.onclick = this.handlers.onClickShuffle;
     this.muteButton.onclick = this.handlers.onClickMute;
+    this.likeButton.onclick = this.handlers.onClickLike;
     this.fullscreenButton.onclick = () => jwplayer().setFullscreen();
 
     // 플레이바 핸들러 달기
@@ -479,6 +480,12 @@ class Controller {
       this.handlers.letIncreaseStop();
     },
 
+    onIdle: () => {
+      this.helpers.toggleControlStatus();
+      this.handlers.letIncreaseStop();
+      this.updates.updatePlayBar();
+    },
+
     onComplete: () => {
       let startTime = this.currentInfo.startTime;
       if (this.isRepeat == "one") jwplayer().seek(startTime);
@@ -529,7 +536,11 @@ class Controller {
       Controller.updateTooltip(true, true);
       QueueManager.setPlaylistName();
 
-      if (mustStop) jwplayer().stop();
+      if (mustStop) {
+        jwplayer().stop();
+        this.helpers.toggleControlStatus();
+        this.handlers.letIncreaseStop();
+      }
     },
 
     onMouseOverTooltip: (e) => {
@@ -660,6 +671,23 @@ class Controller {
       this.helpers.toggleVolumeBarMuteState(currMuteState);
     },
 
+    onClickLike: () => {
+      let likeStatus = this.currentInfo.isLiked;
+      likeStatus = !likeStatus;
+      this.currentInfo.reference.isLiked = likeStatus;
+      this.currentInfo.isLiked = likeStatus;
+
+      Array.prototype.forEach.call(
+        document.querySelectorAll(`[music-id="${this.currentInfo.musicId}"]`),
+        (item) => {
+          item.setAttribute("is-liked", likeStatus);
+        }
+      );
+
+      let isLiked = this.currentInfo.isLiked ? "liked" : "";
+      this.likeButton.className = isLiked;
+    },
+
     onInputVolumeBar: (e) => {
       let value = e.target.value;
       e.target.style.background =
@@ -761,6 +789,7 @@ class Controller {
       jwplayer().on("play", this.handlers.onPlay);
       jwplayer().on("pause", this.handlers.onPause);
       jwplayer().on("buffer", this.handlers.onBuffer);
+      jwplayer().on("idle", this.handlers.onIdle);
       jwplayer().on("complete", this.handlers.onComplete);
       jwplayer().on("volume", this.updates.updateVolumeBar);
       jwplayer().on("mute", this.updates.updateMuteState);
@@ -790,14 +819,14 @@ class Controller {
           ? "playing"
           : undefined;
 
-      if (isPlaying === "buffering" || isPlaying == "idle") {
+      if (isPlaying === "buffering") {
         this.helpers.toggleDisabledStatus("control", true);
         return;
       } else if (isPlaying === "playing" && currState != isPlaying) {
         this.playButton.className = "pause";
       } else if (
         (isPlaying === "paused" && currState != isPlaying) ||
-        isPlaying === "stopped"
+        isPlaying === "idle"
       ) {
         this.playButton.className = "play";
       }
