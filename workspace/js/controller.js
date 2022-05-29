@@ -227,7 +227,7 @@ class Controller {
     this.volumeBar.setAttribute("mute", false);
     this.volumeBar.addEventListener("input", this.handlers.onInputVolumeBar);
     this.volumeBar.addEventListener("change", this.handlers.onChangeVolumeBar);
-    this.volumeBar.dispatchEvent(inputEvent);
+    this.updates.updateVolumeBar();
   }
 
   // public 메소드
@@ -891,6 +891,7 @@ class Controller {
           this.muteButton.disabled = bool;
           this.likeButton.disabled = bool;
           this.meatballsButton.disabled = bool;
+          this.fullscreenButton.disabled = bool;
         }
         case "playlist": {
           this.openPlaylistButton.disabled = bool;

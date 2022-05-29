@@ -13,16 +13,20 @@
 }
 
 #fullscreen-button {
-  background: url("../assets/img/36px/Fullscreen.svg") no-repeat center/36px;
+  background: url("../assets/img/36px/Fullscreen-p.svg") no-repeat center/36px;
+}
+
+#fullscreen-button:disabled {
+  background: url("../assets/img/36px/Fullscreen-g.svg") no-repeat center/36px;
 }
 
 #open-queue:hover,
-#fullscreen-button:hover {
+#fullscreen-button:hover:not(:disabled) {
   background-color: var(--color-base-1, #f5f5f5);
 }
 
 #open-queue:active,
-#fullscreen-button:active {
+#fullscreen-button:active:not(:disabled) {
   background-color: var(--color-base-2, #ebebeb);
 }
 
@@ -245,24 +249,42 @@
   border-radius: 100px;
   background: linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) 0%, var(--color-base-3, #d9d9d9) 0%, var(--color-base-3, #d9d9d9) 100%);
   margin-bottom: 6px;
+}
+
+#play-bar:not(:disabled) {
   cursor: pointer;
+}
+
+#play-bar:disabled {
+  cursor: default;
 }
 
 #play-bar::-webkit-slider-thumb {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: var(--color-primary, #595ae2);
   box-shadow: 0 2px 4px rgba(0,0,0,0.25);
   transition: all 150ms ease-in-out;
 }
 
-#play-bar::-webkit-slider-thumb:hover {
+#play-bar:not(:disabled)::-webkit-slider-thumb {
+  background-color: var(--color-primary, #595ae2);
+}
+
+#play-bar:disabled::-webkit-slider-thumb {
+  background-color: var(--color-ceil-2, #A9A9A9);
+}
+
+#play-bar:not(:disabled)::-webkit-slider-thumb {
+  background-color: var(--color-primary, #595ae2);
+}
+
+#play-bar:not(:disabled)::-webkit-slider-thumb:hover {
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
   transform: scale(1.2);
 }
 
-#play-bar::-webkit-slider-thumb:active {
+#play-bar:not(:disabled)::-webkit-slider-thumb:active {
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   transform: scale(2);
 }
@@ -382,7 +404,8 @@
 }
 
 #curr-song-artist {
-  width: 100%;
+  width: min-content;
+  flex-grow: 0;
   font: 400 14px/20px 'NotoSans';
   color: var(--color-ceil-1, #707070);
   cursor: pointer;
@@ -467,7 +490,7 @@
 }
 
 #open-queue,
-#fullscreen-button,
+#fullscreen-button:not(:disabled),
 #repeat-button:not(:disabled),
 #shuffle-button:not(:disabled),
 #prev-button:not(:disabled),
