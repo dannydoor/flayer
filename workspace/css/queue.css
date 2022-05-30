@@ -21,6 +21,10 @@
   color: var(--color-ceil, #262626);
 }
 
+.queue-desc:not(:last-child) {
+  margin-bottom: 4px;
+}
+
 .queue-desc-sub {
   font: var(--font-artist, 400 12px/1 "NotoSans");
   letter-spacing: -0.02em;

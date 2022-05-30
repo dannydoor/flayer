@@ -29,11 +29,11 @@
 - [x] 큐매니저 선언 -> 컨트롤러 선언해서 정상작동 확인.
 - [x] 라이브러리 매니저 - 정렬된 배열 만들기
 - [x] 라이브러리 매니저 - 이전 곡 다음 곡 골라주는 메소드 구현.
-- [ ] 임시 플레이리스트 만들고 플레이리스트 메소드 구현
-- [ ] play next 디버그
+- [x] 임시 플레이리스트 만들고 플레이리스트 메소드 구현
+- [x] play next 디버그
 - [ ] play later 디버그
 - [x] 라이브러리 play this 디버그 + shuffle 디버그
-- [ ] 플레이리스트 play this 디버그
+- [x] 플레이리스트 play this 디버그
 - [ ] apply playlist change 디버그
 - [x] makeup library 디버그
 
