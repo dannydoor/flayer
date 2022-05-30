@@ -77,13 +77,44 @@ class ModalManager {
 }
 
 class PlaylistManager {
-  constructor() {}
-
-  getPlaylistContents() {
-    return [];
+  constructor() {
+    let f9Ids = [
+      "b8c7ae2910424c46ee902c2d89b92bae",
+      "b4c6da2da37901c304515cb037be5aa3",
+      "db95bc4542cd1b09846eb457e0466b65",
+      "f3b6994b4c6357599a6c2216b1147553",
+      "840309a1673dc890296a3b46488f53d0",
+      "dca2c4e9aba2b938c6a90eacd4692ba9",
+      "62963235b875a134c90a5bdb1d0e7009",
+      "e63b158a5766e783082f6bc698764cfa",
+      "b97d9deb688e95123bc5056751e61874",
+      "8766b377dd71d237834c7889d2c353c0",
+      "bca77e0673e76fb5b97049106a4592da",
+      "78fdf3ffbdc79e644b8f915fbadd4da2",
+      "5408f44cb7b22af2a1cb6d2107721080",
+      "b5f43499021d52b70f5ffa371577eb7f",
+      "17ccc83bece16520a59c8889feb4e0ad",
+      "315e91611a0a510f6f1c880baab0e55f",
+    ];
+    this.tempPlaylistFragment = new DocumentFragment();
+    this.tempPlaylistArr = f9Ids.map((item) => objTable[item]);
+    this.tempContext = hash("프롬이가 채고야" + Date.now());
+    this.tempPlaylistArr.forEach((obj, index) => {
+      let elem = document.createElement("div", { is: "playlist-item" });
+      elem.setup(obj, this.tempContext, index + 1);
+      this.tempPlaylistFragment.append(elem);
+    });
   }
 
-  getPlaylistName() {
+  getPlaylistContents(context) {
+    if (!context) return;
+    if (context.startsWith("playlist:")) return this.tempPlaylistArr;
+    else return [];
+  }
+
+  getPlaylistName(context) {
+    if (!context) return;
+    if (context.startsWith("playlist:")) return "프롬이가 채고야";
     return null;
   }
 }

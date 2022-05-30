@@ -260,7 +260,6 @@ class PlaylistItem extends PlayableItem {
 
   onContextMenu(e) {
     e.preventDefault();
-
     /* let contextMenu = document.createElement("playlist-context");
     contextMenu.setup(this);
     this.append(contextMenu); */ // 컨텍스트 메뉴 생성
@@ -320,6 +319,7 @@ class QueueItem extends MusicItem {
   onContextMenu(e) {
     e.preventDefault();
 
+    QueueManager.playNext(this.musicObj, this.getAttribute("context"));
     /* let contextMenu = document.createElement("queue-context");
     contextMenu.setup(this);
     this.append(contextMenu); */

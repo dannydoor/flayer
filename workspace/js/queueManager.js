@@ -122,6 +122,7 @@ class QueueManager {
     tempFragment = null;
 
     Controller.updateByQueueChange();
+    this.updateScroll();
     return;
   }
 
