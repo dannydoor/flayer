@@ -114,14 +114,24 @@ class PlaylistManager {
   }
 
   _delete() {
+    if (this.tempChanges.deleted.length == this.tempPlaylistArr.length) return;
     if (!this.tempModified.length)
       this.tempModified = this.tempPlaylistArr.slice();
     let length = this.tempModified.length;
-    let randNum = Math.floor(Math.random() * length);
-    let delTarget = this.tempModified[randNum];
+    let delTarget,
+      gotcha = false;
+    while (!gotcha) {
+      let randNum = Math.floor(Math.random() * length);
+      if (this.tempChanges.added.includes(this.tempModified[randNum])) {
+        continue;
+      } else {
+        gotcha = true;
+        delTarget = this.tempModified[randNum];
+      }
+    }
 
     this.tempChanges.deleted.push(delTarget);
-    this.tempModified = this.tempModified.splice(randNum, 1);
+    this.tempModified.splice(randNum, 1);
   }
 
   _add() {
@@ -143,10 +153,10 @@ class PlaylistManager {
     }
 
     this.tempChanges.added.push(addTarget);
-    this.tempModified = this.tempModified.splice(randNum, 0, addTarget);
+    this.tempModified.splice(randNum, 0, addTarget);
   }
 
-  _shuffle() {
+  _switch() {
     if (!this.tempModified.length)
       this.tempModified = this.tempPlaylistArr.slice();
 
@@ -168,9 +178,18 @@ class PlaylistManager {
     if (!this.tempModified.length) return;
     QueueManager.applyPlaylistChanges(
       this.tempModified,
-      this.context,
+      this.tempContext,
       this.tempChanges
     );
+
+    this.tempPlaylistArr = this.tempModified.slice();
+    this.tempPlaylistFragment = new DocumentFragment();
+    this.tempPlaylistArr.forEach((obj, index) => {
+      let elem = document.createElement("div", { is: "playlist-item" });
+      elem.setup(obj, this.tempContext, index + 1);
+      this.tempPlaylistFragment.append(elem);
+    });
+    this._init();
   }
 
   getPlaylistContents(context) {
