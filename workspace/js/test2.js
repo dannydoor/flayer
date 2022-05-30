@@ -121,6 +121,56 @@ class PlaylistManager {
     let delTarget = this.tempModified[randNum];
 
     this.tempChanges.deleted.push(delTarget);
+    this.tempModified = this.tempModified.splice(randNum, 1);
+  }
+
+  _add() {
+    if (!this.tempModified.length)
+      this.tempModified = this.tempPlaylistArr.slice();
+    let length = this.tempModified.length;
+    let randNum = Math.floor(Math.random() * length);
+    let gotcha = false,
+      addTarget;
+
+    while (!gotcha) {
+      let target = libraryManager.chooseRandObj();
+      if (this.tempModified.includes(target)) {
+        continue;
+      } else {
+        gotcha = true;
+        addTarget = target;
+      }
+    }
+
+    this.tempChanges.added.push(addTarget);
+    this.tempModified = this.tempModified.splice(randNum, 0, addTarget);
+  }
+
+  _shuffle() {
+    if (!this.tempModified.length)
+      this.tempModified = this.tempPlaylistArr.slice();
+
+    let length = this.tempModified.length;
+    let rand1 = Math.floor(Math.random() * length);
+    let rand2 = Math.floor(Math.random() * length);
+    [this.tempModified[rand1], this.tempModified[rand2]] = [
+      this.tempModified[rand2],
+      this.tempModified[rand1],
+    ];
+  }
+
+  _init() {
+    this.tempModified = [];
+    this.tempChanges = { added: [], deleted: [] };
+  }
+
+  _confirmChange() {
+    if (!this.tempModified.length) return;
+    QueueManager.applyPlaylistChanges(
+      this.tempModified,
+      this.context,
+      this.tempChanges
+    );
   }
 
   getPlaylistContents(context) {

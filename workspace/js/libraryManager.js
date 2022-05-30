@@ -51,4 +51,10 @@ class LibraryManager {
   getLastObj() {
     return this.sortedValueTable[this.sortMode][this.sortedArr.length - 1];
   }
+
+  chooseRandObj() {
+    return this.musicObjArr[
+      Math.floor(Math.random() * this.musicObjArr.length)
+    ];
+  }
 }

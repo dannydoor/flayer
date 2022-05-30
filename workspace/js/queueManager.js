@@ -657,13 +657,11 @@ class QueueManager {
 
   _chooseRandom() {
     // 라이브러리에서 무작위로 골라 큐에 없는 곡을 반환하는 메소드.
-    let arr = libraryManager.musicObjArr;
-    let length = arr.length;
     let gotcha = false;
     let randObj;
 
     while (!gotcha) {
-      let target = arr[Math.floor(Math.random() * length)];
+      let target = libraryManager.chooseRandObj();
       if (this._mapManager(target, "check")) {
         continue;
       } else {
