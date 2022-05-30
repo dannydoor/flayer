@@ -149,9 +149,11 @@ class QueueManager {
     context,
     changes = { added: [], deleted: [] }
   ) {
+    if (!this.queue.querySelector(`[context="${context}"]`)) return;
     let newCurrent;
     let isCurrentDeleted = false;
     let currentId = QueueManager.currentMusic.musicId;
+    let isJustSwitched = !changes.added.length && !changes.deleted.length;
     newCurrentFinder = newCurrentFinder.bind(this);
     currentDeletionChecker = currentDeletionChecker.bind(this);
     clearQueueData = clearQueueData.bind(this);
@@ -217,7 +219,12 @@ class QueueManager {
       if (!foundCurrentElem) newCurrent = QueueManager.queueFirstChild;
     }
 
-    Controller.updateByQueueChange();
+    if (!isJustSwitched && isCurrentDeleted)
+      Controller.updateMusicToPlay(newCurrent);
+    else {
+      newCurrent.classList.add("current");
+      Controller.updateByQueueChange();
+    }
     this.updateScroll();
 
     function newCurrentFinder(isNew = false, deleteList = []) {

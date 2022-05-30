@@ -105,7 +105,7 @@ class PlaylistManager {
     this.tempPlaylistArr = f9Ids.map((item) => objTable[item]);
     this.tempModified = [];
     this.tempChanges = { added: [], deleted: [] };
-    this.tempContext = "playlist:" + hash("프롬이가 채고야" + Date.now());
+    this.tempContext = hash("프롬이가 채고야" + Date.now());
     this.tempPlaylistArr.forEach((obj, index) => {
       let elem = document.createElement("div", { is: "playlist-item" });
       elem.setup(obj, this.tempContext, index + 1);
@@ -118,10 +118,11 @@ class PlaylistManager {
     if (!this.tempModified.length)
       this.tempModified = this.tempPlaylistArr.slice();
     let length = this.tempModified.length;
-    let delTarget,
+    let randNum,
+      delTarget,
       gotcha = false;
     while (!gotcha) {
-      let randNum = Math.floor(Math.random() * length);
+      randNum = Math.floor(Math.random() * length);
       if (this.tempChanges.added.includes(this.tempModified[randNum])) {
         continue;
       } else {
@@ -176,11 +177,13 @@ class PlaylistManager {
 
   _confirmChange() {
     if (!this.tempModified.length) return;
+    let initTime = Date.now();
     QueueManager.applyPlaylistChanges(
       this.tempModified,
-      this.tempContext,
+      "playlist:" + this.tempContext,
       this.tempChanges
     );
+    // console.log(Date.now - initTime);
 
     this.tempPlaylistArr = this.tempModified.slice();
     this.tempPlaylistFragment = new DocumentFragment();
