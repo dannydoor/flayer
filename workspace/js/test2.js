@@ -72,7 +72,12 @@ class ModalManager {
   constructor() {}
 
   createModal() {
-    return "clear";
+    let answer = prompt(
+      "현재 재생 대기 중인 음악이 있습니다. 그대로 유지하고 재생하겠습니까? (yes: 재생 대기 목록 유지 | clear: 지우고 재생)"
+    );
+    if (answer == "clear") return "clear";
+    else if (answer.startsWith("y")) return "keep";
+    else return "cancel";
   }
 }
 
@@ -98,12 +103,24 @@ class PlaylistManager {
     ];
     this.tempPlaylistFragment = new DocumentFragment();
     this.tempPlaylistArr = f9Ids.map((item) => objTable[item]);
-    this.tempContext = hash("프롬이가 채고야" + Date.now());
+    this.tempModified = [];
+    this.tempChanges = { added: [], deleted: [] };
+    this.tempContext = "playlist:" + hash("프롬이가 채고야" + Date.now());
     this.tempPlaylistArr.forEach((obj, index) => {
       let elem = document.createElement("div", { is: "playlist-item" });
       elem.setup(obj, this.tempContext, index + 1);
       this.tempPlaylistFragment.append(elem);
     });
+  }
+
+  _delete() {
+    if (!this.tempModified.length)
+      this.tempModified = this.tempPlaylistArr.slice();
+    let length = this.tempModified.length;
+    let randNum = Math.floor(Math.random() * length);
+    let delTarget = this.tempModified[randNum];
+
+    this.tempChanges.deleted.push(delTarget);
   }
 
   getPlaylistContents(context) {

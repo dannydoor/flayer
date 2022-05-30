@@ -165,8 +165,10 @@ class Controller {
     this.fullscreenButton.onclick = () => jwplayer().setFullscreen();
     this.openQueueButton.onclick = this.handlers.onClickOpenQueue.bind(this);
     document.body.addEventListener("mouseup", () => {
-      if (document.querySelector(".seeking")) {
-        document.querySelector(".seeking").dispatchEvent(mouseUpEvent);
+      if (document.querySelector(".seeking, .seek-ready")) {
+        document
+          .querySelector(".seeking, .seek-ready")
+          .dispatchEvent(mouseUpEvent);
       }
     });
 
@@ -281,6 +283,7 @@ class Controller {
     this.currentMusic = musicToPlay;
     QueueManager.makeUpLibraryItem();
     this.updates.updatePrevAndNext(musicToPlay);
+    queueManager.updateScroll();
   }
 
   static updateTooltip(prevOrNext = false, playlist = false) {
@@ -534,7 +537,6 @@ class Controller {
       Controller.updateMusicToPlay(musicToPlay);
       Controller.updateTooltip(true, true);
       QueueManager.setPlaylistName();
-      queueManager.updateScroll();
     },
 
     onNext: (e) => {
@@ -555,7 +557,6 @@ class Controller {
       Controller.updateMusicToPlay(musicToPlay);
       Controller.updateTooltip(true, true);
       QueueManager.setPlaylistName();
-      queueManager.updateScroll();
 
       if (mustStop) {
         jwplayer().stop();
@@ -605,6 +606,7 @@ class Controller {
       let seeking = (e) => {
         let target = e.target;
         clearTimeout(target.timerId);
+        target.classList.add("seek-ready");
         target.querySelector(".tooltip").classList.remove("visible");
         startSeeking = startSeeking.bind(this);
         this.seekStarttimerId = setTimeout(() => {
@@ -615,6 +617,7 @@ class Controller {
         function startSeeking() {
           target.isSeeking = true;
           jwplayer().pause();
+          target.classList.remove("seek-ready");
           let origPos = jwplayer().getPosition();
           pos = origPos;
           this.seektimerId = setInterval(seek, 700);
@@ -626,6 +629,7 @@ class Controller {
 
     onMouseUpSeek: (e) => {
       let target = e.target;
+      target.classList.remove("seek-ready");
       target.classList.remove("seeking");
       clearTimeout(this.seekStarttimerId);
       clearInterval(this.seektimerId);

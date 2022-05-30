@@ -98,21 +98,18 @@ class QueueManager {
 
     if (isShuffled) {
       let arr = Array.from(tempFragment);
-      for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i - 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
+      shuffleHelper(arr);
       arr.forEach((item) => tempFragment.append(item));
-    } else {
     }
 
     if (startId) {
       // 플레이리스트로부터 처음으로 재생할 음악의 id를 전달받아 이를 첫번째 요소로 올림.
       let nextMusic = tempFragment.querySelector(`[music-id="${startId}"]`);
-      tempFragment.prepend(nextMusic);
+      if (isShuffled) tempFragment.prepend(nextMusic);
       currentMusicInQueue.after(tempFragment);
 
-      controller.nextButton.click();
+      Controller.updateMusicToPlay(nextMusic);
+      Controller.updateByQueueChange();
 
       tempFragment = null;
       return;
@@ -428,11 +425,13 @@ class QueueManager {
     let isLibrary = controller.currentInfo.context.startsWith("library");
     let noPrev = controller.currentMusic == QueueManager.queueFirstChild;
     let noNext = controller.currentMusic == QueueManager.queueLastChild;
+    let isPureLibrary = !!this.queueRepo;
     let needsMakeUp = noPrev || noNext;
     addBefore = addBefore.bind(this);
     addAfter = addAfter.bind(this);
 
-    if (!isLibrary || !needsMakeUp || !this.queueStatus) return;
+    if (!isLibrary || !needsMakeUp || !this.queueStatus || !isPureLibrary)
+      return;
 
     let target = controller.currentMusic;
     let targetId = target.getAttribute("music-id");
@@ -692,10 +691,7 @@ class QueueManager {
 
     let shuffleArr = Array.from(shuffleFragment.children);
     // 피셔-예이츠 알고리즘
-    for (let i = shuffleArr.length - 1; i > 0; i--) {
-      let j = Math.floor(Math.random() * (i + 1));
-      [shuffleArr[i], shuffleArr[j]] = [shuffleArr[j], shuffleArr[i]];
-    }
+    shuffleHelper(shuffleArr);
 
     shuffleArr.forEach((item) => {
       this.queue.append(item);

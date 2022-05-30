@@ -234,6 +234,13 @@
       dataUrlConverter();
       window["temp-imgs"].remove();
 */
+      var shuffleHelper = function (arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      };
+      
       var objTable;
       var inputEvent = new InputEvent("input");
       var mouseUpEvent = new MouseEvent("mouseup");

@@ -35,6 +35,11 @@
   background-color: var(--color-base-2, rgba(235, 235, 235, 1));
 }
 
+.music-item.slip-reordering {
+  background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
+  backdrop-filter: blur(8px);
+}
+
 .music-item .front-indicator {
   display: flex;
   flex-flow: column;
