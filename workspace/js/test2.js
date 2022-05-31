@@ -52,7 +52,10 @@ class ObjectFactory {
 
   _builder(arr) {
     let obj = {};
-    obj.title = arr[0];
+    let isNew = false;
+    let reg = /\[New\]\s/g;
+    isNew = reg.test(arr[0]);
+    obj.title = isNew ? arr[0].replace(reg, "") : arr[0];
     obj.artist = arr[1];
     obj.startTime = arr[2];
     obj.endTime = arr[3];
@@ -60,7 +63,7 @@ class ObjectFactory {
     obj.src = arr[4];
     obj.isLiked = false;
     obj.isPlaying = false;
-    obj.isNew = obj.title.includes("[New]");
+    obj.isNew = isNew;
     obj.id = hash(obj.title + obj.src);
     obj.playedCounts = 0;
 
@@ -113,14 +116,16 @@ class PlaylistManager {
     });
   }
 
-  _delete() {
+  _delete(num) {
     if (this.tempChanges.deleted.length == this.tempPlaylistArr.length) return;
     if (!this.tempModified.length)
       this.tempModified = this.tempPlaylistArr.slice();
+
     let length = this.tempModified.length;
     let randNum,
       delTarget,
       gotcha = false;
+
     while (!gotcha) {
       randNum = Math.floor(Math.random() * length);
       if (this.tempChanges.added.includes(this.tempModified[randNum])) {
@@ -133,11 +138,15 @@ class PlaylistManager {
 
     this.tempChanges.deleted.push(delTarget);
     this.tempModified.splice(randNum, 1);
+
+    if (num) this._delete(--num);
+    else return;
   }
 
-  _add() {
+  _add(num) {
     if (!this.tempModified.length)
       this.tempModified = this.tempPlaylistArr.slice();
+
     let length = this.tempModified.length;
     let randNum = Math.floor(Math.random() * length);
     let gotcha = false,
@@ -155,19 +164,26 @@ class PlaylistManager {
 
     this.tempChanges.added.push(addTarget);
     this.tempModified.splice(randNum, 0, addTarget);
+
+    if (num) this._add(--num);
+    else return;
   }
 
-  _switch() {
+  _switch(num) {
     if (!this.tempModified.length)
       this.tempModified = this.tempPlaylistArr.slice();
 
     let length = this.tempModified.length;
     let rand1 = Math.floor(Math.random() * length);
     let rand2 = Math.floor(Math.random() * length);
+
     [this.tempModified[rand1], this.tempModified[rand2]] = [
       this.tempModified[rand2],
       this.tempModified[rand1],
     ];
+
+    if (num) this._switch(--num);
+    else return;
   }
 
   _init() {
@@ -191,6 +207,9 @@ class PlaylistManager {
       let elem = document.createElement("div", { is: "playlist-item" });
       elem.setup(obj, this.tempContext, index + 1);
       this.tempPlaylistFragment.append(elem);
+    });
+    Array.prototype.forEach.call(this.tempPlaylistFragment, (item, index) => {
+      item.updateIndex(index + 1);
     });
     this._init();
   }
