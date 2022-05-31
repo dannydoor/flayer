@@ -32,6 +32,24 @@ class LibraryManager {
         this.sortedFragment[i].append(elem);
       });
     }
+
+    this.tempContainer = window["temp-container"];
+    this.tempContainerContent = window["temp-content"];
+    this.tempContainerContent.append(this.sortedFragment[2]);
+    this.tempContainer.currentFragment = this.sortedFragment[2];
+    this.tempContainer.querySelector(".close-button").onclick = (e) => {
+      e.preventDefault();
+
+      document.querySelector(".open-tab").click();
+    };
+
+    this.tempButton = document.querySelector(".open-tab");
+    this.tempButton.onclick = (e) => {
+      e.preventDefault();
+
+      e.target.classList.toggle("active");
+      TabManager.toggle("temp");
+    };
   }
 
   getPrevObj(id) {

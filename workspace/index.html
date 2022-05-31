@@ -27,52 +27,6 @@
   <body>
     <div class="container">
       <div id='tab' class="invisible">
-        <!-- <div id="test-div"></div> -->
-        <div id="queue-container" class="tab-container">
-          <div class="header">
-            <span class="header-title">재생 중인 목록</span>
-            <button class="close-button"></button>
-          </div>
-          <div class="content">
-            <div class="scrollable" data-simplebar>
-              <div class="queue-item-header record">
-                <span class="queue-desc">기록</span>
-                <span id="clear-record" class="queue-desc-sub">비우기</span>
-              </div>
-              <div id="record-stack"></div>
-              <div class="queue-item-header queue">
-                <div class="queue-desc-container">
-                  <span class="queue-desc">재생 대기열</span>
-                  <span class="queue-desc-sub" id="curr-playlist-name"></span>
-                </div>
-                <div id="queue-status" class="active">
-                  <div class="tooltip on">
-                    <div class="tooltip-header">
-                      연결됨
-                    </div>
-                    <div class="tooltip-desc">
-                      <p>
-                        재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영됩니다
-                      </p>
-                    </div>
-                  </div>
-                  <div class="tooltip off">
-                    <div class="tooltip-header">
-                      연결해제됨
-                    </div>
-                    <div class="tooltip-desc">
-                      <p>
-                        재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영되지 않습니다
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div id="queue-content">
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div id="video"></div>
       <div class="control-panel">
@@ -156,6 +110,62 @@
     <div id="element-storehouse">
       <div id="menu-buttons">
         <button class="open-tab"></button>
+      </div>
+      <div id="temp-container">
+        <div class="header">
+          <span class="header-title">임시 라이브러리</span>
+          <button class="close-button"></button>
+        </div>
+        <div class="content">
+          <div data-simplebar class="scrollable">
+            <div id="temp-content"></div>
+          </div>
+        </div>
+      </div>
+      <div id="queue-container" class="tab-container">
+        <div class="header">
+          <span class="header-title">재생 중인 목록</span>
+          <button class="close-button"></button>
+        </div>
+        <div class="content">
+          <div class="scrollable" data-simplebar>
+            <div class="queue-item-header record">
+              <span class="queue-desc">기록</span>
+              <span id="clear-record" class="queue-desc-sub">비우기</span>
+            </div>
+            <div id="record-stack"></div>
+            <div class="queue-item-header queue">
+              <div class="queue-desc-container">
+                <span class="queue-desc">재생 대기열</span>
+                <span class="queue-desc-sub" id="curr-playlist-name"></span>
+              </div>
+              <div id="queue-status" class="active">
+                <div class="tooltip on">
+                  <div class="tooltip-header">
+                    연결됨
+                  </div>
+                  <div class="tooltip-desc">
+                    <p>
+                      재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영됩니다
+                    </p>
+                  </div>
+                </div>
+                <div class="tooltip off">
+                  <div class="tooltip-header">
+                    연결해제됨
+                  </div>
+                  <div class="tooltip-desc">
+                    <p>
+                      재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영되지 않습니다
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="queue-content">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="modal-storehouse"></div>
@@ -245,7 +255,7 @@
         }
       };
       
-      var objTable;
+      var objTable, tabManager;
       var inputEvent = new InputEvent("input");
       var mouseUpEvent = new MouseEvent("mouseup");
       var queueManager = new QueueManager(true, recordStack, queueContent, queueContent, map);

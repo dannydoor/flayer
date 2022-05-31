@@ -222,7 +222,7 @@ class Controller {
       videoCover.setAttribute("id", "video-cover");
       setTimeout(() => {
         window["video"].append(videoCover);
-        window["video"].append(document.querySelector("#menu-buttons"));
+        tabManager = new TabManager();
       }, 300);
 
       // 창 정보 비우기
@@ -643,8 +643,8 @@ class Controller {
 
     onClickOpenQueue: () => {
       this.openQueueButton.classList.toggle("active");
-      window["tab"].classList.toggle("invisible");
-      queueManager.updateScroll();
+      TabManager.toggle("queue");
+      setTimeout(() => queueManager.updateScroll(), 50);
     },
 
     onClickPlay: () => {

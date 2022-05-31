@@ -48,7 +48,9 @@ class QueueManager {
     this._updateQueueStatus(queueStatus);
 
     setTimeout(() => {
-      this.scrollWrapper = document.querySelector(".simplebar-content-wrapper");
+      this.scrollWrapper = window["queue-container"].querySelector(
+        ".simplebar-content-wrapper"
+      );
       this.updateScroll();
     }, 200);
 

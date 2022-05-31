@@ -1,3 +1,7 @@
+#queue-container {
+  z-index: 9999;
+}
+
 .queue-item-header{
   display: flex;
   justify-content: space-between;
