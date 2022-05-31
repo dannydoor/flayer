@@ -212,15 +212,18 @@ class Controller {
         jwplayer().stop();
       });
 
-      // 초기 화면
-      let videoCover = document.createElement("div");
-      videoCover.setAttribute("id", "video-cover");
-      setTimeout(() => window["video"].append(videoCover), 300);
-
       // 컨트롤바 비활성화
       this.helpers.toggleDisabledStatus("control", true);
       this.helpers.toggleDisabledStatus("barsAndOthers", true);
       this.initState = "init";
+
+      // 초기 화면
+      let videoCover = document.createElement("div");
+      videoCover.setAttribute("id", "video-cover");
+      setTimeout(() => {
+        window["video"].append(videoCover);
+        window["video"].append(document.querySelector("#menu-buttons"));
+      }, 300);
 
       // 창 정보 비우기
       this.playBar.setAttribute("min", 0);
