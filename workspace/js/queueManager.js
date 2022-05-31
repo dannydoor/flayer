@@ -397,9 +397,14 @@ class QueueManager {
       let contextMusics = playlistManager.getPlaylistContents(context);
 
       this._applyToQueue(contextMusics, context);
-      if (controller.isShuffled) this._shuffleQueue(true);
       let currentMusic = this.queue.querySelector(`[music-id="${currentId}"]`);
-      this.queue.prepend(currentMusic);
+      if (controller.isShuffled) {
+        this._shuffleQueue(true);
+        this.queue.prepend(currentMusic);
+      } else {
+        Controller.updateMusicToPlay(currentMusic);
+        return;
+      }
     }
 
     Controller.playMusic();
@@ -595,6 +600,7 @@ class QueueManager {
     // 모달 매니저가 진짜로 기록을 삭제할 건지 모달을 띄우고 사용자의 대답을 받는 프로미스를 생성, 대답을 반환.
     if (!sureToDelete) return;
     this.record.innerHTML = "";
+    this.updateScroll();
   }
 
   _clearQueue() {

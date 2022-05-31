@@ -237,6 +237,7 @@ class PlaylistItem extends PlayableItem {
 
     if (this.getAttribute("music-id")) {
       this.bindHandler();
+      this.context = this.getAttribute("context");
     }
   }
 

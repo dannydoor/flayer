@@ -74,13 +74,22 @@ class ObjectFactory {
 class ModalManager {
   constructor() {}
 
-  createModal() {
-    let answer = prompt(
-      "현재 재생 대기 중인 음악이 있습니다. 그대로 유지하고 재생하겠습니까? (yes: 재생 대기 목록 유지 | clear: 지우고 재생)"
-    );
-    if (answer == "clear") return "clear";
-    else if (answer.startsWith("y")) return "keep";
-    else return "cancel";
+  createModal(type) {
+    switch (type) {
+      case "queue-play": {
+        let answer = prompt(
+          "현재 재생 대기 중인 음악이 있습니다. 그대로 유지하고 재생하겠습니까? (yes: 재생 대기 목록 유지 | clear: 지우고 재생)"
+        );
+        if (!answer || answer.startsWith("c")) return "clear";
+        else if (answer.startsWith("y")) return "keep";
+        else return "cancel";
+      }
+      case "clear-record": {
+        let answer = confirm("정말로 기록을 삭제하시겠습니까?");
+        if (answer) return true;
+        else return false;
+      }
+    }
   }
 }
 
@@ -193,13 +202,11 @@ class PlaylistManager {
 
   _confirmChange() {
     if (!this.tempModified.length) return;
-    let initTime = Date.now();
     QueueManager.applyPlaylistChanges(
       this.tempModified,
       "playlist:" + this.tempContext,
       this.tempChanges
     );
-    // console.log(Date.now - initTime);
 
     this.tempPlaylistArr = this.tempModified.slice();
     this.tempPlaylistFragment = new DocumentFragment();
@@ -212,6 +219,14 @@ class PlaylistManager {
       item.updateIndex(index + 1);
     });
     this._init();
+    this._appendTempPlaylist();
+  }
+
+  _appendTempPlaylist() {
+    queueManager.record.innerHTML = "";
+    queueManager.record.append(
+      playlistManager.tempPlaylistFragment.cloneNode(true)
+    );
   }
 
   getPlaylistContents(context) {
