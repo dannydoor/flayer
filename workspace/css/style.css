@@ -186,8 +186,8 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background: url("../assets/img/120px/Main-Logo-w.svg") no-repeat center/400px auto;
-  background-color: #595ae2;
+  background: url("../assets/img/120px/Main-Logo-p.svg") no-repeat center/400px auto;
+  background-color: #fff;
   z-index: 1000;
 }
 

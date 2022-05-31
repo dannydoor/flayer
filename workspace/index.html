@@ -175,10 +175,11 @@
       function main() {
         let initTime = Date.now();
         let objectFactory = new ObjectFactory();
-        let map = new Map();
+        // let map = new Map();
         objTable = ObjectFactory.objHashTableBuilder(db);
         // console.log("객체 생성까지: "+ (Date.now() - initTime));
 
+        /*
         let [sorted1, sorted2, sorted3, sorted4] = ObjectFactory.getSortedArr(objTable);
         // console.log("배열 정렬까지: "+ (Date.now() - initTime));
         
@@ -216,7 +217,8 @@
         
       }
 
-      let [recordStack, queueContent, map] = main();
+      main();
+      // let [recordStack, queueContent, map] = main();
 /*
       async function getFileFromImgUrl(url) {
         const response = await fetch(url);
@@ -258,7 +260,7 @@
       var objTable, tabManager;
       var inputEvent = new InputEvent("input");
       var mouseUpEvent = new MouseEvent("mouseup");
-      var queueManager = new QueueManager(true, recordStack, queueContent, queueContent, map);
+      var queueManager = new QueueManager();
       var modalManager = new ModalManager();
       var libraryManager = new LibraryManager(objTable, 2);
       var playlistManager = new PlaylistManager();

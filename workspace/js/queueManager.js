@@ -12,8 +12,10 @@ class QueueManager {
     this.statusIndicator = window["queue-status"];
     this.clearButton = window["clear-record"];
     this.currPlaylistName = window["curr-playlist-name"];
-    this.queueRepo = queueRepo.cloneNode(true);
-    this.queueRepo.querySelector(".current").classList.remove("current");
+    if (queueRepo) {
+      this.queueRepo = queueRepo.cloneNode(true);
+      this.queueRepo.querySelector(".current").classList.remove("current");
+    }
     this.queueStatus = queueStatus;
 
     // 메소드 바인딩
