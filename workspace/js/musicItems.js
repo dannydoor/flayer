@@ -38,8 +38,8 @@ class MusicItem extends HTMLDivElement {
     let currentLike = this.getAttribute("is-liked");
 
     musics.forEach((item) => {
-      if (item.getAttribute("music-id") == currentLike) return;
-      item.setAttribute("music-id", currentLike);
+      if (item.getAttribute("is-liked") == currentLike) return;
+      item.setAttribute("is-liked", currentLike);
     });
   }
 

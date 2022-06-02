@@ -82,6 +82,7 @@ class Controller {
       isLiked: undefined,
       reference: undefined,
     };
+    this._isMediaSessionSet = false;
     this._mediaSessionObj = {
       title: undefined,
       artist: undefined,
@@ -421,26 +422,32 @@ class Controller {
 
     updateMediaSession: () => {
       // 미디어세션 API 정보 업데이트
-      this._mediaSessionObj.title = this.currentInfo.title;
-      this._mediaSessionObj.artist = this.currentInfo.artist;
-      let metadata = this._mediaSessionObj;
+      if (!this._isMediaSessionSet) {
+        this._isMediaSessionSet = true;
+        this._mediaSessionObj.title = this.currentInfo.title;
+        this._mediaSessionObj.artist = this.currentInfo.artist;
+        let metadata = this._mediaSessionObj;
 
-      if ("mediaSession" in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata(metadata);
-        navigator.mediaSession.setActionHandler("play", () => {
-          jwplayer().play();
-          navigator.mediaSession.playbackState = "playing";
-        });
-        navigator.mediaSession.setActionHandler("pause", () => {
-          jwplayer().pause();
-          navigator.mediaSession.playbackState = "paused";
-        });
-        navigator.mediaSession.setActionHandler("previoustrack", () =>
-          window["prev-button"].click()
-        );
-        navigator.mediaSession.setActionHandler("nexttrack", () =>
-          window["next-button"].click()
-        );
+        if ("mediaSession" in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata(metadata);
+          navigator.mediaSession.setActionHandler("play", () => {
+            jwplayer().play();
+            navigator.mediaSession.playbackState = "playing";
+          });
+          navigator.mediaSession.setActionHandler("pause", () => {
+            jwplayer().pause();
+            navigator.mediaSession.playbackState = "paused";
+          });
+          navigator.mediaSession.setActionHandler("previoustrack", () =>
+            window["prev-button"].click()
+          );
+          navigator.mediaSession.setActionHandler("nexttrack", () =>
+            window["next-button"].click()
+          );
+        }
+      } else {
+        navigator.mediaSession.metadata.title = this.currentInfo.title;
+        navigator.mediaSession.metadata.artist = this.currentInfo.artist;
       }
     },
 
@@ -644,7 +651,7 @@ class Controller {
     onClickOpenQueue: () => {
       this.openQueueButton.classList.toggle("active");
       TabManager.toggle("queue");
-      setTimeout(() => queueManager.updateScroll(), 50);
+      queueManager.updateScroll();
     },
 
     onClickPlay: () => {

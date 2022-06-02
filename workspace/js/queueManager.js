@@ -441,7 +441,7 @@ class QueueManager {
     let isLibrary = controller.currentInfo.context.startsWith("library");
     let noPrev = controller.currentMusic == QueueManager.queueFirstChild;
     let noNext = controller.currentMusic == QueueManager.queueLastChild;
-    let isPureLibrary = !!this.queueRepo;
+    let isPureLibrary = !this.queueRepo;
     let needsMakeUp = noPrev || noNext;
     addBefore = addBefore.bind(this);
     addAfter = addAfter.bind(this);
@@ -722,15 +722,17 @@ class QueueManager {
       this.statusIndicator.classList.add("active");
     } else {
       this.statusIndicator.classList.remove("active");
-    }
-
-    if (!bool) {
       if (!this.queueRepo) {
         // 저장고가 비워져있을 경우 큐를 복사해서 새로 만들어줌.
         this.queueRepo = new DocumentFragment();
-        this.queueRepo.append(this.queue.cloneNode(true));
+
+        Array.prototype.forEach.call(this.queue.children, (item) => {
+          let clone = elem.cloneNode(true);
+          clone.removeAttribute("style");
+          clone.classList.remove("slip-reordering");
+          this.queueRepo.append(clone);
+        });
       }
-    } else {
     }
   }
 
