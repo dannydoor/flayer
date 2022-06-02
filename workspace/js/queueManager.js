@@ -521,7 +521,9 @@ class QueueManager {
     let isCurrent = elem.classList.contains("current");
     let needUpdate =
       elem.previousElementSibling.classList.contains("current") ||
-      elem.nextElementSibling.classList.contains("current");
+      (elem.nextElementSibling
+        ? elem.nextElementSibling.classList.contains("current")
+        : false);
 
     let elemIndex = elem.index;
     let elemInRepo = this.queueRepo.querySelector(`[index="${elemIndex}"]`);
@@ -634,7 +636,12 @@ class QueueManager {
     let origNextElem = elem.nextElementSibling;
     if (origNextElem == newNextElem) return;
     else {
-      newNextElem.before(elem);
+      if (newNextElem) {
+        newNextElem.before(elem);
+      } else {
+        newNextElem = this.queue.lastElementChild;
+        newNextElem.after(elem);
+      }
 
       if (!controller.isShuffled) {
         if (this.queueStatus) this._updateQueueStatus(false);
@@ -727,7 +734,7 @@ class QueueManager {
         this.queueRepo = new DocumentFragment();
 
         Array.prototype.forEach.call(this.queue.children, (item) => {
-          let clone = elem.cloneNode(true);
+          let clone = item.cloneNode(true);
           clone.removeAttribute("style");
           clone.classList.remove("slip-reordering");
           this.queueRepo.append(clone);
