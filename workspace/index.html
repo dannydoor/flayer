@@ -197,11 +197,14 @@
             isRepeat: controller.isRepeat,
           };
           let record = Array.from(queueManager.record.children).map(item => item.getAttribute("music-id"));
-          let queueRepo = Array.from(queueManager.record.children).map(item => { return {id: item.getAttribute("music-id"), context: item.getAttribute("context")}});
+          let queueRepo = []
+          Array.from(queueManager.queueRepo.children).forEach(item => {
+            queueRepo.push({id:item.getAttribute("music-id"), context: item.getAttribute("context")})
+          });
           let queue = [];
           let queueRepoTable = {};
           let currentIndex = null;
-          let map = queueManager._musicMap;
+          let map = queueManager._musicMap.entries();
           Array.from(queueManager.queueRepo.children).forEach((item, index) => {
             queueRepoTable[item.getAttribute("index")] = index;
           });
@@ -214,6 +217,7 @@
           lastSession.queueInfo.queue = queue;
           lastSession.queueInfo.queueRepo = queueRepo;
           lastSession.queueInfo.currentIndex = currentIndex;
+          lastSession.queueInfo.map = map;
           localStorage.lastSession = JSON.stringify(lastSession);
         }
       }
