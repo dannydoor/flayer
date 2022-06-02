@@ -187,14 +187,11 @@ class Controller {
       this._setupOptions.file = this.currentInfo.url;
 
       let options = this._setupOptions;
-      let updateMediaSession = this.updates.updateMediaSession;
-      let startTime = this.currentInfo.startTime;
 
       jwplayer("video").setup(options);
       jwplayer().once("beforePlay", () => {
         jwplayer().setMute(false);
-        jwplayer().seek(startTime);
-        updateMediaSession();
+        jwplayer().stop();
       });
 
       this.updates.updateControlBar();
@@ -374,7 +371,7 @@ class Controller {
 
     updatePlayBar: () => {
       let currTime = parseInt(
-        !!jwplayer().getPosition()
+        jwplayer().getPosition() - this.currentInfo.startTime >= 0
           ? jwplayer().getPosition() - this.currentInfo.startTime
           : 0
       );

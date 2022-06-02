@@ -175,81 +175,51 @@
       function main() {
         let initTime = Date.now();
         let objectFactory = new ObjectFactory();
-        // let map = new Map();
+        if (localStorage.lastSession) {
+
+        } else {
+
+        }
         objTable = ObjectFactory.objHashTableBuilder(db);
-        // console.log("객체 생성까지: "+ (Date.now() - initTime));
 
-        /*
-        let [sorted1, sorted2, sorted3, sorted4] = ObjectFactory.getSortedArr(objTable);
-        // console.log("배열 정렬까지: "+ (Date.now() - initTime));
-        
-        let recordFragment = new DocumentFragment();
-        let queueFragment = new DocumentFragment();
-        let context = "library";
+        window.addEventListener("beforeunload", () => lastSessionCallback());
 
-        for (let item of sorted1) {
-          let recordElem = document.createElement("div", { is: "record-item"});
-          recordElem.setup(item);
-          map.set(item.id, 1);
-          recordFragment.append(recordElem);
+        var lastSessionCallback = function() {
+          let lastSession = {};
+          if (controller.currentInfo.reference) {
+            controller.currentInfo.reference.isPlaying = false;
+          }
+          lastSession.objTable = objTable;
+          lastSession.currentInfo = {
+            id: controller.currentInfo?.id, 
+            context: controller.currentInfo?.context,
+            isShuffled: controller.isShuffled,
+            isRepeat: controller.isRepeat,
+          };
+          let record = Array.from(queueManager.record.children).map(item => item.getAttribute("music-id"));
+          let queueRepo = Array.from(queueManager.record.children).map(item => { return {id: item.getAttribute("music-id"), context: item.getAttribute("context")}});
+          let queue = [];
+          let queueRepoTable = {};
+          let currentIndex = null;
+          let map = queueManager._musicMap;
+          Array.from(queueManager.queueRepo.children).forEach((item, index) => {
+            queueRepoTable[item.getAttribute("index")] = index;
+          });
+          Array.from(queueManager.queue).forEach((item, index) => {
+            if (item.classList.contains("current")) currentIndex = index;
+            queue.push(queueRepoTable[item.getAttribute("index")]);
+          })
+          lastSession.queueInfo = {}
+          lastSession.queueInfo.record = record;
+          lastSession.queueInfo.queue = queue;
+          lastSession.queueInfo.queueRepo = queueRepo;
+          lastSession.queueInfo.currentIndex = currentIndex;
+          localStorage.lastSession = JSON.stringify(lastSession);
         }
-        // console.log("sorted1 요소 생성까지: "+ (Date.now() - initTime));
-        for (let item of sorted3) {
-          let queueElem = document.createElement("div", { is: "queue-item"});
-          queueElem.setup(item, context);
-          queueFragment.append(queueElem);
-        }
-        // console.log("sorted2 요소 생성까지: "+ (Date.now() - initTime));
-
-        queueFragment.firstElementChild.classList.add("current");
-
-        return [recordFragment, queueFragment, map];
-        /* window["record-stack"].append(recordFragment);
-        window["queue-content"].append(queueFragment);
-        console.log("DOM 렌더링까지: "+ (Date.now() - initTime));
-
-        let scrollHeight = getComputedStyle(window["record-stack"]).height;
-        console.log(scrollHeight);
-        console.log("스크롤 크기 계산까지: "+ (Date.now() - initTime)); */ 
-
-        ;
-        
-        
       }
 
       main();
-      // let [recordStack, queueContent, map] = main();
-/*
-      async function getFileFromImgUrl(url) {
-        const response = await fetch(url);
-        const data = await response.blob();
-        return new File([data], url, {
-          type: "image/png",
-        });
-      }
-      var imgData96, imgData128, imgData192, imgData256, imgData384, imgData512;
-      let imgDataArr = [96, 128, 192, 256, 384, 512];
-      function dataUrlConverter() {
-        document.querySelectorAll('img').forEach(async (item, index) => {
-          let file = await getFileFromImgUrl(item.src);
-          console.log(file.result);
-          let reader = new FileReader();
-        
-          reader.onload = (e) => {
-            console.log(reader.result);
-            window["imgData" + imgDataArr[index]] = reader.result;
-          };
 
-          reader.onerror = (e) => {
-            throw reader.error;
-          };
-
-          reader.readAsDataURL(file);
-        });
-      }
-      dataUrlConverter();
-      window["temp-imgs"].remove();
-*/
       var shuffleHelper = function (arr) {
         for (let i = arr.length - 1; i > 0; i--) {
           let j = Math.floor(Math.random() * (i + 1));
@@ -257,7 +227,16 @@
         }
       };
       
-      var objTable, tabManager;
+      var objTable, 
+        tabManager, 
+        lsObj, 
+        lsContext, 
+        lsRecord, 
+        lsQueue, 
+        lsQueueRepo,
+        lsMap,
+        lsShuffle, 
+        lsRepeat;
       var inputEvent = new InputEvent("input");
       var mouseUpEvent = new MouseEvent("mouseup");
       var queueManager = new QueueManager();
