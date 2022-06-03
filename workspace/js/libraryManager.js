@@ -37,6 +37,10 @@ class LibraryManager {
     this.tempContainerContent = window["temp-content"];
     this.tempContainerContent.append(this.sortedFragment[2]);
     this.tempContainer.currentFragment = this.sortedFragment[2];
+    this.tempContainer.querySelector(".show-liked").onclick = (e) => {
+      e.preventDefault();
+      window["temp-container"].classList.toggle("only-liked");
+    };
     this.tempContainer.querySelector(".close-button").onclick = (e) => {
       e.preventDefault();
 

@@ -287,6 +287,24 @@ body {
   height: calc(100% - 40px);
 }
 
+#temp-container .show-liked {
+  position: absolute;
+  top: 8px;
+  right: 40px;
+  width: 24px;
+  height: 24px;
+  background: url("../assets/img/24px/Like-w.svg") no-repeat center/20px;
+  cursor: pointer;
+}
+
+#temp-container.only-liked .show-liked {  
+  background: url("../assets/img/24px/Liked-w.svg") no-repeat center/20px;
+}
+
+#temp-container.only-liked [is-liked=false] {
+  display: none;
+}
+
 .scrollable {
   height: 100%;
 }
