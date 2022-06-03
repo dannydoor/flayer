@@ -13,7 +13,9 @@ class QueueManager {
     this.clearButton = window["clear-record"];
     this.currPlaylistName = window["curr-playlist-name"];
     if (queueRepo) {
-      this.queueRepo = queueRepo.cloneNode(true);
+      this.queueRepo = queueRepo.childElementCount
+        ? queueRepo.cloneNode(true)
+        : null;
     }
     this.queueStatus = queueStatus;
 

@@ -58,7 +58,17 @@ class Controller {
 
     // 프로퍼티 초기화
     this.initState = null;
+    if (initShuffle) {
+      this.shuffleButton.classList.add("active");
+    }
     this.isShuffled = initShuffle;
+    if (!initRepeat) {
+    } else if (initRepeat == "one") {
+      this.repeatButton.classList.add("active");
+      this.repeatButton.classList.add("one");
+    } else {
+      this.repeatButton.classList.add("active");
+    }
     this.isRepeat = initRepeat;
     this.timerId = null;
     this.seektimerId = null;
@@ -200,8 +210,6 @@ class Controller {
       this.updates.updatePlayerHandler();
       this.helpers.setPlayerHandlers();
       Controller.updateByQueueChange();
-
-      this.initState = "init";
     } else {
       // 초기화
       this._setupOptions.file =
@@ -231,9 +239,12 @@ class Controller {
       this.helpers.setPlayerHandlers();
       Controller.updateTooltip(true, true);
     }
+    this.initState = "init";
+
     // 초기 화면
     let videoCover = document.createElement("div");
     videoCover.setAttribute("id", "video-cover");
+
     setTimeout(() => {
       window["video"].append(videoCover);
       tabManager = new TabManager();
@@ -378,12 +389,9 @@ class Controller {
           ? jwplayer().getPosition() - this.currentInfo.startTime
           : 0
       );
-      if (this.playBar.value == currTime) return;
-      else {
-        this.playBar.value = currTime;
-        [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
-          this.helpers.timeFormatter(currTime, this.currentInfo.duration);
-      }
+      this.playBar.value = currTime;
+      [this.currentTime.innerHTML, this.remainingTime.innerHTML] =
+        this.helpers.timeFormatter(currTime, this.currentInfo.duration);
       this.playBar.dispatchEvent(inputEvent);
     },
 
@@ -655,6 +663,10 @@ class Controller {
     },
 
     onClickPlay: () => {
+      if (this.initState) {
+        window["video-cover"].remove();
+        this.initState = null;
+      }
       jwplayer().playToggle();
       this.helpers.toggleControlStatus();
     },
