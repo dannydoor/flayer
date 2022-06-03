@@ -187,18 +187,21 @@ class Controller {
       this._setupOptions.file = this.currentInfo.url;
 
       let options = this._setupOptions;
+      let startTime = this.currentInfo.startTime;
 
       jwplayer("video").setup(options);
       jwplayer().once("beforePlay", () => {
         jwplayer().setMute(false);
+        jwplayer().seek(startTime);
         jwplayer().stop();
       });
 
       this.updates.updateControlBar();
       this.updates.updatePlayerHandler();
       this.helpers.setPlayerHandlers();
-      Controller.updateMusicToPlay(QueueManager.currentMusic);
-      Controller.updateTooltip(true, true);
+      Controller.updateByQueueChange();
+
+      this.initState = "init";
     } else {
       // 초기화
       this._setupOptions.file =
@@ -215,14 +218,6 @@ class Controller {
       this.helpers.toggleDisabledStatus("barsAndOthers", true);
       this.initState = "init";
 
-      // 초기 화면
-      let videoCover = document.createElement("div");
-      videoCover.setAttribute("id", "video-cover");
-      setTimeout(() => {
-        window["video"].append(videoCover);
-        tabManager = new TabManager();
-      }, 300);
-
       // 창 정보 비우기
       this.playBar.setAttribute("min", 0);
       this.playBar.setAttribute("max", 0);
@@ -236,6 +231,14 @@ class Controller {
       this.helpers.setPlayerHandlers();
       Controller.updateTooltip(true, true);
     }
+    // 초기 화면
+    let videoCover = document.createElement("div");
+    videoCover.setAttribute("id", "video-cover");
+    setTimeout(() => {
+      window["video"].append(videoCover);
+      tabManager = new TabManager();
+    }, 300);
+
     // 볼륨바 핸들러 달기
     this.volumeBar.setAttribute("mute", false);
     this.volumeBar.addEventListener("input", this.handlers.onInputVolumeBar);

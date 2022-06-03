@@ -173,108 +173,139 @@
     <script src="./js/simpleBar/simplebar.js"></script>
     <script>
       function main() {
-        let objectFactory = new ObjectFactory();
-        if (localStorage.lastSession) {
-          let lastSession = JSON.parse(localStorage.lastSession);
-          objTable = lastSession.objTable;
-          [lsObj, lsContext, lsShuffle, lsRepeat] = [
-            objTable[lastSession.currentInfo?.id],
-            lastSession.currentInfo?.context,
-            lastSession.currentInfo.isShuffled,
-            lastSession.currentInfo.isRepeat,
-          ];
-          let recordArr = [];
-          let queueArr = [];
-          let queueRepoArr = [];
-          lastSession.queueInfo.record.forEach(item => {
-            let elem = document.createElement("div", { is: "record-item" });
-            elem.setup(objTable[item.id]);
-            recordArr.push(elem);
-          })
-          lastSession.queueInfo.queue.forEach(item => {
-            let elem = document.createElement("div", { is: "queue-item" });
-            elem.setup(objTable[item.id], item.context);
-            queueArr.push(elem);
-          })
-          lastSession.queueInfo.queueRepo.forEach(index => {
-            let elem = queueArr[index].cloneNode(true);
-            queueRepoArr.push(elem);
-          })
+  let objectFactory = new ObjectFactory();
+  if (localStorage.lastSession) {
+    let lastSession = JSON.parse(localStorage.lastSession);
 
-        } else {
+    objTable = lastSession.objTable;
+    [lsObj, lsContext, lsShuffle, lsRepeat] = [
+      objTable[lastSession.currentInfo?.id],
+      lastSession.currentInfo?.context,
+      lastSession.currentInfo.isShuffled,
+      lastSession.currentInfo.isRepeat
+    ];
 
-        }
-        objTable = ObjectFactory.objHashTableBuilder(db);
+    let recordArr = [];
+    let queueArr = [];
+    let queueRepoArr = [];
 
-        window.addEventListener("beforeunload", () => lastSessionCallback());
+    lastSession.queueInfo.record.forEach((item) => {
+      let elem = document.createElement("div", { is: "record-item" });
+      elem.setup(objTable[item.id]);
+      recordArr.push(elem);
+    });
+    lastSession.queueInfo.queue.forEach((item) => {
+      let elem = document.createElement("div", { is: "queue-item" });
+      elem.setup(objTable[item.id], item.context);
+      queueArr.push(elem);
+    });
+    lastSession.queueInfo.queueRepo.forEach((index) => {
+      let elem = queueArr[index].cloneNode(true);
+      queueRepoArr.push(elem);
+    });
 
-        var lastSessionCallback = function() {
-          let lastSession = {};
-          if (controller.currentInfo.reference) {
-            controller.currentInfo.reference.isPlaying = false;
-          }
-          lastSession.objTable = objTable;
-          lastSession.currentInfo = {
-            id: controller.currentInfo?.id,
-            context: controller.currentInfo?.context,
-            isShuffled: controller.isShuffled,
-            isRepeat: controller.isRepeat,
-          };
-          let record = Array.from(queueManager.record.children).map(item => item.getAttribute("music-id"));
-          let queue = [];
-          let queueTable = {};
-          let queueRepo = []
-          let currentIndex = null;
-          let currentStatus = queueManager.queueStatus;
-          Array.from(queueManager.queue.children).forEach((item, index) => {
-            if (item.classList.contains("current")) currentIndex = index;
-            queue.push({id:item.getAttribute("music-id"), context: item.getAttribute("context")});
-            queueTable[item.getAttribute("index")] = index;
-          });
-          if (queueManager.queueRepo) {
-            Array.from(queueManager.queueRepo.children).forEach(item => {
-              queueRepo.push(queueTable[item.getAttribute("index")]);
-            });
-          }
-          let map = Array.from(queueManager._musicMap.entries());
-          lastSession.queueInfo = {}
-          lastSession.queueInfo.record = record;
-          lastSession.queueInfo.queue = queue;
-          lastSession.queueInfo.queueRepo = queueRepo;
-          lastSession.queueInfo.currentIndex = currentIndex;
-          lastSession.queueInfo.map = map;
-          lastSession.queueInfo.queueStatus = currentStatus;
-          localStorage.lastSession = JSON.stringify(lastSession);
-        }
-      }
+    if (queueArr[lastSession.queueInfo.currentIndex]) {
+      queueArr[lastSession.queueInfo.currentIndex].classList.add("current");
+    };
 
-      main();
+    let recordFragment = new DocumentFragment();
+    let queueFragment = new DocumentFragment();
+    let queueRepoFragment = new DocumentFragment();
+    recordArr.forEach(elem => recordFragment.append(elem));
+    queueArr.forEach(elem => queueFragment.append(elem));
+    queueRepoArr.forEach(elem => queueRepoFragment.append(elem));
 
-      var shuffleHelper = function (arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-          let j = Math.floor(Math.random() * (i + 1));
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-      };
-      
-      var objTable, 
-        tabManager, 
-        lsObj =
-        lsContext =
-        lsRecord =
-        lsQueue =
-        lsQueueRepo =
-        lsMap =
-        lsShuffle =
-        lsRepeat = null;
-      var inputEvent = new InputEvent("input");
-      var mouseUpEvent = new MouseEvent("mouseup");
-      var queueManager = new QueueManager();
-      var modalManager = new ModalManager();
-      var libraryManager = new LibraryManager(objTable, 2);
-      var playlistManager = new PlaylistManager();
-      var controller = new Controller();
-      // new SimpleBar(document.querySelector('.scrollable'))
+    let map = new Map();
+    lastSession.queueInfo.map.forEach(item => {
+      map[item[0]] = item[1];
+    });
+
+    [lsRecord, lsQueue, lsQueueRepo, lsMap, lsQueueStatus] = [
+      recordFragment,
+      queueFragment,
+      queueRepoFragment,
+      map,
+      lastSession.queueInfo.queueStatus
+    ];
+  } 
+  
+  objTable = ObjectFactory.objHashTableBuilder(db, objTable);
+
+  window.addEventListener("beforeunload", () => lastSessionCallback());
+
+  var lastSessionCallback = function () {
+    let lastSession = {};
+    if (controller.currentInfo.reference) {
+      controller.currentInfo.reference.isPlaying = false;
+    }
+    lastSession.objTable = objTable;
+    lastSession.currentInfo = {
+      id: controller.currentInfo?.id,
+      context: controller.currentInfo?.context,
+      isShuffled: controller.isShuffled,
+      isRepeat: controller.isRepeat,
+    };
+    let record = Array.from(queueManager.record.children).map((item) =>
+      item.getAttribute("music-id")
+    );
+    let queue = [];
+    let queueTable = {};
+    let queueRepo = [];
+    let currentIndex = null;
+    let currentStatus = queueManager.queueStatus;
+    Array.from(queueManager.queue.children).forEach((item, index) => {
+      if (item.classList.contains("current")) currentIndex = index;
+      queue.push({
+        id: item.getAttribute("music-id"),
+        context: item.getAttribute("context"),
+      });
+      queueTable[item.getAttribute("index")] = index;
+    });
+    if (queueManager.queueRepo) {
+      Array.from(queueManager.queueRepo.children).forEach((item) => {
+        queueRepo.push(queueTable[item.getAttribute("index")]);
+      });
+    }
+    let map = Array.from(queueManager._musicMap.entries());
+    lastSession.queueInfo = {
+      "record" : record,
+      "queue" : queue,
+      "queueRepo" : queueRepo,
+      "currentIndex" : currentIndex,
+      "map" : map,
+      "queueStatus" : currentStatus,
+    };
+    localStorage.lastSession = JSON.stringify(lastSession);
+  };
+}
+
+main();
+
+var shuffleHelper = function (arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+};
+
+var objTable,
+  tabManager,
+  lsObj,
+  lsContext,
+  lsShuffle,
+  lsRepeat,
+  lsRecord,
+  lsQueue,
+  lsQueueRepo,
+  lsMap,
+  lsQueueStatus = true;
+var inputEvent = new InputEvent("input");
+var mouseUpEvent = new MouseEvent("mouseup");
+var queueManager = new QueueManager(lsQueueStatus, lsRecord, lsQueueRepo, lsQueue, lsMap);
+var modalManager = new ModalManager();
+var libraryManager = new LibraryManager(objTable, 2);
+var playlistManager = new PlaylistManager();
+var controller = new Controller(lsObj, lsContext, lsShuffle, lsRepeat);
     </script>
   </body>
 </html>

@@ -14,7 +14,6 @@ class QueueManager {
     this.currPlaylistName = window["curr-playlist-name"];
     if (queueRepo) {
       this.queueRepo = queueRepo.cloneNode(true);
-      this.queueRepo.querySelector(".current").classList.remove("current");
     }
     this.queueStatus = queueStatus;
 

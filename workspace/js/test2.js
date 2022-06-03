@@ -3,13 +3,25 @@ class ObjectFactory {
     ObjectFactory.objHashTableBuilder =
       ObjectFactory.objHashTableBuilder.bind(this);
     ObjectFactory.getSortedArr = ObjectFactory.getSortedArr.bind(this);
+    this.reg = /\[New\]\s/g;
   }
 
-  static objHashTableBuilder(arr) {
-    let obj = {};
+  static objHashTableBuilder(arr, obj) {
+    if (!obj) obj = {};
     arr.forEach((item) => {
-      let newObj = this._builder(item);
-      obj[newObj.id] = newObj;
+      let title = this.reg.test(item[0])
+        ? item[0].replace(this.reg, "")
+        : item[0];
+      let key = hash(title + item[4]);
+
+      if (obj[key] !== undefined) {
+        obj[key].startTime = item[2];
+        obj[key].endTime = item[3];
+        obj[key].duration = parseInt(item[3] - item[2]);
+      } else {
+        let newObj = this._builder(item);
+        obj[newObj.id] = newObj;
+      }
     });
     return obj;
   }
@@ -53,9 +65,8 @@ class ObjectFactory {
   _builder(arr) {
     let obj = {};
     let isNew = false;
-    let reg = /\[New\]\s/g;
-    isNew = reg.test(arr[0]);
-    obj.title = isNew ? arr[0].replace(reg, "") : arr[0];
+    isNew = this.reg.test(arr[0]);
+    obj.title = isNew ? arr[0].replace(this.reg, "") : arr[0];
     obj.artist = arr[1];
     obj.startTime = arr[2];
     obj.endTime = arr[3];
