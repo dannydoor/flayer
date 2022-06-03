@@ -292,7 +292,7 @@ class QueueItem extends MusicItem {
     this.context = context;
     this.classList.add("queue");
     if (!index) {
-      this.index = hash(Date.now() + obj.id);
+      this.index = hash(Math.floor(Math.random() * Date.now()) + obj.id);
     } else {
       this.index = index;
     }

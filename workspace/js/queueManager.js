@@ -645,13 +645,6 @@ class QueueManager {
 
       if (!controller.isShuffled) {
         if (this.queueStatus) this._updateQueueStatus(false);
-        let elemInRepo = this.queueRepo.querySelector(
-          `[index="${elem.index}"]`
-        );
-        let nextElemInRepo = this.queueRepo.querySelector(
-          `[index="${newNextElem.index}"]`
-        );
-        nextElemInRepo.before(elemInRepo);
       }
 
       Controller.updateByQueueChange();
