@@ -117,6 +117,12 @@
           <button class="show-liked"></button>
           <button class="close-button"></button>
         </div>
+        <div class="header search">
+          <input type="text" id="library-search" placeholder="검색">
+          <div id="search-sample" data-simplebar>
+            <div id="search-sample-content"></div>
+          </div>
+        </div>
         <div class="content">
           <div data-simplebar class="scrollable">
             <div id="temp-content"></div>
@@ -289,7 +295,9 @@ var shuffleHelper = function (arr) {
   }
 };
 
-var objTable,
+var searchSet = new Set(),
+  searchSpace,
+  objTable,
   tabManager,
   lsObj,
   lsContext,

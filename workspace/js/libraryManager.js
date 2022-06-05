@@ -56,6 +56,27 @@ class LibraryManager {
     };
   }
 
+  filterChecker(input, target)
+
+  autoComplete(input, target) {
+    // input 이벤트 마다 실행
+    input = input.toLowerCase();
+
+    let filteredAuto = searchSpace.filter((item) => {
+      item.toLowerCase().startsWith(input);
+    });
+
+    filteredAuto.forEach((item) => {
+      let elem = document.createElement("div");
+      elem.innerHTML = item;
+      elem.onclick = () => {
+        target.value = elem.innerHTML;
+        window["search-sample-content"].innerHTML = "";
+      };
+      window["search-sample-content"].append(elem);
+    });
+  }
+
   getPrevObj(id) {
     let index = this.sortedKeyTable[this.sortMode][id];
     return this.sortedValueTable[this.sortMode][index - 1];

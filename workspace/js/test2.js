@@ -20,9 +20,17 @@ class ObjectFactory {
         obj[key].duration = parseInt(item[3] - item[2]);
       } else {
         let newObj = this._builder(item);
-        obj[newObj.id] = newObj;
+        obj[key] = newObj;
       }
+
+      searchSet.add(obj[key].artist);
+      searchSet.add(obj[key].title);
     });
+
+    serachSpace = Array.from(serachSet.keys());
+    serachSpace.sort((a, b) => a.localeCompare(b));
+    serachSet = null;
+
     return obj;
   }
 

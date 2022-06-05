@@ -33,6 +33,7 @@
     <div class="item"></div>
     <div class="item"></div>
   </div>
+  <input type="search" name="search" id="search">
   <script src="./js/simpleBar/simplebar.js"></script>
   <script>
     function itemMaker() {
@@ -40,6 +41,7 @@
       newDiv.className = 'item';
       return newDiv;
     }
+    document.addEventListener("keyup", e => console.log(e.target));
   </script>
 </body>
 </html>
