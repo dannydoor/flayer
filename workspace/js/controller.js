@@ -136,6 +136,7 @@ class Controller {
     Controller.updateMusicToPlay = Controller.updateMusicToPlay.bind(this);
     Controller.updateTooltip = Controller.updateTooltip.bind(this);
     Controller.updateByQueueChange = Controller.updateByQueueChange.bind(this);
+    Controller.updatePlayingItems = Controller.updatePlayingItems.bind(this);
     for (let key in this.updates) {
       this.updates[key] = this.updates[key].bind(this);
     }
@@ -153,6 +154,7 @@ class Controller {
     this.playButton.onclick = this.handlers.onClickPlay;
     this.prevButton.onclick = this.handlers.onPrev;
     this.nextButton.onclick = this.handlers.onNext;
+    this.songArtistSection.ondblclick = this.handlers.onDblclickArtist;
     this.prevButton.onmouseover =
       this.nextButton.onmouseover =
       this.openPlaylistButton.onmouseover =
@@ -209,6 +211,8 @@ class Controller {
       this.updates.updateControlBar();
       this.updates.updatePlayerHandler();
       this.helpers.setPlayerHandlers();
+
+      Controller.updatePlayingItems();
       Controller.updateByQueueChange();
     } else {
       // 초기화
@@ -248,6 +252,7 @@ class Controller {
     setTimeout(() => {
       window["video"].append(videoCover);
       tabManager = new TabManager();
+      window["volume-bar"].dispatchEvent(inputEvent);
     }, 300);
 
     // 볼륨바 핸들러 달기
@@ -255,6 +260,17 @@ class Controller {
     this.volumeBar.addEventListener("input", this.handlers.onInputVolumeBar);
     this.volumeBar.addEventListener("change", this.handlers.onChangeVolumeBar);
     this.updates.updateVolumeBar();
+
+    setTimeout(() => {
+      jwplayer().once("beforePlay", () => {
+        if (this.initState) {
+          // 초기화의 일환으로 컨트롤바가 비활성화됐었다면 다시 활성화
+          this.helpers.toggleDisabledStatus("control", false);
+          window["video-cover"].remove();
+          this.initState = null;
+        }
+      });
+    }, 400);
   }
 
   // public 메소드
@@ -270,14 +286,6 @@ class Controller {
   }
 
   static updateMusicToPlay(musicToPlay) {
-    if (this.initState) {
-      // 초기화의 일환으로 컨트롤바가 비활성화됐었다면 다시 활성화
-      this.helpers.toggleDisabledStatus("control", false);
-      this.helpers.toggleDisabledStatus("barsAndOthers", false);
-      window["video-cover"].remove();
-      this.initState = null;
-    }
-
     // 컨트롤바의 재생 중인 음악을 전달받은 음악으로 업데이트하고 불러와 재생
     if (this.currentInfo.reference)
       this.currentInfo.reference.isPlaying = false;
@@ -353,6 +361,14 @@ class Controller {
     this.currentMusic = newCurrMusic;
     this.updates.updatePrevAndNext(newCurrMusic);
     Controller.updateTooltip(true);
+  }
+
+  static updatePlayingItems() {
+    document
+      .querySelectorAll(`[music-id="${this.currentInfo.id}"]`)
+      .forEach((item) => {
+        item.classList.add("playing");
+      });
   }
 
   // private 메소드
@@ -663,10 +679,6 @@ class Controller {
     },
 
     onClickPlay: () => {
-      if (this.initState) {
-        window["video-cover"].remove();
-        this.initState = null;
-      }
       jwplayer().playToggle();
       this.helpers.toggleControlStatus();
     },
@@ -740,6 +752,18 @@ class Controller {
 
       let isLiked = this.currentInfo.isLiked ? "liked" : "";
       this.likeButton.className = isLiked;
+    },
+
+    onDblclickArtist: () => {
+      window["set-artist-tag"].click();
+      window["library-search-field"].value = this.currentInfo.artist;
+      window["library-search-field"].dispatchEvent(changeEvent);
+      if (
+        !window["open-tab"].classList.contains("active") ||
+        window["open-queue"].classList.contains("active")
+      ) {
+        window["open-tab"].click();
+      }
     },
 
     onInputVolumeBar: (e) => {

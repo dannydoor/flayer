@@ -137,6 +137,19 @@ class PlayableItem extends MusicItem {
   onClick(e) {
     if (e.defaultPrevented) return;
 
+    let target = e.target.closest(".music-item");
+
+    if (target.classList.contains("active")) return;
+
+    document.querySelectorAll(".music-item.active").forEach((item) => {
+      item.classList.remove("active");
+    });
+    target.classList.add("active");
+  }
+
+  onDblclick(e) {
+    if (e.defaultPrevented) return;
+
     QueueManager.playThis(this.referencedObj, this.context);
   }
 
@@ -147,7 +160,8 @@ class PlayableItem extends MusicItem {
   }
 
   bindHandler() {
-    this.onclick = this.onClick.bind(this);
+    this.onclick = this.onClick;
+    this.ondblclick = this.onDblclick.bind(this);
 
     const addButton = this.querySelector(".music-add");
     addButton.onclick = this._addToPlaylistForButton.bind(this);
@@ -175,6 +189,7 @@ class LibraryItem extends PlayableItem {
   onContextMenu(e) {
     e.preventDefault();
 
+    QueueManager.playNext(this.referencedObj, this.context);
     /* let contextMenu = document.createElement("library-context");
     contextMenu.setup(this);
     this.append(contextMenu); */ // 컨텍스트 메뉴 만들어 추가.

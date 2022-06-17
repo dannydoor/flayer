@@ -137,11 +137,12 @@
   min-height: 10px;
 }
 
-.simplebar-scrollbar:before {
+.simplebar-scrollbar::before {
+  display: block;
   position: absolute;
   content: '';
   background-color: #d9d9d9;
-  mix-blend-mode: multiply;
+  mix-blend-mode: overlay;
   border-radius: 12px;
   left: 10px;
   right: 2px;
@@ -149,9 +150,9 @@
   transition: opacity 0.2s linear;
 }
 
-.simplebar-scrollbar.simplebar-visible:before {
+.simplebar-scrollbar.simplebar-visible::before {
   /* When hovered, remove all transitions from drag handle */
-  opacity: 1;
+  opacity: 0.7;
   transition: opacity 0s linear, left 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
@@ -160,16 +161,16 @@
   width: 16px;
 }
 
-.simplebar-track.simplebar-vertical .simplebar-scrollbar:before {
+.simplebar-track.simplebar-vertical .simplebar-scrollbar::before {
   top: 2px;
   bottom: 2px;
 }
 
-.simplebar-scrollbar.simplebar-hover:before {
+.simplebar-scrollbar.simplebar-hover::before {
   background-color: #a9a9a9;
 }
 
-.simplebar-dragging .simplebar-scrollbar:before {
+.simplebar-dragging .simplebar-scrollbar::before {
   left: 6px;
   background-color: #a9a9a9;
 }

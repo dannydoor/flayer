@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/Controller.css">
     <link rel="stylesheet" href="./css/queue.css">
     <link rel="stylesheet" href="./css/musicItems.css">
+    <link rel="stylesheet" href="./css/contextmenu.css">
     <link rel="stylesheet" href="./js/simpleBar/simplebar.css">
     <script type="text/javascript" src="./js/jwplayer.js"></script>
     <script>
@@ -20,7 +21,9 @@
     <script type="text/javascript" src="./js/controller.js"></script>
     <script type="text/javascript" src="./js/queueManager.js"></script>
     <script type="text/javascript" src="./js/libraryManager.js"></script>
-    <script type="text/javascript" src="./js/test2.js"></script>
+    <script type="text/javascript" src="./js/contextmenuManager.js"></script>
+    <script type="text/javascript" src="./js/tabManager.js"></script>
+    <script type="text/javascript" src="./js/test.js"></script>
     <script type="text/javascript" src="./js/testDB.js"></script>
     <title>flayer</title>
   </head>
@@ -30,7 +33,7 @@
       </div>
       <div id="video"></div>
       <div class="control-panel">
-        <button id="open-queue" data-tooltip="재생 중인 목록 보기">
+        <button id="open-queue">
           <div class="tooltip">
             <div class="tooltip-desc">
               <strong>재생 중인 목록</strong>
@@ -83,7 +86,7 @@
         <div class="song-info-block">
           <div class="curr-song-info">
             <strong id="curr-song-title">DM</strong>
-            <span id="curr-song-artist">fromis_9</span>
+            <span id="curr-song-artist" title="이 가수의 전체 음악 보기">fromis_9</span>
           </div>
           <button id="open-curr-playlist">
             <div class="tooltip">
@@ -98,7 +101,7 @@
           <button id="like-this-button"></button>
           <button id="meatballs-button"></button>
         </div>
-        <button id="fullscreen-button" data-tooltip="전체화면">
+        <button id="fullscreen-button">
           <div class="tooltip">
             <div class="tooltip-desc">
               <strong>전체 화면</strong>
@@ -109,23 +112,34 @@
     </div>
     <div id="element-storehouse" class="storehouse">
       <div id="menu-buttons">
-        <button class="open-tab"></button>
+        <button id="open-tab" class="open-tab"></button>
       </div>
-      <div id="temp-container" class="tab-container">
+      <div id="library-container" class="tab-container">
         <div class="header">
-          <span class="header-title">임시 라이브러리</span>
-          <button class="show-liked"></button>
+          <span class="header-title">라이브러리</span>
           <button class="close-button"></button>
         </div>
         <div class="header search">
-          <input type="text" id="library-search" placeholder="검색">
-          <div id="search-sample" data-simplebar>
-            <div id="search-sample-content"></div>
+          <div id="library-search-box" class="tag-box">
+            <div class="clear-search"></div>
           </div>
+          <div id="library-search-opt-btn" class="library-btn">
+            <div class="background"></div>
+          </div>
+          <div id="search-sample" class="hidden" data-simplebar>
+            <div id="search-sample-content">
+            </div>
+          </div>
+        </div>
+        <div class="sub-header">
+          <span>총 <span id="displayed-counts"></span>곡</span>
+           <div id="library-sort-btn" class="library-btn">
+            <div class="background"></div>
+           </div>
         </div>
         <div class="content">
           <div data-simplebar class="scrollable">
-            <div id="temp-content"></div>
+            <div id="library-content"></div>
           </div>
         </div>
       </div>
@@ -176,145 +190,181 @@
       </div>
     </div>
     <div id="modal-storehouse" class="storehouse"></div>
-    <div id="contextmenu-storehouse" class="storehouse"></div>
+    <div id="contextmenu-storehouse" class="storehouse">
+      <div id="library-search-opt" class="contextmenu menu">
+        <div class="item-container">
+          <div class="item all checked" id="set-all-tag">모두 검색</div>
+          <div class="item title" id="set-title-tag">제목만 검색</div>
+          <div class="item artist" id="set-artist-tag">가수만 검색</div>
+        </div>
+        <div class="contour"></div>
+        <div class="item-container">
+          <div class="item show-all checked">모든 항목 표시</div>
+          <div class="item new">새로 추가된 항목</div>
+          <div class="item liked">좋아요 표시한 항목</div>
+        </div>
+      </div>
+      <div id="library-sort-opt" class="contextmenu menu">
+        <div class="item-container">
+          <div class="item ascend" data-value="2">오름차순 (ㄱ→ㅎ)</div>
+          <div class="item descend" data-value="3">내림차순 (ㅎ→ㄱ)</div>
+        </div>
+        <div class="contour"></div>
+        <div class="item-container">
+          <div class="item title" data-value="1">제목</div>
+          <div class="item artist" data-value="-1">가수</div>
+        </div>
+      </div>
+    </div>
     <script src="./js/simpleBar/simplebar.js"></script>
+    <script src="./js/search.js"></script>
     <script>
       function main() {
-  let objectFactory = new ObjectFactory();
-  if (localStorage.lastSession) {
-    let lastSession = JSON.parse(localStorage.lastSession);
+        let objectFactory = new ObjectFactory();
+        if (localStorage.lastSession) {
+          let lastSession = JSON.parse(localStorage.lastSession);
 
-    objTable = lastSession.objTable;
-    [lsObj, lsContext, lsShuffle, lsRepeat] = [
-      objTable[lastSession.currentInfo?.id],
-      lastSession.currentInfo?.context,
-      lastSession.currentInfo.isShuffled,
-      lastSession.currentInfo.isRepeat
-    ];
+          objTable = lastSession.objTable;
+          [lsObj, lsContext, lsShuffle, lsRepeat, lsSortMode] = [
+            objTable[lastSession.currentInfo?.id],
+            lastSession.currentInfo?.context,
+            lastSession.currentInfo.isShuffled,
+            lastSession.currentInfo.isRepeat,
+            lastSession.currentInfo.sortMode,
+          ];
 
-    let recordArr = [];
-    let queueArr = [];
-    let queueRepoArr = [];
+          let recordArr = [];
+          let queueArr = [];
+          let queueRepoArr = [];
 
-    lastSession.queueInfo.record.forEach((item) => {
-      let elem = document.createElement("div", { is: "record-item" });
-      elem.setup(objTable[item.id]);
-      recordArr.push(elem);
-    });
-    lastSession.queueInfo.queue.forEach((item) => {
-      let elem = document.createElement("div", { is: "queue-item" });
-      elem.setup(objTable[item.id], item.context);
-      queueArr.push(elem);
-    });
-    lastSession.queueInfo.queueRepo.forEach((index) => {
-      let elem = queueArr[index].cloneNode(true);
-      queueRepoArr.push(elem);
-    });
+          lastSession.queueInfo.record.forEach((item) => {
+            let elem = document.createElement("div", { is: "record-item" });
+            elem.setup(objTable[item]);
+            recordArr.push(elem);
+          });
+          lastSession.queueInfo.queue.forEach((item) => {
+            let elem = document.createElement("div", { is: "queue-item" });
+            elem.setup(objTable[item.id], item.context);
+            queueArr.push(elem);
+          });
+          lastSession.queueInfo.queueRepo.forEach((index) => {
+            let elem = queueArr[index].cloneNode(true);
+            queueRepoArr.push(elem);
+          });
 
-    if (queueArr[lastSession.queueInfo.currentIndex]) {
-      queueArr[lastSession.queueInfo.currentIndex].classList.add("current");
-    };
+          if (queueArr[lastSession.queueInfo.currentIndex]) {
+            queueArr[lastSession.queueInfo.currentIndex].classList.add("current");
+          };
 
-    let recordFragment = new DocumentFragment();
-    let queueFragment = new DocumentFragment();
-    let queueRepoFragment = new DocumentFragment();
-    recordArr.forEach(elem => recordFragment.append(elem));
-    queueArr.forEach(elem => queueFragment.append(elem));
-    queueRepoArr.forEach(elem => queueRepoFragment.append(elem));
+          let recordFragment = new DocumentFragment();
+          let queueFragment = new DocumentFragment();
+          let queueRepoFragment = new DocumentFragment();
+          recordArr.forEach(elem => recordFragment.append(elem));
+          queueArr.forEach(elem => queueFragment.append(elem));
+          queueRepoArr.forEach(elem => queueRepoFragment.append(elem));
 
-    let map = new Map();
-    lastSession.queueInfo.map.forEach(item => {
-      map[item[0]] = item[1];
-    });
+          let map = new Map();
+          lastSession.queueInfo.map.forEach(item => {
+            map[item[0]] = item[1];
+          });
 
-    [lsRecord, lsQueue, lsQueueRepo, lsMap, lsQueueStatus] = [
-      recordFragment,
-      queueFragment,
-      queueRepoFragment,
-      map,
-      lastSession.queueInfo.queueStatus
-    ];
-  } 
-  
-  objTable = ObjectFactory.objHashTableBuilder(db, objTable);
+          [lsRecord, lsQueue, lsQueueRepo, lsMap, lsQueueStatus] = [
+            recordFragment,
+            queueFragment,
+            queueRepoFragment,
+            map,
+            lastSession.queueInfo.queueStatus
+          ];
+        } 
+        
+        objTable = ObjectFactory.objHashTableBuilder(db, objTable);
 
-  window.addEventListener("beforeunload", () => lastSessionCallback());
+        window.addEventListener("beforeunload", () => lastSessionCallback());
 
-  var lastSessionCallback = function () {
-    let lastSession = {};
-    if (controller.currentInfo.reference) {
-      controller.currentInfo.reference.isPlaying = false;
-    }
-    lastSession.objTable = objTable;
-    lastSession.currentInfo = {
-      id: controller.currentInfo?.id,
-      context: controller.currentInfo?.context,
-      isShuffled: controller.isShuffled,
-      isRepeat: controller.isRepeat,
-    };
-    let record = Array.from(queueManager.record.children).map((item) =>
-      item.getAttribute("music-id")
-    );
-    let queue = [];
-    let queueTable = {};
-    let queueRepo = [];
-    let currentIndex = null;
-    let currentStatus = queueManager.queueStatus;
-    Array.from(queueManager.queue.children).forEach((item, index) => {
-      if (item.classList.contains("current")) currentIndex = index;
-      queue.push({
-        id: item.getAttribute("music-id"),
-        context: item.getAttribute("context"),
-      });
-      queueTable[item.getAttribute("index")] = index;
-    });
-    if (queueManager.queueRepo) {
-      Array.from(queueManager.queueRepo.children).forEach((item) => {
-        queueRepo.push(queueTable[item.getAttribute("index")]);
-      });
-    }
-    let map = Array.from(queueManager._musicMap.entries());
-    lastSession.queueInfo = {
-      "record" : record,
-      "queue" : queue,
-      "queueRepo" : queueRepo,
-      "currentIndex" : currentIndex,
-      "map" : map,
-      "queueStatus" : currentStatus,
-    };
-    localStorage.lastSession = JSON.stringify(lastSession);
-  };
-}
+        var lastSessionCallback = function () {
+          let lastSession = {};
+          if (controller.currentInfo.reference) {
+            controller.currentInfo.reference.isPlaying = false;
+          }
+          lastSession.objTable = objTable;
+          lastSession.currentInfo = {
+            id: controller.currentInfo?.id,
+            context: controller.currentInfo?.context,
+            isShuffled: controller.isShuffled,
+            isRepeat: controller.isRepeat,
+            sortMode: libraryManager.sortMode,
+          };
+          let record = [];
+          let queue = [];
+          let queueTable = {};
+          let queueRepo = [];
+          let currentIndex = null;
+          let currentStatus = queueManager.queueStatus;
+          Array.from(queueManager.record.children).forEach((item) =>
+            record.push(item.getAttribute("music-id"))
+          );
+          Array.from(queueManager.queue.children).forEach((item, index) => {
+            if (item.classList.contains("current")) currentIndex = index;
+            queue.push({
+              id: item.getAttribute("music-id"),
+              context: item.getAttribute("context"),
+            });
+            queueTable[item.getAttribute("index")] = index;
+          });
+          if (queueManager.queueRepo) {
+            Array.from(queueManager.queueRepo.children).forEach((item) => {
+              queueRepo.push(queueTable[item.getAttribute("index")]);
+            });
+          }
+          let map = Array.from(queueManager._musicMap.entries());
+          lastSession.queueInfo = {
+            "record" : record,
+            "queue" : queue,
+            "queueRepo" : queueRepo,
+            "currentIndex" : currentIndex,
+            "map" : map,
+            "queueStatus" : currentStatus,
+          };
+          localStorage.lastSession = JSON.stringify(lastSession);
+        };
+      }
 
-main();
 
-var shuffleHelper = function (arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-};
 
-var searchSet = new Set(),
-  searchSpace,
-  objTable,
-  tabManager,
-  lsObj,
-  lsContext,
-  lsShuffle,
-  lsRepeat,
-  lsRecord,
-  lsQueue,
-  lsQueueRepo,
-  lsMap,
-  lsQueueStatus = true;
-var inputEvent = new InputEvent("input");
-var mouseUpEvent = new MouseEvent("mouseup");
-var queueManager = new QueueManager(lsQueueStatus, lsRecord, lsQueueRepo, lsQueue, lsMap);
-var modalManager = new ModalManager();
-var libraryManager = new LibraryManager(objTable, 2);
-var playlistManager = new PlaylistManager();
-var controller = new Controller(lsObj, lsContext, lsShuffle, lsRepeat);
+      var shuffleHelper = function (arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      };
+
+      var searchSet = new Set(),
+        searchSpace,
+        objTable,
+        tabManager,
+        lsSortMode,
+        lsObj,
+        lsContext,
+        lsShuffle,
+        lsRepeat,
+        lsRecord,
+        lsQueue,
+        lsQueueRepo,
+        lsMap,
+        lsQueueStatus = true;
+
+      main();
+
+      var inputEvent = new InputEvent("input");
+      var changeEvent = new InputEvent("change");
+      var mouseUpEvent = new MouseEvent("mouseup");
+      var queueManager = new QueueManager(lsQueueStatus, lsRecord, lsQueueRepo, lsQueue, lsMap);
+      var modalManager = new ModalManager();
+      var libraryManager = new LibraryManager(objTable, lsSortMode);
+      var librarySearchElem = new SearchElem("library");
+      var playlistManager = new PlaylistManager();
+      var controller = new Controller(lsObj, lsContext, lsShuffle, lsRepeat);
+      var contextmenuManager = new ContextmenuManager();
     </script>
   </body>
 </html>

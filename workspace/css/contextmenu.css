@@ -1,0 +1,88 @@
+.contextmenu {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: var(--color-base-blurred);
+  backdrop-filter: blur(16px);
+  width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.25);
+  overflow: hidden;
+  z-index: 10000;
+}
+
+.contextmenu .item-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  text-align: start;
+}
+
+.contextmenu .item {
+  position: relative;
+  width: 100%;
+  height: 32px;
+  padding: 8px 0;
+  background-color: var(--color-base);
+  background-blend-mode: multiply;
+  font: var(--font-small);
+  color: var(--color-ceil);
+  cursor: pointer;
+}
+
+.contextmenu .item:hover {
+  background-color: var(--color-base-1);
+}
+
+.contextmenu .item:active {
+  background-color: var(--color-base-2);
+}
+
+.contextmenu .item::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  left: 0;
+  bottom: 0;
+  mix-blend-mode: multiply;
+  background-color: var(--color-base-1);
+}
+
+.contextmenu.menu .item {
+  padding-left: 40px;
+}
+
+.contextmenu.menu .item.checked {
+  color: var(--color-primary);
+}
+
+.contextmenu.menu .item::before {
+  content: '';
+  visibility: hidden;
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 8px;
+  left: 16px;
+  background: url("../assets/img/16px/Done-p.svg") no-repeat center/16px;
+}
+
+.contextmenu.menu .item.checked::before {
+  visibility: visible;
+}
+
+.contextmenu.menu .contour {
+  width: 100%;
+  height: 4px;
+  mix-blend-mode: multiply;
+  background-color: var(--color-base-3);
+}
+
+#library-search-opt,
+#library-sort-opt {
+  top: calc(100% + 8px);
+  right: 0;
+}

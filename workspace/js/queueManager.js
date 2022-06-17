@@ -339,7 +339,11 @@ class QueueManager {
   static playThis(obj, context) {
     let isExistingKept = false;
     clearQueue = clearQueue.bind(this);
-    let isLibrary = context.startsWith("library");
+    let isLibrary = context.startsWith("library"),
+      isFiltered =
+        window["library-container"].classList.contains("searching") ||
+        window["library-container"].classList.contains("only-liked") ||
+        window["library-container"].classList.contains("only-new");
 
     if (!this.queueStatus) {
       let howToHandleExistingQueue = modalManager.createModal("queue-play");
@@ -359,8 +363,18 @@ class QueueManager {
     if (isExistingKept) {
       if (isLibrary) {
         // 라이브러리 요소의 경우 그 음악만 나중에 재생.
-        QueueManager.playNext(obj, context);
-        controller.nextButton.click();
+        if (isFiltered) {
+          let contextMusics = libraryManager.getFilteredContents();
+          QueueManager.playNext(
+            contextMusics,
+            context,
+            controller.isShuffled,
+            obj.id
+          );
+        } else {
+          QueueManager.playNext(obj, context);
+          controller.nextButton.click();
+        }
         return;
       } else {
         // 플레이리스트는 컨텍스트의 음악을 한꺼번에 나중에 재생.
@@ -385,7 +399,7 @@ class QueueManager {
       item.classList.remove("current");
     });
 
-    if (isLibrary) {
+    if (isLibrary && !isFiltered) {
       let nextObj;
 
       if (!controller.isShuffled) {
@@ -399,7 +413,9 @@ class QueueManager {
       this.queueRepo = null; // 라이브러리는 저장소를 따로 만들지 않음.
     } else {
       let currentId = obj.id;
-      let contextMusics = playlistManager.getPlaylistContents(context);
+      let contextMusics = isLibrary
+        ? libraryManager.getFilteredContents()
+        : playlistManager.getPlaylistContents(context);
 
       this._applyToQueue(contextMusics, context);
       let currentMusic = this.queue.querySelector(`[music-id="${currentId}"]`);
@@ -438,21 +454,26 @@ class QueueManager {
     this.updateScroll();
   }
 
-  static makeUpLibraryItem() {
-    let isLibrary = controller.currentInfo.context.startsWith("library");
-    let noPrev = controller.currentMusic == QueueManager.queueFirstChild;
-    let noNext = controller.currentMusic == QueueManager.queueLastChild;
-    let isPureLibrary = !this.queueRepo;
-    let needsMakeUp = noPrev || noNext;
+  static makeUpLibraryItem(isForced = false) {
+    let isLibrary = controller.currentInfo.context.startsWith("library"),
+      isPureLibrary = !this.queueRepo,
+      isShuffled = controller.isShuffled,
+      target = controller.currentMusic;
     addBefore = addBefore.bind(this);
     addAfter = addAfter.bind(this);
+
+    if (isPureLibrary && isForced && !isShuffled) {
+      this._clearBeforeAfter();
+    }
+
+    let noNext = target == QueueManager.queueLastChild,
+      noPrev = target == QueueManager.queueFirstChild,
+      needsMakeUp = noNext || noPrev;
 
     if (!isLibrary || !needsMakeUp || !this.queueStatus || !isPureLibrary)
       return;
 
-    let target = controller.currentMusic;
     let targetId = target.getAttribute("music-id");
-    let isShuffled = controller.isShuffled;
 
     if (isShuffled) {
       if (noPrev) {

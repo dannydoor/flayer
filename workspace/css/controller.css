@@ -137,14 +137,6 @@
   background: url("../assets/img/36px/Prev.svg") no-repeat center/36px;
 }
 
-#prev-button:hover:not(:disabled) {
-  background: url("../assets/img/36px/Prev-p.svg") no-repeat center/36px;
-}
-
-#prev-button:active:not(:disabled) {
-  background: url("../assets/img/36px/Prev-pd.svg") no-repeat center/36px;
-}
-
 #prev-button:disabled {
   background: url("../assets/img/36px/Prev-g.svg") no-repeat center/36px;
 }
@@ -152,15 +144,6 @@
 #next-button {
   background: url("../assets/img/36px/Next.svg") no-repeat center/36px;
 }
-
-#next-button:hover:not(:disabled) {
-  background: url("../assets/img/36px/Next-p.svg") no-repeat center/36px;
-}
-
-#next-button:active:not(:disabled) {
-  background: url("../assets/img/36px/Next-pd.svg") no-repeat center/36px;
-}
-
 #next-button:disabled {
   background: url("../assets/img/36px/Next-g.svg") no-repeat center/36px;
 }
@@ -173,28 +156,12 @@
   background: url("../assets/img/36px/Play.svg") no-repeat center/36px;
 }
 
-#play-or-pause.play:hover:not(:disabled) {
-  background: url("../assets/img/36px/Play-p.svg") no-repeat center/36px;
-}
-
-#play-or-pause.play:active:not(:disabled) {
-  background: url("../assets/img/36px/Play-pd.svg") no-repeat center/36px;
-}
-
 #play-or-pause.play:disabled {
   background: url("../assets/img/36px/Play-g.svg") no-repeat center/36px;
 }
 
 #play-or-pause.pause {
   background: url("../assets/img/36px/Pause.svg") no-repeat center/36px;
-}
-
-#play-or-pause.pause:hover:not(:disabled) {
-  background: url("../assets/img/36px/Pause-p.svg") no-repeat center/36px;
-}
-
-#play-or-pause.pause:active:not(:disabled) {
-  background: url("../assets/img/36px/Pause-pd.svg") no-repeat center/36px;
 }
 
 #play-or-pause.pause:disabled {

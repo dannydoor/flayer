@@ -33,48 +33,105 @@ class LibraryManager {
       });
     }
 
-    this.tempContainer = window["temp-container"];
-    this.tempContainerContent = window["temp-content"];
-    this.tempContainerContent.append(this.sortedFragment[2]);
-    this.tempContainer.currentFragment = this.sortedFragment[2];
-    this.tempContainer.querySelector(".show-liked").onclick = (e) => {
-      e.preventDefault();
-      window["temp-container"].classList.toggle("only-liked");
-    };
-    this.tempContainer.querySelector(".close-button").onclick = (e) => {
+    this.libraryContainer = window["library-container"];
+    this.libraryContainerContent = window["library-content"];
+    this.libraryContainerContent.append(
+      this.sortedFragment[this.sortMode].cloneNode(true)
+    );
+    this.initSortOpt();
+
+    this.updateDisplayedCounts();
+
+    this.libraryContainer.querySelector(".close-button").onclick = (e) => {
       e.preventDefault();
 
       document.querySelector(".open-tab").click();
     };
+    window["library-search-opt-btn"].onclick = this.libraryBtnHandler("search");
+    window["library-sort-btn"].onclick = this.libraryBtnHandler("sort");
 
-    this.tempButton = document.querySelector(".open-tab");
-    this.tempButton.onclick = (e) => {
+    this.tempTabButton = document.querySelector(".open-tab");
+    this.tempTabButton.onclick = (e) => {
       e.preventDefault();
 
-      e.target.classList.toggle("active");
-      TabManager.toggle("temp");
+      if (window["open-queue"].classList.contains("active")) {
+        window["open-queue"].click();
+        if (!e.target.classList.contains("active")) {
+          e.target.classList.toggle("active");
+          TabManager.toggle("library");
+        }
+      } else {
+        e.target.classList.toggle("active");
+        TabManager.toggle("library");
+      }
     };
   }
 
-  filterChecker(input, target)
+  initSortOpt() {
+    let sortOpt = window["library-sort-opt"];
 
-  autoComplete(input, target) {
-    // input 이벤트 마다 실행
-    input = input.toLowerCase();
+    if (this.sortMode < 2) {
+      sortOpt.querySelector(".title").classList.add("checked");
+    } else {
+      sortOpt.querySelector(".artist").classList.add("checked");
+    }
 
-    let filteredAuto = searchSpace.filter((item) => {
-      item.toLowerCase().startsWith(input);
-    });
+    if (!(this.sortMode % 2)) {
+      sortOpt.querySelector(".ascend").classList.add("checked");
+    } else {
+      sortOpt.querySelector(".descend").classList.add("checked");
+    }
+  }
 
-    filteredAuto.forEach((item) => {
-      let elem = document.createElement("div");
-      elem.innerHTML = item;
-      elem.onclick = () => {
-        target.value = elem.innerHTML;
-        window["search-sample-content"].innerHTML = "";
-      };
-      window["search-sample-content"].append(elem);
-    });
+  updateDisplayedCounts() {
+    let isSearching = this.libraryContainer.classList.contains("searching")
+        ? ".searched"
+        : "",
+      isLikedOnly = this.libraryContainer.classList.contains("only-liked")
+        ? "[is-liked=true]"
+        : "",
+      isNewOnly = this.libraryContainer.classList.contains("only-new")
+        ? "[is-new=true]"
+        : "";
+
+    let counts = this.libraryContainer.querySelectorAll(
+      `.music-item${isSearching}${isLikedOnly}${isNewOnly}`
+    ).length;
+
+    window["displayed-counts"].innerHTML = counts;
+  }
+
+  updateSortMode(param) {
+    this.libraryContainerContent.innerHTML = "";
+
+    if (param < 0) {
+      param = -param;
+    } else {
+      param -= 2;
+    }
+
+    this.sortMode = param;
+    this.libraryContainerContent.append(
+      this.sortedFragment[this.sortMode].cloneNode(true)
+    );
+
+    window["library-search-field"].dispatchEvent(changeEvent);
+    QueueManager.makeUpLibraryItem(true);
+    Controller.updateByQueueChange();
+  }
+
+  libraryBtnHandler(type) {
+    return (e) => {
+      e.stopPropagation();
+
+      let target = e.target.closest(".library-btn");
+
+      if (target.querySelector(".contextmenu")) {
+        ContextmenuManager.returnToStorehouse();
+      } else {
+        ContextmenuManager.addContextmenu(target, "library-" + type + "-opt");
+      }
+    };
   }
 
   getPrevObj(id) {
@@ -93,6 +150,28 @@ class LibraryManager {
 
   getLastObj() {
     return this.sortedValueTable[this.sortMode][this.sortedArr.length - 1];
+  }
+
+  getFilteredContents() {
+    let isSearching = this.libraryContainer.classList.contains("searching")
+        ? ".searched"
+        : "",
+      isLikedOnly = this.libraryContainer.classList.contains("only-liked")
+        ? "[is-liked=true]"
+        : "",
+      isNewOnly = this.libraryContainer.classList.contains("only-new")
+        ? "[is-new=true]"
+        : "",
+      arr = this.libraryContainer.querySelectorAll(
+        `.music-item${isSearching}${isLikedOnly}${isNewOnly}`
+      ),
+      objArr = [];
+
+    arr.forEach((item) => {
+      objArr.push(item.referencedObj);
+    });
+
+    return objArr;
   }
 
   chooseRandObj() {

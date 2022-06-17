@@ -18,6 +18,10 @@
       margin-bottom: 30px;
       background-color: #262626;
     }
+    span {
+      background-color: red;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -33,7 +37,7 @@
     <div class="item"></div>
     <div class="item"></div>
   </div>
-  <input type="search" name="search" id="search">
+  <input type="text" name="search" id="search">
   <script src="./js/simpleBar/simplebar.js"></script>
   <script>
     function itemMaker() {
@@ -41,7 +45,10 @@
       newDiv.className = 'item';
       return newDiv;
     }
-    document.addEventListener("keyup", e => console.log(e.target));
+    document.addEventListener("keydown", e => console.log(e.code));
+    let span = document.createElement("span");
+    span.innerHTML = "text"
+    search.append(span);
   </script>
 </body>
 </html>

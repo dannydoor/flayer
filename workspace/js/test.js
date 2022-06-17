@@ -1,147 +1,271 @@
-document.querySelectorAll("input[type=range]").forEach((item) => {
-  item.oninput = function (e) {
-    let value = e.target.value;
-    e.target.style.background =
-      "linear-gradient(to right, var(--color-primary, #595ae2) 0%, var(--color-primary, #595ae2) " +
-      this.value +
-      "%, var(--color-base-3, #d9d9d9) " +
-      this.value +
-      "%, var(--color-base-3, #d9d9d9) 100%)";
-  };
-});
+class ObjectFactory {
+  constructor() {
+    ObjectFactory.objHashTableBuilder =
+      ObjectFactory.objHashTableBuilder.bind(this);
+    ObjectFactory.getSortedArr = ObjectFactory.getSortedArr.bind(this);
+    this.reg = /\[New\]\s/g;
+  }
 
-let testObjArray = [
-  {
-    id: "musicID",
-    title: "DM",
-    artist: "fromis_9",
-    src: "",
-    startTime: 0,
-    endTime: 206,
-    duration: 206,
-    isLiked: true,
-    isPlaying: true,
-    isNew: false,
-    playedTime: 1,
-  },
-  {
-    id: "musicID2",
-    title: "Feel Good (SECRET CODE)",
-    artist: "fromis_9",
-    src: "",
-    startTime: 0,
-    endTime: 223,
-    duration: 223,
-    isLiked: true,
-    isPlaying: false,
-    isNew: false,
-    playedTime: 1,
-  },
-  {
-    id: "musicID3",
-    title:
-      "우리의 길 (feat. 김관호, 김다영, 김명식, 김상우, 김형미, 김훈희, 민나래, 이찬미, 임성규, 조서연, 조아라, 조찬미 & 한설희)",
-    artist: "염평안",
-    src: "",
-    startTime: 0,
-    endTime: 306,
-    duration: 306,
-    isLiked: true,
-    isPlaying: false,
-    isNew: false,
-    playedTime: 1,
-  },
-  {
-    id: "musicID4",
-    title: "너를 따라 너에게",
-    artist: "fromis_9",
-    src: "",
-    startTime: 0,
-    endTime: 213,
-    duration: 213,
-    isLiked: true,
-    isPlaying: false,
-    isNew: false,
-    playedTime: 1,
-  },
-  {
-    id: "musicID5",
-    title: "L'Amour, Les Baguettes, Paris",
-    artist: "Stella Jang",
-    src: "",
-    startTime: 0,
-    endTime: 167,
-    duration: 167,
-    isLiked: true,
-    isPlaying: false,
-    isNew: false,
-    playedTime: 1,
-  },
-];
+  static objHashTableBuilder(arr, obj) {
+    if (!obj) obj = {};
+    arr.forEach((item) => {
+      let title = this.reg.test(item[0])
+        ? item[0].replace(this.reg, "")
+        : item[0];
+      let key = hash(title + item[4]);
 
-let itemType = ["library", "playlist", "queue", "editing", "selectable"];
-
-let context = "fromis_9";
-
-for (let i = 0; i < 5; i++) {
-  let obj = testObjArray[i];
-  let type = itemType[i];
-  let item = document.createElement("div", { is: `${type}-item` });
-
-  item.setup(obj, context, i + 1);
-  window["test-div"].append(item);
-}
-
-function setupSlip(list) {
-  list.addEventListener(
-    "slip:beforereorder",
-    function (e) {
-      /* if (!e.target.classList.contains('queue') && !e.target.classList.contains('editing')) {
-          e.preventDefault();
-      } */
-      if (
-        e.target.classList.contains("library") ||
-        e.target.classList.contains("playlist") ||
-        e.target.classList.contains("selectable")
-      )
-        e.preventDefault();
-    },
-    false
-  );
-
-  list.addEventListener(
-    "slip:beforeswipe",
-    (e) => {
-      e.preventDefault();
-    },
-    false
-  );
-
-  list.addEventListener(
-    "slip:beforewait",
-    (e) => {
-      if (e.target.classList.contains("music-drag")) {
-        e.preventDefault();
+      if (obj[key] !== undefined) {
+        obj[key].startTime = item[2];
+        obj[key].endTime = item[3];
+        obj[key].duration = parseInt(item[3] - item[2]);
+        obj[key].isNew = false;
+      } else {
+        let newObj = this._builder(item);
+        obj[key] = newObj;
+        obj[key].isNew = true;
       }
-    },
-    false
-  );
 
-  list.addEventListener(
-    "slip:reorder",
-    (e) => {
-      e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
-      return false;
-    },
-    false
-  );
+      searchSet.add(obj[key].artist);
+      searchSet.add(obj[key].title);
+    });
 
-  let options = {
-    ignoredElements: [".library", ".playlist", ".selectable"],
-  };
+    searchSpace = Array.from(searchSet.keys());
+    searchSpace.sort((a, b) => a.localeCompare(b));
+    searchSpace.forEach((item) => {
+      let div = document.createElement("div");
+      div.innerHTML = item;
+      div.onmousedown = (e) => {
+        window["library-search-field"].value = e.target.innerHTML;
+        window["search-sample"].classList.add("hidden");
+      };
+      window["search-sample-content"].append(div);
+    });
+    searchSet = null;
 
-  return new Slip(list, options);
+    return obj;
+  }
+
+  static getSortedArr(obj) {
+    let arr1 = [];
+    let arr2, arr4;
+    for (let key in obj) {
+      arr1.push(obj[key]);
+    }
+    let arr3 = arr1.slice();
+
+    arr1.sort(compareTitle);
+    arr2 = arr1.slice().reverse();
+    arr3.sort(compareArtist);
+    arr4 = arr3.slice().reverse();
+
+    return [arr1, arr2, arr3, arr4];
+
+    function compareTitle(obj1, obj2) {
+      let title1 = strFormatter(obj1["title"]);
+      let title2 = strFormatter(obj2["title"]);
+      let artist1 = strFormatter(obj1["artist"]);
+      let artist2 = strFormatter(obj2["artist"]);
+      return !!title1.localeCompare(title2)
+        ? title1.localeCompare(title2)
+        : artist1.localeCompare(artist2);
+    }
+
+    function compareArtist(obj1, obj2) {
+      let title1 = strFormatter(obj1["title"]);
+      let title2 = strFormatter(obj2["title"]);
+      let artist1 = strFormatter(obj1["artist"]);
+      let artist2 = strFormatter(obj2["artist"]);
+      return !!artist1.localeCompare(artist2)
+        ? artist1.localeCompare(artist2)
+        : title1.localeCompare(title2);
+    }
+  }
+
+  _builder(arr) {
+    let obj = {};
+    obj.title = isNew ? arr[0].replace(this.reg, "") : arr[0];
+    obj.artist = arr[1];
+    obj.startTime = arr[2];
+    obj.endTime = arr[3];
+    obj.duration = parseInt(obj.endTime - obj.startTime);
+    obj.src = arr[4];
+    obj.isLiked = false;
+    obj.isPlaying = false;
+    obj.isNew = true;
+    obj.id = hash(obj.title + obj.src);
+    obj.playedCounts = 0;
+
+    return obj;
+  }
 }
 
-let testDiv = window["test-div"];
-setupSlip(testDiv);
+class ModalManager {
+  constructor() {}
+
+  createModal(type) {
+    switch (type) {
+      case "queue-play": {
+        let answer = prompt(
+          "현재 재생 대기 중인 음악이 있습니다. 그대로 유지하고 재생하겠습니까? (yes: 재생 대기 목록 유지 | clear: 지우고 재생)"
+        );
+        if (!answer || answer.startsWith("c")) return "clear";
+        else if (answer.startsWith("y")) return "keep";
+        else return "cancel";
+      }
+      case "clear-record": {
+        let answer = confirm("정말로 기록을 삭제하시겠습니까?");
+        if (answer) return true;
+        else return false;
+      }
+    }
+  }
+}
+
+class PlaylistManager {
+  constructor() {
+    let f9Ids = [
+      "b8c7ae2910424c46ee902c2d89b92bae",
+      "b4c6da2da37901c304515cb037be5aa3",
+      "db95bc4542cd1b09846eb457e0466b65",
+      "f3b6994b4c6357599a6c2216b1147553",
+      "840309a1673dc890296a3b46488f53d0",
+      "dca2c4e9aba2b938c6a90eacd4692ba9",
+      "62963235b875a134c90a5bdb1d0e7009",
+      "e63b158a5766e783082f6bc698764cfa",
+      "b97d9deb688e95123bc5056751e61874",
+      "8766b377dd71d237834c7889d2c353c0",
+      "bca77e0673e76fb5b97049106a4592da",
+      "78fdf3ffbdc79e644b8f915fbadd4da2",
+      "5408f44cb7b22af2a1cb6d2107721080",
+      "b5f43499021d52b70f5ffa371577eb7f",
+      "17ccc83bece16520a59c8889feb4e0ad",
+      "315e91611a0a510f6f1c880baab0e55f",
+    ];
+    this.tempPlaylistFragment = new DocumentFragment();
+    this.tempPlaylistArr = f9Ids.map((item) => objTable[item]);
+    this.tempModified = [];
+    this.tempChanges = { added: [], deleted: [] };
+    this.tempContext = hash("프롬이가 채고야" + Date.now());
+    this.tempPlaylistArr.forEach((obj, index) => {
+      let elem = document.createElement("div", { is: "playlist-item" });
+      elem.setup(obj, this.tempContext, index + 1);
+      this.tempPlaylistFragment.append(elem);
+    });
+  }
+
+  _delete(num) {
+    if (this.tempChanges.deleted.length == this.tempPlaylistArr.length) return;
+    if (!this.tempModified.length)
+      this.tempModified = this.tempPlaylistArr.slice();
+
+    let length = this.tempModified.length;
+    let randNum,
+      delTarget,
+      gotcha = false;
+
+    while (!gotcha) {
+      randNum = Math.floor(Math.random() * length);
+      if (this.tempChanges.added.includes(this.tempModified[randNum])) {
+        continue;
+      } else {
+        gotcha = true;
+        delTarget = this.tempModified[randNum];
+      }
+    }
+
+    this.tempChanges.deleted.push(delTarget);
+    this.tempModified.splice(randNum, 1);
+
+    if (num) this._delete(--num);
+    else return;
+  }
+
+  _add(num) {
+    if (!this.tempModified.length)
+      this.tempModified = this.tempPlaylistArr.slice();
+
+    let length = this.tempModified.length;
+    let randNum = Math.floor(Math.random() * length);
+    let gotcha = false,
+      addTarget;
+
+    while (!gotcha) {
+      let target = libraryManager.chooseRandObj();
+      if (this.tempModified.includes(target)) {
+        continue;
+      } else {
+        gotcha = true;
+        addTarget = target;
+      }
+    }
+
+    this.tempChanges.added.push(addTarget);
+    this.tempModified.splice(randNum, 0, addTarget);
+
+    if (num) this._add(--num);
+    else return;
+  }
+
+  _switch(num) {
+    if (!this.tempModified.length)
+      this.tempModified = this.tempPlaylistArr.slice();
+
+    let length = this.tempModified.length;
+    let rand1 = Math.floor(Math.random() * length);
+    let rand2 = Math.floor(Math.random() * length);
+
+    [this.tempModified[rand1], this.tempModified[rand2]] = [
+      this.tempModified[rand2],
+      this.tempModified[rand1],
+    ];
+
+    if (num) this._switch(--num);
+    else return;
+  }
+
+  _init() {
+    this.tempModified = [];
+    this.tempChanges = { added: [], deleted: [] };
+  }
+
+  _confirmChange() {
+    if (!this.tempModified.length) return;
+    QueueManager.applyPlaylistChanges(
+      this.tempModified,
+      "playlist:" + this.tempContext,
+      this.tempChanges
+    );
+
+    this.tempPlaylistArr = this.tempModified.slice();
+    this.tempPlaylistFragment = new DocumentFragment();
+    this.tempPlaylistArr.forEach((obj, index) => {
+      let elem = document.createElement("div", { is: "playlist-item" });
+      elem.setup(obj, this.tempContext, index + 1);
+      this.tempPlaylistFragment.append(elem);
+    });
+    Array.prototype.forEach.call(this.tempPlaylistFragment, (item, index) => {
+      item.updateIndex(index + 1);
+    });
+    this._init();
+    this._appendTempPlaylist();
+  }
+
+  _appendTempPlaylist() {
+    queueManager.record.innerHTML = "";
+    queueManager.record.append(
+      playlistManager.tempPlaylistFragment.cloneNode(true)
+    );
+  }
+
+  getPlaylistContents(context) {
+    if (!context) return;
+    if (context.startsWith("playlist:")) return this.tempPlaylistArr;
+    else return [];
+  }
+
+  getPlaylistName(context) {
+    if (!context) return;
+    if (context.startsWith("playlist:")) return "프롬이가 채고야";
+    return null;
+  }
+}
