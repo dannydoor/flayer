@@ -1,0 +1,438 @@
+
+/* 플레이리스트 목록 스타일 시작 */
+.header .playlist-sort-btn {
+  position: absolute;
+  top: 8px;
+  right: 40px;
+  width: 24px;
+  height: 24px;
+  background: url("../assets/img/default/sort-w.svg") no-repeat center/24px;
+  cursor: pointer;
+}
+
+.header .playlist-sort-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  mix-blend-mode: multiply;
+}
+
+.header .playlist-sort-btn:hover::after {
+  background-color: var(--color-base-2);
+}
+
+.header .playlist-sort-btn:active::after {
+  background-color: var(--color-base-3);
+}
+
+#add-container .playlist-sort-btn {
+  right: 16px;
+}
+
+/* playlist-item 스타일 시작 */
+.playlist-item {
+  position: relative;
+  display: flex;
+  width: 320px;
+  height: 64px;
+  align-items: center;
+  padding: 24px 16px 24px 72px;
+  cursor: pointer;
+  background-position: top 14px left 24px;
+  background-repeat: no-repeat;
+  background-size: 36px;
+}
+
+.playlist-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  width: 280px;
+  height: 1px;
+  background-color: var(--color-base-2);
+}
+
+.playlist-item.item:hover {
+  background-color: var(--color-base-1);
+}
+
+.playlist-item.item:active {
+  background-color: var(--color-base-2);
+}
+
+.playlist-item.create-new {
+  background-color: var(--color-base-1);
+}
+
+.playlist-item.create-new:hover {
+  background-color: var(--color-base-2);
+}
+
+.playlist-item.create-new:active {
+  background-color: var(--color-base-3);
+}
+
+.playlist-item.item:not(.item-playing) {
+  color: var(--color-ceil);
+  background-image: url("../assets/img/default/playlist.svg");
+}
+
+.playlist-item.item.item-playing {
+  color: var(--color-primary);
+  background-image: url("../assets/img/default/playlist-p.svg");
+}
+
+.playlist-item.create-new {
+  background-image: url("../assets/img/default/add-p.svg");
+}
+
+.playlist-item .playlist-name {
+  width: 200px;
+  height: 100%;
+  margin-right: 8px;
+  font: var(--font-medium-bold);
+  vertical-align: center;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+
+.playlist-item.create-new .playlist-name {
+  color: var(--color-primary);
+}
+
+.playlist-item.item::before {
+  position: absolute;
+  content: "";
+  top: 20px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  background: url("../assets/img/default/right-g.svg") no-repeat center/24px;
+}
+
+.playlist-item.item.item-playing::before {
+  background: url("../assets/img/default/right-p.svg") no-repeat center/24px;
+}
+
+/* 플레이리스트 항목 페이지 스타일 시작 */
+.header .hide-button {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: 8px;
+  left: 8px;
+  border-radius: 50%;
+  background: url("../assets/img/default/left-w.svg") no-repeat center/24px;
+  cursor: pointer;
+}
+
+#library-container .hide-button::after,
+#playlist-list-container .hide-button::after {
+  content:"메뉴";
+  position: absolute;
+  font: var(--font-tiny-bold);
+  letter-spacing: -0.01em;
+  top: 7px;
+  left: 100%;
+  width: 20px;
+  color: white;
+}
+
+.header .meatballs {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: 8px;
+  right: 40px;
+  background: url("../assets/img/default/meatballs-w.svg") no-repeat center/24px;
+}
+
+.header .meatballs::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  mix-blend-mode: multiply;
+}
+
+.header .meatballs:hover::after {
+  background-color: var(--color-base-1);
+}
+
+.header .meatballs:active::after {
+  background-color: var(--color-base-2);
+}
+
+.playlist-info {
+  width: 100%;
+  padding: 24px 32px 0 32px;
+  margin-bottom: 16px;
+}
+
+.playlist-info h2 {
+  width: 100%;
+  font: var(--font-large-bold);
+  letter-spacing: -0.01em;
+  color: var(--color-ceil);
+}
+
+.playlist-info p {
+  width: 100%;
+  font: var(--font-small);
+  letter-spacing: -0.01em;
+  color: var(--color-ceil-1);
+  margin-top: 16px;
+}
+
+.playlist-info p.blank {
+  display: none;
+}
+
+.playlist-btns {
+  width: 100%;
+  height: 56px;
+  padding: 0 32px 16px;
+  display: flex;
+  position: relative;
+}
+
+.playlist-btns::after {
+  position: absolute;
+  content: '';
+  bottom: 0;
+  right: 16px;
+  width: 272px;
+  height: 1px;
+  background-color: var(--color-base-2);
+}
+
+.playlist-btns button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  padding: 12px 0 12px;
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  background-repeat: no-repeat;
+  background-size: 16px;
+  font: var(--font-medium-bold);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 200ms ease-in-out, transform 200ms cubic-bezier(0.54, -0.04, 0.35, 2.5);
+}
+
+.playlist-btns button:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.playlist-btns button:active {
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
+.playlist-btns .play {
+  margin-right: 16px;
+}
+
+.playlist-btns .play {
+  background-image: url("../assets/img/default/play-w.svg");
+  background-position: top 12px left 32px;
+}
+
+.playlist-btns .play::after {
+  position: absolute;
+  content: '재생';
+  top: 13px;
+  left: 52px;
+}
+
+.playlist-btns .shuffle {
+  background-image: url("../assets/img/default/shuffle-w.svg");
+  background-position: top 12px left 20px;
+}
+
+.playlist-btns .shuffle::after {
+  position: absolute;
+  content: '임의 재생';
+  top: 13px;
+  left: 40px;
+}
+
+.add-songs {
+  position: relative;
+  margin: 16px 32px;
+  width: 256px;
+  height: 64px;
+  background-color: var(--color-base-1);
+  background-position: top 8px left 8px;
+  background-size: 48px;
+  background-repeat: no-repeat;
+  background-image: url("../assets/img/default/add-p.svg");
+  font: var(--font-small-bold);
+  color: var(--color-primary);
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.add-songs:hover {
+  background-color: var(--color-base-2);
+}
+
+.add-songs:active {
+  background-color: var(--color-base-3);
+}
+
+.add-songs::before {
+  position: absolute;
+  content: '';
+  top: -16px;
+  right: -16px;
+  width: 272px;
+  height: 1px;
+  background-color: var(--color-base-2);
+}
+
+.add-songs::after {
+  content: "플레이리스트가 비어있습니다\A여기를 눌러 음악을 추가해보세요";
+  text-align: left;
+  white-space: pre;
+  position: absolute;
+  top: 16px;
+  left: 64px;
+}
+
+.playlist-footer {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding-left: 32px;
+  font: var(--font-tiny-bold);
+  letter-spacing: -0.01em;
+  color: var(--color-ceil-2);
+}
+
+/* 플레이리스트 편집 페이지 스타일 시작 */
+.header .cancel-button,
+.header .commit-button {
+  position: absolute;
+  top: 12px;
+  color: white;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.header .cancel-button:hover,
+.header .commit-button:hover {
+  text-decoration: underline;
+}
+
+.header .cancel-button {
+  left: 16px;
+  font: var(--font-medium);
+}
+
+.header .commit-button {
+  right: 16px;
+  font: var(--font-medium-bold);
+}
+
+.edit-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px 16px 32px;
+}
+
+.edit-info::after,
+.edit-info::before {
+  content: '';
+  position: absolute;
+  width: 272px;
+  height: 1px;
+  background-color: var(--color-base-2);
+  left: 32px;
+}
+
+.edit-info::before {
+  bottom: 56px;
+}
+
+.edit-info::after {
+  bottom: 0;
+}
+
+.input-name {
+  width: 256px;
+  height: 24px;
+  font: var(--font-large-bold);
+  letter-spacing: -0.01em;
+  color: var(--color-ceil);
+  margin-bottom: 24px;
+  resize: none;
+}
+
+.input-desc {
+  position: relative;
+  width: 256px;
+  height: 32px;
+  font: var(--font-small);
+  letter-spacing: -0.01em;
+  color: var(--color-ceil-1);
+  margin-top: 8px;
+  resize: none;
+}
+
+.add-new-songs {
+  position: relative;
+  width: 100%;
+  height: 56px;
+  color: var(--color-primary);
+  font: var(--font-medium-bold);
+  padding: 21px 64px 19px;
+  background-color: var(--color-base-1);
+  cursor: pointer;
+}
+
+.add-new-songs::before {
+  position: absolute;
+  content: '';
+  width: 24px;
+  height: 24px;
+  top: 16px;
+  left: 32px;
+  background: url("../assets/img/default/add-p.svg") no-repeat center/24px;
+}
+
+.add-new-songs::after {
+  position: absolute;
+  content: '';
+  width: 272px;
+  height: 1px;
+  bottom: 0;
+  left: 32px;
+  background-color: var(--color-base-2);
+}
+
+.add-new-songs:hover {
+  background-color: var(--color-base-2);
+}
+
+.add-new-songs:active {
+  background-color: var(--color-base-3);
+}

@@ -1,11 +1,13 @@
 // 라이브러리의 정렬과 검색을 관장
 
 class LibraryManager {
-  constructor(objHashTable, sortMode = 0) {
+  constructor(sortMode = 0) {
     // 0: 제목 - 가수 오름차순 | 1: 제목 - 가수 내림차순 | 2: 가수 - 제목 오름차순 | 3: 가수 - 제목 내림차순
     this.musicObjArr = [];
-    for (let key in objHashTable) {
-      this.musicObjArr.push(objHashTable[key]);
+    for (let key in DbManager.db) {
+      if (!key.endsWith("#")) {
+        this.musicObjArr.push(DbManager.db[key]);
+      }
     }
 
     this.sortMode = sortMode;
@@ -16,7 +18,7 @@ class LibraryManager {
       this.sortedArr[1],
       this.sortedArr[2],
       this.sortedArr[3],
-    ] = ObjectFactory.getSortedArr(objHashTable);
+    ] = DbManager.getSortedArr(DbManager.db);
     this.sortedFragment = [];
     this.sortedKeyTable = [{}, {}, {}, {}];
     this.sortedValueTable = [{}, {}, {}, {}];
@@ -33,38 +35,18 @@ class LibraryManager {
       });
     }
 
-    this.libraryContainer = window["library-container"];
-    this.libraryContainerContent = window["library-content"];
-    this.libraryContainerContent.append(
+    this.container = window["library-container"];
+    this.containerContent = window["library-content"];
+    this.containerContent.append(
       this.sortedFragment[this.sortMode].cloneNode(true)
     );
     this.initSortOpt();
 
     this.updateDisplayedCounts();
 
-    this.libraryContainer.querySelector(".close-button").onclick = (e) => {
-      e.preventDefault();
-
-      document.querySelector(".open-tab").click();
-    };
     window["library-search-opt-btn"].onclick = this.libraryBtnHandler("search");
     window["library-sort-btn"].onclick = this.libraryBtnHandler("sort");
-
-    this.tempTabButton = document.querySelector(".open-tab");
-    this.tempTabButton.onclick = (e) => {
-      e.preventDefault();
-
-      if (window["open-queue"].classList.contains("active")) {
-        window["open-queue"].click();
-        if (!e.target.classList.contains("active")) {
-          e.target.classList.toggle("active");
-          TabManager.toggle("library");
-        }
-      } else {
-        e.target.classList.toggle("active");
-        TabManager.toggle("library");
-      }
-    };
+    window["library-add-btn"].onclick = this.addToPlaylistAll.bind(this);
   }
 
   initSortOpt() {
@@ -84,25 +66,25 @@ class LibraryManager {
   }
 
   updateDisplayedCounts() {
-    let isSearching = this.libraryContainer.classList.contains("searching")
+    let isSearching = this.container.classList.contains("searching")
         ? ".searched"
         : "",
-      isLikedOnly = this.libraryContainer.classList.contains("only-liked")
+      isLikedOnly = this.container.classList.contains("only-liked")
         ? "[is-liked=true]"
         : "",
-      isNewOnly = this.libraryContainer.classList.contains("only-new")
+      isNewOnly = this.container.classList.contains("only-new")
         ? "[is-new=true]"
         : "";
 
-    let counts = this.libraryContainer.querySelectorAll(
+    let counts = this.container.querySelectorAll(
       `.music-item${isSearching}${isLikedOnly}${isNewOnly}`
     ).length;
 
-    window["displayed-counts"].innerHTML = counts;
+    window["library-displayed-counts"].innerHTML = counts;
   }
 
   updateSortMode(param) {
-    this.libraryContainerContent.innerHTML = "";
+    this.containerContent.innerHTML = "";
 
     if (param < 0) {
       param = -param;
@@ -111,7 +93,7 @@ class LibraryManager {
     }
 
     this.sortMode = param;
-    this.libraryContainerContent.append(
+    this.containerContent.append(
       this.sortedFragment[this.sortMode].cloneNode(true)
     );
 
@@ -134,6 +116,13 @@ class LibraryManager {
     };
   }
 
+  addToPlaylistAll() {
+    let arr = this.getFilteredContents();
+    arr = arr.map((obj) => obj.id);
+
+    PlaylistManager.addToPlaylist(...arr);
+  }
+
   getPrevObj(id) {
     let index = this.sortedKeyTable[this.sortMode][id];
     return this.sortedValueTable[this.sortMode][index - 1];
@@ -153,16 +142,16 @@ class LibraryManager {
   }
 
   getFilteredContents() {
-    let isSearching = this.libraryContainer.classList.contains("searching")
+    let isSearching = this.container.classList.contains("searching")
         ? ".searched"
         : "",
-      isLikedOnly = this.libraryContainer.classList.contains("only-liked")
+      isLikedOnly = this.container.classList.contains("only-liked")
         ? "[is-liked=true]"
         : "",
-      isNewOnly = this.libraryContainer.classList.contains("only-new")
+      isNewOnly = this.container.classList.contains("only-new")
         ? "[is-new=true]"
         : "",
-      arr = this.libraryContainer.querySelectorAll(
+      arr = this.container.querySelectorAll(
         `.music-item${isSearching}${isLikedOnly}${isNewOnly}`
       ),
       objArr = [];

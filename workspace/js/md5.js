@@ -188,6 +188,7 @@
 
 var strFormatter = function (str) {
   let reg = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"\s]/gi;
+  str = str.toString();
   str = reg.test(str) ? str.replace(reg, "").toLowerCase() : str.toLowerCase();
   return str;
 };

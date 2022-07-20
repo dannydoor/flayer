@@ -2,36 +2,54 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0" />
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/Controller.css">
-    <link rel="stylesheet" href="./css/queue.css">
-    <link rel="stylesheet" href="./css/musicItems.css">
-    <link rel="stylesheet" href="./css/contextmenu.css">
-    <link rel="stylesheet" href="./js/simpleBar/simplebar.css">
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no,
+      initial-scale=1.0"
+      />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/library.css" />
+    <link rel="stylesheet" href="./css/playlist.css" />
+    <link rel="stylesheet" href="./css/controller.css" />
+    <link rel="stylesheet" href="./css/queue.css" />
+    <link rel="stylesheet" href="./css/musicItems.css" />
+    <link rel="stylesheet" href="./css/contextmenu.css" />
+    <link rel="stylesheet" href="./css/popup.css" />
+    <link rel="stylesheet" href="./css/darkMode.css" />
+    <link rel="stylesheet" href="./js/simpleBar/simplebar.css" />
     <script type="text/javascript" src="./js/jwplayer.js"></script>
     <script>
-      jwplayer.key = 'Bch7bd0cZt0adCRYHGveauTP1LaJlq1EMyrU/IxgfrGDc3gTqZxyPFEKKMI';
+      jwplayer.key =
+        "Bch7bd0cZt0adCRYHGveauTP1LaJlq1EMyrU/IxgfrGDc3gTqZxyPFEKKMI";
     </script>
     <script type="text/javascript" src="./js/artworks.js"></script>
     <script type="text/javascript" src="./js/md5.js"></script>
     <script type="text/javascript" src="./js/slip.js"></script>
+    <script type="text/javascript" src="./js/dbManager.js"></script>
     <script type="text/javascript" src="./js/musicItems.js"></script>
     <script type="text/javascript" src="./js/controller.js"></script>
     <script type="text/javascript" src="./js/queueManager.js"></script>
     <script type="text/javascript" src="./js/libraryManager.js"></script>
     <script type="text/javascript" src="./js/contextmenuManager.js"></script>
+    <script type="text/javascript" src="./js/playlistManager.js"></script>
     <script type="text/javascript" src="./js/tabManager.js"></script>
+    <script type="text/javascript" src="./js/popupManager.js"></script>
     <script type="text/javascript" src="./js/test.js"></script>
     <script type="text/javascript" src="./js/testDB.js"></script>
     <title>flayer</title>
   </head>
-  <body>
+  <body class="">
     <div class="container">
-      <div id='tab' class="invisible">
-      </div>
+      <div id="tab" class="invisible"></div>
       <div id="video"></div>
+      <div id="video-cover"></div>
+      <div id="menu-buttons">
+        <button id="open-menu" class="open-menu"></button>
+        <div class="decoration"></div>
+        <button id="open-library" class="open-library"></button>
+        <button id="open-playlist" class="open-playlist"></button>
+      </div>
       <div class="control-panel">
         <button id="open-queue">
           <div class="tooltip">
@@ -45,9 +63,7 @@
           <div class="control-buttons">
             <button id="prev-button">
               <div class="tooltip">
-                <div class="tooltip-header">
-                  이전 곡
-                </div>
+                <div class="tooltip-header">이전 곡</div>
                 <div class="tooltip-desc">
                   <strong></strong>
                   <span></span>
@@ -57,9 +73,7 @@
             <button id="play-or-pause" class="play"></button>
             <button id="next-button">
               <div class="tooltip">
-                <div class="tooltip-header">
-                  다음 곡
-                </div>
+                <div class="tooltip-header">다음 곡</div>
                 <div class="tooltip-desc">
                   <strong></strong>
                   <span></span>
@@ -71,14 +85,14 @@
         </div>
       </div>
       <div class="play-volume-bars">
-        <input type="range" id="play-bar" value="0">
+        <input type="range" id="play-bar" value="0" />
         <div class="timers">
           <span id="current-time">00:00</span>
           <span id="remaining-time">- 05:02</span>
         </div>
         <div class="volume-bar-container">
-          <div id="mute-button"></div>
-          <input type="range" id="volume-bar" value="0">
+          <div id="mute-button" title="음소거"></div>
+          <input type="range" id="volume-bar" value="0" />
           <div id="volume-button"></div>
         </div>
       </div>
@@ -90,9 +104,7 @@
           </div>
           <button id="open-curr-playlist">
             <div class="tooltip">
-              <div class="tooltip-header">
-                재생 중인 플레이리스트
-              </div>
+              <div class="tooltip-header">재생 중인 플레이리스트</div>
               <div class="tooltip-desc">
                 <strong></strong>
               </div>
@@ -111,11 +123,26 @@
       </div>
     </div>
     <div id="element-storehouse" class="storehouse">
-      <div id="menu-buttons">
-        <button id="open-tab" class="open-tab"></button>
+      <div id="main-menu" class="tab-container">
+        <div class="header">
+          <div class="close-button"></div>
+        </div>
+        <div class="contour"></div>
+        <div data-func="library" class="big-item library">라이브러리</div>
+        <div data-func="playlist" class="big-item playlist">플레이리스트</div>
+        <div class="contour"></div>
+        <div data-func="setting" class="big-item setting">설정</div>
+        <a
+          class="big-item shortcut"
+          href="https://www.dema.mil.kr/web/main.do"
+          target="_blank">국방홍보원 바로가기
+        </a>
+        <a data-func="help" href="./도움말.html" target="_blank" class="big-item
+          help" id="help-me">도움말 </a>
       </div>
       <div id="library-container" class="tab-container">
         <div class="header">
+          <button class="hide-button"></button>
           <span class="header-title">라이브러리</span>
           <button class="close-button"></button>
         </div>
@@ -123,19 +150,22 @@
           <div id="library-search-box" class="tag-box">
             <div class="clear-search"></div>
           </div>
-          <div id="library-search-opt-btn" class="library-btn">
-            <div class="background"></div>
-          </div>
-          <div id="search-sample" class="hidden" data-simplebar>
-            <div id="search-sample-content">
-            </div>
+          <div
+            id="library-search-opt-btn"
+            class="library-btn search-opt-btn"></div>
+          <div
+            id="library-search-sample"
+            class="hidden search-sample"
+            data-simplebar>
+            <div
+              id="library-search-sample-content"
+              class="search-sample-content"></div>
           </div>
         </div>
         <div class="sub-header">
-          <span>총 <span id="displayed-counts"></span>곡</span>
-           <div id="library-sort-btn" class="library-btn">
-            <div class="background"></div>
-           </div>
+          <span>총 <span id="library-displayed-counts"></span>곡</span>
+          <div id="library-sort-btn" class="library-btn sort-btn"></div>
+          <div id="library-add-btn" class="library-btn add-to-btn"></div>
         </div>
         <div class="content">
           <div data-simplebar class="scrollable">
@@ -160,36 +190,296 @@
                 <span class="queue-desc">재생 대기열</span>
                 <span class="queue-desc-sub" id="curr-playlist-name"></span>
               </div>
-              <div id="queue-status" class="active">
+              <div id="queue-state" class="active">
                 <div class="tooltip on">
-                  <div class="tooltip-header">
-                    연결됨
-                  </div>
+                  <div class="tooltip-header">연결됨</div>
                   <div class="tooltip-desc">
                     <p>
-                      재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영됩니다
+                      재생 중인 플레이리스트의<br />변경된 곡 순서가 자동으로<br />반영됩니다
                     </p>
                   </div>
                 </div>
                 <div class="tooltip off">
-                  <div class="tooltip-header">
-                    연결해제됨
-                  </div>
+                  <div class="tooltip-header">연결해제됨</div>
                   <div class="tooltip-desc">
                     <p>
-                      재생 중인 플레이리스트의<br>변경된 곡 순서가 자동으로<br>반영되지 않습니다
+                      재생 중인 플레이리스트의<br />변경된 곡 순서가 자동으로<br />반영되지
+                      않습니다
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            <div id="queue-content">
+            <div id="queue-content"></div>
+          </div>
+        </div>
+      </div>
+      <div id="playlist-list-container" class="tab-container">
+        <div class="header">
+          <button class="hide-button"></button>
+          <span class="header-title">플레이리스트</span>
+          <button class="playlist-sort-btn"></button>
+          <button class="close-button"></button>
+        </div>
+        <div class="content">
+          <div class="scrollable" data-simplebar>
+            <div class="playlist-item create-new">
+              <span class="playlist-name">새로운 플레이리스트 생성</span>
             </div>
+            <div class="items"></div>
+          </div>
+        </div>
+      </div>
+      <div id="edit-container" class="tab-container">
+        <div class="header">
+          <button class="cancel-button">취소</button>
+          <button class="commit-button">확인</button>
+        </div>
+        <div class="content">
+          <div class="scrollable" data-simplebar>
+            <div class="edit-info">
+              <textarea
+                class="input-name"
+                placeholder="이름"
+                max-length="40"
+                spellcheck="false"></textarea>
+              <textarea
+                class="input-desc"
+                placeholder="설명"
+                max-length="100"
+                spellcheck="false"></textarea>
+            </div>
+            <div class="add-new-songs">음악 추가</div>
+            <div class="edit-items"></div>
+          </div>
+        </div>
+      </div>
+      <div id="add-container" class="float-container">
+        <div class="header">
+          <span class="header-title">플레이리스트에 추가</span>
+          <button class="cancel-button">취소</button>
+          <button class="playlist-sort-btn"></button>
+        </div>
+        <div class="content">
+          <div class="scrollable" data-simplebar>
+            <div class="playlist-item create-new">
+              <span class="playlist-name">새로운 플레이리스트 생성</span>
+            </div>
+            <div class="items"></div>
+          </div>
+        </div>
+      </div>
+      <div id="backdrop"></div>
+      <div id="selectable-container" class="float-container">
+        <div class="header">
+          <button class="cancel-button">취소</button>
+          <button class="commit-button">확인</button>
+          <span class="header-title">추가할 곡 선택</span>
+        </div>
+        <div class="header search">
+          <div id="selectable-search-box" class="tag-box">
+            <div class="clear-search"></div>
+          </div>
+          <div
+            id="selectable-search-opt-btn"
+            class="library-btn search-opt-btn"></div>
+          <div
+            id="selectable-search-sample"
+            class="hidden search-sample"
+            data-simplebar>
+            <div
+              id="selectable-search-sample-content"
+              class="search-sample-content"></div>
+          </div>
+        </div>
+        <div class="sub-header">
+          <span>총 <span id="selectable-displayed-counts"></span>곡</span>
+          <div id="selectable-sort-btn" class="library-btn sort-btn"></div>
+          <div id="selectable-add-btn" class="library-btn add-to-btn"></div>
+        </div>
+        <div class="content">
+          <div data-simplebar class="scrollable">
+            <div id="selectable-content"></div>
           </div>
         </div>
       </div>
     </div>
-    <div id="modal-storehouse" class="storehouse"></div>
+    <div id="popup-storehouse" class="storehouse">
+      <div id="modal-backdrop"></div>
+      <div class="popup added" id="added-to-playlist"></div>
+      <div class="popup liked" id="liked"></div>
+      <div class="popup disliked" id="disliked"></div>
+      <div class="popup next" id="added-next"></div>
+      <div class="popup later" id="added-later"></div>
+      <div class="modal" id="queue-modal">
+        <span>현재 재생 대기 중인 음악이 있습니다.<br />지우고
+          재생하시겠습니까?</span>
+        <div class="buttons-left">
+          <button data-func="keep" class="left fill">계속 재생</button>
+          <button data-func="clear" class="left fill">지우기</button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div class="modal" id="playlist-delete-modal">
+        <span>정말로 이 플레이리스트를<br />삭제하시겠습니까?<br />이 작업은 되돌릴
+          수 없습니다.</span>
+        <div class="buttons-right">
+          <button data-func="commit" class="right fill">확인</button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div class="modal" id="clear-record-modal">
+        <span>정말로 기록을 비우시겠습니까?</span>
+        <div class="buttons-right">
+          <button data-func="commit" class="right fill">확인</button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div class="modal" id="item-hide-modal">
+        <span>정말로 이 음악을 숨기시겠습니까?<br />숨겨진 항목은 설정에서
+          <br />관리하실 수 있습니다.</span>
+        <div class="buttons-right">
+          <button data-func="commit" class="right fill">확인</button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div class="modal" id="tab-modal">
+        <span>현재 저장되지 않은 작업이 있습니다.<br />계속 진행하기 전에<br />먼저
+          작업을 마쳐야 합니다.</span>
+        <button data-func="cancel" class="full fill">확인</button>
+      </div>
+      <div class="modal" id="alert-modal">
+        <span>플레이리스트 이름은<br>2자 이상이어야 합니다!</span>
+        <button data-func="cancel" class="full fill">확인</button>
+      </div>
+      <div class="modal" id="edit-cancel-modal">
+        <span>편집 화면을 벗어나시겠습니까?<br />저장되지 않은 변경사항은<br />폐기됩니다.</span>
+        <div class="buttons-right">
+          <button data-func="commit" class="right fill">확인</button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div class="modal" id="playlist-add-modal">
+        <span>추가하려는 음악 중 플레이리스트에<br />이미 포함된 음악이
+          있습니다.<br />해당 음악은 무시됩니다.</span>
+        <button data-func="cancel" class="full fill">확인</button>
+      </div>
+      <div class="modal" id="setting-updated-modal">
+        <span>변경된 사항의 적용을 위해<br />페이지를 새로고침해주세요.</span>
+        <button data-func="cancel" class="full fill">확인</button>
+      </div>
+      <div class="modal" id="reset-modal">
+        <span>정말로 초기화하시겠습니까?<br />이 작업은 되돌릴 수 없습니다.</span>
+        <div class="buttons-right">
+          <button data-func="commit" class="right fill">확인</button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div class="modal" id="override-modal">
+        <span>이름이 동일한 항목이 있습니다.<br />덮어쓰시겠습니까?</span>
+        <div class="buttons-right">
+          <button data-func="commit" class="right fill">확인</button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div class="modal" id="manage-hided-modal">
+        <label for="manage-hided-modal">숨긴 항목 관리</label>
+        <div class="scrollable" data-simplebar>
+          <div class="content"></div>
+        </div>
+        <div class="buttons-right">
+          <button data-func="commit" class="right fill">
+            선택 항목 숨김 해제
+          </button>
+          <button data-func="cancel" class="right">취소</button>
+        </div>
+      </div>
+      <div id="setting" class="">
+        <label for="setting">설정</label>
+        <div class="setting-contents">
+          <span class="setting-title">저장 정보</span>
+          <div class="setting-items">
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-sub-title">데이터베이스 정보</span>
+                <p class="setting-desc">
+                  현재 적용되어 있는 데이터베이스가 업로드된 시각을 확인하고
+                  새로운 파일을 업로드해 업데이트하세요.<br />업데이트하더라도
+                  좋아요 및 재생 횟수 등의 기존 기록은 사라지지 않습니다.
+                </p>
+              </div>
+              <div class="setting-btns">
+                <button data-func="upload-db" class="setting-btn">
+                  파일 업로드
+                </button>
+                <span id="db-upload-date">*</span>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-sub-title">저장소 정보 관리</span>
+                <p class="setting-desc">
+                  flayer의 폴더 위치가 옮겨지거나 파일이 임의로 수정되면<br />각
+                  음악의 재생 정보와 플레이리스트 등의 저장 정보가 소실될 수
+                  있습니다.<br />저장소에 저장된 flayer와 관련한 모든 정보들을
+                  내보내거나 불러와서 정보를 보존하세요.<br />필요하면 초기화를
+                  할 수도 있습니다.
+                </p>
+              </div>
+              <div class="setting-btns">
+                <button data-func="download-ls" class="setting-btn">
+                  내보내기
+                </button>
+                <button data-func="upload-ls" class="setting-btn">
+                  불러오기
+                </button>
+                <button data-func="reset-ls" class="setting-btn secondary">
+                  초기화
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setting-contents">
+          <span class="setting-title">숨긴 항목 관리</span>
+          <div class="setting-items">
+            <div class="setting-item">
+              <div class="setting-info">
+                <p class="setting-desc">
+                  숨긴 항목을 확인하고 관리하세요. 변경사항을 적용하려면 반드시
+                  새로고침을 해야 합니다.
+                </p>
+              </div>
+              <div class="setting-btns">
+                <button data-func="manage-hided" class="setting-btn">
+                  관리
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setting-contents">
+          <span class="setting-title">테마</span>
+          <div class="setting-items">
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-sub-title">다크 모드</span>
+              </div>
+              <div class="setting-btns">
+                <button
+                  id="dark-mode-switch"
+                  data-func="theme"
+                  data-state="off"
+                  class="slider-btn"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="buttons-right">
+          <button data-func="exit" class="fill">확인</button>
+        </div>
+      </div>
+    </div>
     <div id="contextmenu-storehouse" class="storehouse">
       <div id="library-search-opt" class="contextmenu menu">
         <div class="item-container">
@@ -215,156 +505,219 @@
           <div class="item artist" data-value="-1">가수</div>
         </div>
       </div>
+      <div id="selectable-search-opt" class="contextmenu menu">
+        <div class="item-container">
+          <div class="item all checked">모두 검색</div>
+          <div class="item title">제목만 검색</div>
+          <div class="item artist">가수만 검색</div>
+        </div>
+        <div class="contour"></div>
+        <div class="item-container">
+          <div class="item show-all checked">모든 항목 표시</div>
+          <div class="item new">새로 추가된 항목</div>
+          <div class="item liked">좋아요 표시한 항목</div>
+        </div>
+      </div>
+      <div id="selectable-sort-opt" class="contextmenu menu">
+        <div class="item-container">
+          <div class="item ascend" data-value="2">오름차순 (ㄱ→ㅎ)</div>
+          <div class="item descend" data-value="3">내림차순 (ㅎ→ㄱ)</div>
+        </div>
+        <div class="contour"></div>
+        <div class="item-container">
+          <div class="item title" data-value="1">제목</div>
+          <div class="item artist" data-value="-1">가수</div>
+        </div>
+      </div>
+      <div id="playlist-sort-opt" class="contextmenu menu">
+        <div class="item-container">
+          <div class="item ascend" data-value="0">오름차순 (ㄱ→ㅎ)</div>
+          <div class="item descend" data-value="1">내림차순 (ㅎ→ㄱ)</div>
+        </div>
+        <div class="contour"></div>
+        <div class="item-container">
+          <div class="item name" data-value="1">이름</div>
+          <div class="item created" data-value="2">최근 추가된 항목</div>
+          <div class="item played" data-value="3">최근 재생된 항목</div>
+        </div>
+      </div>
+      <div id="playlist-create-opt" class="contextmenu">
+        <div class="item-container">
+          <div class="item create"></div>
+          <div class="item file"></div>
+        </div>
+      </div>
+      <div id="playlist-create-opt-add" class="contextmenu">
+        <div class="item-container">
+          <div class="item create"></div>
+          <div class="item file"></div>
+        </div>
+      </div>
+      <div id="playlist-opt" class="contextmenu">
+        <div class="item-container">
+          <div class="item edit"></div>
+          <div class="item delete"></div>
+          <div class="item to-playlist"></div>
+          <div class="item download"></div>
+          <div class="item next"></div>
+          <div class="item later"></div>
+        </div>
+      </div>
+      <div id="controller-item-opt" class="contextmenu">
+        <div class="item-container">
+          <div class="item hide"></div>
+          <div class="item to-playlist"></div>
+          <div class="item next"></div>
+          <div class="item later"></div>
+          <div class="item show"></div>
+        </div>
+      </div>
+      <div id="queue-item-opt" class="contextmenu">
+        <div class="item-container">
+          <div class="item hide"></div>
+          <div class="item delete"></div>
+          <div class="item to-playlist"></div>
+          <div class="item next"></div>
+          <div class="item show"></div>
+          <div class="item like"></div>
+        </div>
+      </div>
+      <div id="playlist-item-opt" class="contextmenu">
+        <div class="item-container">
+          <div class="item hide"></div>
+          <div class="item delete"></div>
+          <div class="item to-playlist"></div>
+          <div class="item next"></div>
+          <div class="item later"></div>
+          <div class="item like"></div>
+        </div>
+      </div>
+      <div id="library-item-opt" class="contextmenu">
+        <div class="item-container">
+          <div class="item hide"></div>
+          <div class="item to-playlist"></div>
+          <div class="item next"></div>
+          <div class="item later"></div>
+          <div class="item like"></div>
+        </div>
+      </div>
     </div>
+
     <script src="./js/simpleBar/simplebar.js"></script>
     <script src="./js/search.js"></script>
     <script>
-      function main() {
-        let objectFactory = new ObjectFactory();
-        if (localStorage.lastSession) {
-          let lastSession = JSON.parse(localStorage.lastSession);
-
-          objTable = lastSession.objTable;
-          [lsObj, lsContext, lsShuffle, lsRepeat, lsSortMode] = [
-            objTable[lastSession.currentInfo?.id],
-            lastSession.currentInfo?.context,
-            lastSession.currentInfo.isShuffled,
-            lastSession.currentInfo.isRepeat,
-            lastSession.currentInfo.sortMode,
-          ];
-
-          let recordArr = [];
-          let queueArr = [];
-          let queueRepoArr = [];
-
-          lastSession.queueInfo.record.forEach((item) => {
-            let elem = document.createElement("div", { is: "record-item" });
-            elem.setup(objTable[item]);
-            recordArr.push(elem);
-          });
-          lastSession.queueInfo.queue.forEach((item) => {
-            let elem = document.createElement("div", { is: "queue-item" });
-            elem.setup(objTable[item.id], item.context);
-            queueArr.push(elem);
-          });
-          lastSession.queueInfo.queueRepo.forEach((index) => {
-            let elem = queueArr[index].cloneNode(true);
-            queueRepoArr.push(elem);
-          });
-
-          if (queueArr[lastSession.queueInfo.currentIndex]) {
-            queueArr[lastSession.queueInfo.currentIndex].classList.add("current");
-          };
-
-          let recordFragment = new DocumentFragment();
-          let queueFragment = new DocumentFragment();
-          let queueRepoFragment = new DocumentFragment();
-          recordArr.forEach(elem => recordFragment.append(elem));
-          queueArr.forEach(elem => queueFragment.append(elem));
-          queueRepoArr.forEach(elem => queueRepoFragment.append(elem));
-
-          let map = new Map();
-          lastSession.queueInfo.map.forEach(item => {
-            map[item[0]] = item[1];
-          });
-
-          [lsRecord, lsQueue, lsQueueRepo, lsMap, lsQueueStatus] = [
-            recordFragment,
-            queueFragment,
-            queueRepoFragment,
-            map,
-            lastSession.queueInfo.queueStatus
-          ];
-        } 
-        
-        objTable = ObjectFactory.objHashTableBuilder(db, objTable);
-
-        window.addEventListener("beforeunload", () => lastSessionCallback());
-
-        var lastSessionCallback = function () {
-          let lastSession = {};
-          if (controller.currentInfo.reference) {
-            controller.currentInfo.reference.isPlaying = false;
-          }
-          lastSession.objTable = objTable;
-          lastSession.currentInfo = {
-            id: controller.currentInfo?.id,
-            context: controller.currentInfo?.context,
-            isShuffled: controller.isShuffled,
-            isRepeat: controller.isRepeat,
-            sortMode: libraryManager.sortMode,
-          };
-          let record = [];
-          let queue = [];
-          let queueTable = {};
-          let queueRepo = [];
-          let currentIndex = null;
-          let currentStatus = queueManager.queueStatus;
-          Array.from(queueManager.record.children).forEach((item) =>
-            record.push(item.getAttribute("music-id"))
-          );
-          Array.from(queueManager.queue.children).forEach((item, index) => {
-            if (item.classList.contains("current")) currentIndex = index;
-            queue.push({
-              id: item.getAttribute("music-id"),
-              context: item.getAttribute("context"),
-            });
-            queueTable[item.getAttribute("index")] = index;
-          });
-          if (queueManager.queueRepo) {
-            Array.from(queueManager.queueRepo.children).forEach((item) => {
-              queueRepo.push(queueTable[item.getAttribute("index")]);
-            });
-          }
-          let map = Array.from(queueManager._musicMap.entries());
-          lastSession.queueInfo = {
-            "record" : record,
-            "queue" : queue,
-            "queueRepo" : queueRepo,
-            "currentIndex" : currentIndex,
-            "map" : map,
-            "queueStatus" : currentStatus,
-          };
-          localStorage.lastSession = JSON.stringify(lastSession);
-        };
-      }
-
-
-
       var shuffleHelper = function (arr) {
+        // 피셔-예이츠 셔플
         for (let i = arr.length - 1; i > 0; i--) {
           let j = Math.floor(Math.random() * (i + 1));
           [arr[i], arr[j]] = [arr[j], arr[i]];
         }
       };
 
-      var searchSet = new Set(),
-        searchSpace,
-        objTable,
+      var queueManager,
+        playlistManager,
+        controller,
+        libraryManager,
+        popupManager,
+        contextmenuManager,
         tabManager,
-        lsSortMode,
-        lsObj,
-        lsContext,
-        lsShuffle,
-        lsRepeat,
-        lsRecord,
-        lsQueue,
-        lsQueueRepo,
-        lsMap,
-        lsQueueStatus = true;
-
-      main();
+        librarySearchElem,
+        selectableSearchElem;
 
       var inputEvent = new InputEvent("input");
       var changeEvent = new InputEvent("change");
       var mouseUpEvent = new MouseEvent("mouseup");
-      var queueManager = new QueueManager(lsQueueStatus, lsRecord, lsQueueRepo, lsQueue, lsMap);
-      var modalManager = new ModalManager();
-      var libraryManager = new LibraryManager(objTable, lsSortMode);
-      var librarySearchElem = new SearchElem("library");
-      var playlistManager = new PlaylistManager();
-      var controller = new Controller(lsObj, lsContext, lsShuffle, lsRepeat);
-      var contextmenuManager = new ContextmenuManager();
+      var dbManager = new DbManager();
+      document.body.addEventListener("keydown", (e) => {
+        switch (e.code) {
+          case "Space": {
+            window["play-or-pause"].click();
+            break;
+          }
+          case "ArrowLeft": {
+            e.preventDefault();
+            if (e.ctrlKey) {
+              window["prev-button"].click()
+            } else {
+              let pos = jwplayer().getPosition();
+              jwplayer().seek(pos - 5);
+            }
+            break;
+          }
+          case "ArrowRight": {
+            e.preventDefault();
+            if (e.ctrlKey) {
+              window["next-button"].click()
+            } else {
+              let pos = jwplayer().getPosition();
+              jwplayer().seek(pos + 5);
+            }
+            break;
+          }
+          case "ArrowUp": {
+            let vol = jwplayer().getVolume();
+            jwplayer().setVolume(vol + 5);
+            break;
+          }
+          case "ArrowDown": {
+            let vol = jwplayer().getVolume();
+            jwplayer().setVolume(vol - 5);
+            break;
+          }
+          case "KeyM": {
+            if (e.altKey) {
+              e.preventDefault();
+              window["open-menu"].click();
+            } else {
+              window["mute-button"].click();
+            }
+            break;
+          }
+          case "Comma": {
+            if (e.altKey) {
+              e.preventDefault();
+              if (tabManager.editCheck()) {
+                break;
+              } else {
+                window["open-menu"].click();
+                tab.querySelector('[data-func="setting"]')?.click();
+              }
+            }
+            break;
+          }
+          case "KeyL": {
+            if (e.altKey) {
+              e.preventDefault();
+              window["open-library"].click();
+            }
+            break;
+          }
+          case "KeyP": {
+            if (e.altKey) {
+              e.preventDefault();
+              window["open-playlist"].click();
+            }
+            break;
+          }
+          case "KeyQ": {
+            if (e.altKey) {
+              e.preventDefault();
+              window["open-queue"].click();
+            }
+            break;
+          }
+          case "KeyH": {
+            if (e.altKey) {
+              e.preventDefault();
+              window["help-me"].click();
+            }
+            break;
+          }
+          case "Enter": {
+            window["fullscreen-button"].click();
+          }
+        }
+      })
     </script>
   </body>
 </html>

@@ -1,0 +1,266 @@
+@font-face {
+  font-family: "NotoSans";
+  src: url("../assets/fonts/notokr-regular.woff2");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "NotoSans";
+  src: url("../assets/fonts/notokr-bold.woff2");
+  font-weight: 700;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  user-select: none;
+}
+
+body {
+  font-family: "NotoSans";
+  line-height: 1.5em;
+}
+
+button,
+input,
+textarea {
+  font-family: "NotoSans", sans-serif;
+  border: none;
+  padding: 0;
+}
+
+*:focus,
+button:focus,
+button:active,
+input:focus,
+input:active,
+textarea:focus,
+textarea:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 시작 */
+
+.flayer {
+  display: inline-block;
+  width: 44px;
+  height: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 40px auto;
+  background-image: url("../assets/img/default/main-logo-p.svg");
+}
+
+.alert {
+  color: #ff678b;
+}
+
+h1 {
+  margin-bottom: 32px;
+}
+
+h4, ul {
+  margin-bottom: 12px;
+  padding: 0;
+}
+
+
+p, li , ul.flexee{
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+ul:not(.flexee) {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+ul.flexer {
+  position: relative;
+}
+
+ul.flexer:not(.flexee) {
+  padding: 8px 0 8px 24px;
+}
+
+ul.flexer::after {
+  position: absolute;
+  top: 12px;
+  left: 4px;
+  display: block;
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: url("../assets/img/default/right-g.svg") no-repeat center/16px;
+}
+
+ul.flexee.flexer::after {
+  top: 0;
+  left: -20px;
+}
+
+ul.flexer .flexee:first-child {
+  margin-top: 8px;
+}
+
+ul.flexer.flexee .flexee {
+  padding-left: 16px;
+}
+
+ul.flexer.opened::after {
+  transform: rotate(90deg);
+}
+
+.flexer:not(.opened) > .flexee {
+  display: none;
+}
+
+.container {
+  padding: 60px 15px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .container {
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
+}
+
+/* footer */
+footer {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #707070;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+}
+
+/* 버튼 */
+
+.ex {
+  width: 16px;
+  height: 16px;
+  transform: translateY(2px);
+}
+
+.ex.playlist {
+  background: url("../assets/img/default/playlist.svg") no-repeat center/16px;
+}
+
+.ex.open {
+  background: url("../assets/img/default/open.svg") no-repeat center/16px;
+}
+
+.ex.list {
+  background: url("../assets/img/default/list.svg") no-repeat center/16px;
+}
+
+.ex.like {
+  background: url("../assets/img/default/like.svg") no-repeat center/16px;
+}
+
+.ex.meatballs {
+  background: url("../assets/img/default/meatballs.svg") no-repeat center/16px;
+}
+
+.ex.fullscreen {
+  background: url("../assets/img/default/fullscreen.svg") no-repeat center/16px;
+}
+
+.ex.mute {
+  background: url("../assets/img/default/mute-gdd.svg") no-repeat center/16px;
+}
+
+.ex.linked {
+  background: url("../assets/img/default/linked.svg") no-repeat center/16px;
+}
+
+.ex.linked-p {
+  background: url("../assets/img/default/linked-p.svg") no-repeat center/16px;
+}
+
+.ex.linked-g {
+  background: url("../assets/img/default/linked-gd.svg") no-repeat center/16px;
+}
+
+.ex.library {
+  background: url("../assets/img/default/library.svg") no-repeat center/16px;
+}
+
+.ex.setting {
+  background: url("../assets/img/default/setting.svg") no-repeat center/16px;
+}
+
+.ex.help {
+  background: url("../assets/img/default/help.svg") no-repeat center/16px;
+}
+
+.ex.search {
+  background: url("../assets/img/default/search.svg") no-repeat center/16px;
+}
+
+.ex.tune {
+  background: url("../assets/img/default/tune.svg") no-repeat center/16px;
+}
+
+.ex.sort {
+  background: url("../assets/img/default/sort.svg") no-repeat center/16px;
+}
+
+.ex.to-playlist {
+  background: url("../assets/img/default/add-to-playlist.svg") no-repeat center/16px;
+}
+
+.ex.add {
+  background: url("../assets/img/default/add.svg") no-repeat center/16px;
+}
+
+.ex.file {
+  background: url("../assets/img/default/file.svg") no-repeat center/16px;
+}
+
+.ex.play {
+  background: url("../assets/img/default/play.svg") no-repeat center/16px;
+}
+
+.ex.shuffle {
+  background: url("../assets/img/default/shuffle.svg") no-repeat center/16px;
+}
+
+.ex.delete {
+  background: url("../assets/img/default/delete.svg") no-repeat center/16px;
+}
+
+.ex.edit {
+  background: url("../assets/img/default/edit.svg") no-repeat center/16px;
+}
+
+.ex.add-before {
+  background: url("../assets/img/default/add-before.svg") no-repeat center/16px;
+}
+
+.ex.add-next {
+  background: url("../assets/img/default/add-next.svg") no-repeat center/16px;
+}
+
+.ex.hide {
+  background: url("../assets/img/default/hide.svg") no-repeat center/16px;
+}
+

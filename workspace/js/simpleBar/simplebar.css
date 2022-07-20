@@ -138,6 +138,7 @@
 }
 
 .simplebar-scrollbar::before {
+  cursor: pointer;
   display: block;
   position: absolute;
   content: '';
@@ -162,6 +163,7 @@
 }
 
 .simplebar-track.simplebar-vertical .simplebar-scrollbar::before {
+  cursor: pointer;
   top: 2px;
   bottom: 2px;
 }

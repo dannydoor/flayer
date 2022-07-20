@@ -6,10 +6,16 @@
   background-color: var(--color-base-blurred);
   backdrop-filter: blur(16px);
   width: 200px;
+  height: auto;
+  right: 0;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.25);
   overflow: hidden;
   z-index: 10000;
+}
+
+#queue-container .contextmenu {
+  z-index: 20000;
 }
 
 .contextmenu .item-container {
@@ -25,11 +31,27 @@
   width: 100%;
   height: 32px;
   padding: 8px 0;
+  padding-left: 16px;
   background-color: var(--color-base);
-  background-blend-mode: multiply;
+  background-size: 16px;
+  background-position: top 8px right 16px;
+  background-repeat: no-repeat;
   font: var(--font-small);
   color: var(--color-ceil);
   cursor: pointer;
+  transition: none;
+}
+
+.contextmenu:not(.menu) .item::before {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font: inherit;
+  color: inherit;
+}
+
+.contextmenu .item.show.disabled {
+  cursor: default;
 }
 
 .contextmenu .item:hover {
@@ -57,21 +79,120 @@
 
 .contextmenu.menu .item.checked {
   color: var(--color-primary);
+  background-position: top 8px left 16px;
+  background-image: url("../assets/img/default/done-p.svg");
 }
 
-.contextmenu.menu .item::before {
-  content: '';
-  visibility: hidden;
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  top: 8px;
-  left: 16px;
-  background: url("../assets/img/16px/Done-p.svg") no-repeat center/16px;
+.contextmenu .item.create {
+  background-image: url("../assets/img/default/add.svg");
 }
 
-.contextmenu.menu .item.checked::before {
-  visibility: visible;
+.contextmenu .item.create::before {
+  content: "새로 만들기";
+}
+
+.contextmenu .item.file {
+  background-image: url("../assets/img/default/file.svg");
+}
+
+.contextmenu .item.file::before {
+  content: "파일 불러오기"
+}
+
+.contextmenu .item.hide {
+  color: var(--color-secondary);
+  background-image: url("../assets/img/default/hide-s.svg");
+}
+
+.contextmenu .item.hide::before {
+  content: "숨기기";
+}
+
+.contextmenu .item.to-playlist {
+  background-image: url("../assets/img/default/add-to-playlist.svg");
+}
+
+.contextmenu .item.to-playlist::before {
+  content: "플레이리스트에 추가";
+}
+
+.contextmenu .item.edit {
+  background-image: url("../assets/img/default/edit.svg");
+}
+
+.contextmenu .item.edit::before {
+  content: "편집";
+}
+
+.contextmenu .item.delete {
+  color: var(--color-secondary);
+  background-image: url("../assets/img/default/delete-s.svg");
+}
+
+.contextmenu .item.delete::before {
+  content: "제거";
+}
+
+.contextmenu .item.download {
+  background-image: url("../assets/img/default/download.svg");
+}
+
+.contextmenu .item.download::before {
+  content: "파일로 저장";
+}
+
+.contextmenu .item.next {
+  background-image: url("../assets/img/default/add-before.svg");
+}
+
+.contextmenu .item.next::before {
+  content: "바로 다음에 재생";
+}
+
+#queue-item-opt .next::before {
+  content: "바로 다음 순서로";
+}
+
+.contextmenu .item.later {
+  background-image: url("../assets/img/default/add-next.svg");
+}
+
+.contextmenu .item.later::before {
+  content: "나중에 재생";
+}
+
+[is-liked="false"] .contextmenu .item.like {
+  background-image: url("../assets/img/default/like.svg");
+}
+
+[is-liked="true"] .contextmenu .item.like {
+  background-image: url("../assets/img/default/dislike.svg");
+}
+
+[is-liked="false"] .contextmenu .item.like::before {
+  content: "좋아요";
+}
+
+[is-liked="true"] .contextmenu .item.like::before {
+  content: "좋아요 취소";
+}
+
+.contextmenu .item.show::before {
+  content: "플레이리스트 보기";
+}
+
+.contextmenu .item.show:not(.disabled) {
+  background-image: url("../assets/img/default/playlist.svg");
+}
+
+.contextmenu .item.show.disabled {
+  color: var(--color-base-3);
+  background-image: url("../assets/img/default/playlist-g.svg");
+}
+
+.contextmenu .item.show.disabled:hover,
+.contextmenu .item.show.disabled:active {
+  background-color: var(--color-base);
 }
 
 .contextmenu.menu .contour {
@@ -82,7 +203,17 @@
 }
 
 #library-search-opt,
-#library-sort-opt {
+#library-sort-opt,
+#selectable-search-opt,
+#selectable-sort-opt,
+#playlist-sort-opt,
+#playlist-opt {
   top: calc(100% + 8px);
-  right: 0;
+}
+
+#playlist-create-opt,
+#playlist-create-opt-add {
+  top: calc(100% + 8px);
+  left: 24px;
+  right: auto;
 }

@@ -1,4 +1,4 @@
-class ObjectFactory {
+/* class ObjectFactory {
   constructor() {
     ObjectFactory.objHashTableBuilder =
       ObjectFactory.objHashTableBuilder.bind(this);
@@ -8,37 +8,60 @@ class ObjectFactory {
 
   static objHashTableBuilder(arr, obj) {
     if (!obj) obj = {};
-    arr.forEach((item) => {
-      let title = this.reg.test(item[0])
-        ? item[0].replace(this.reg, "")
-        : item[0];
-      let key = hash(title + item[4]);
+    let needsUpdate = !Object.keys(obj).length;
 
-      if (obj[key] !== undefined) {
-        obj[key].startTime = item[2];
-        obj[key].endTime = item[3];
-        obj[key].duration = parseInt(item[3] - item[2]);
-        obj[key].isNew = false;
-      } else {
-        let newObj = this._builder(item);
-        obj[key] = newObj;
-        obj[key].isNew = true;
-      }
+    if (needsUpdate) {
+      arr.forEach((item) => {
+        let title = this.reg.test(item[0])
+          ? item[0].replace(this.reg, "")
+          : item[0];
+        let key = hash(title + item[4]);
 
+        if (obj[key] !== undefined) {
+          obj[key].startTime = item[2];
+          obj[key].endTime = item[3];
+          obj[key].duration = parseInt(item[3] - item[2]);
+          obj[key].isNew = false;
+        } else if (obj[key + "#"]) {
+          obj[key] = obj[key + "#"];
+          obj[key + "#"] = undefined;
+
+          obj[key].startTime = item[2];
+          obj[key].endTime = item[3];
+          obj[key].duration = parseInt(item[3] - item[2]);
+          obj[key].isNew = true;
+        } else {
+          let newObj = this._builder(item);
+          obj[key] = newObj;
+          obj[key].isNew = true;
+        }
+      });
+    }
+
+    for (let key in obj) {
       searchSet.add(obj[key].artist);
       searchSet.add(obj[key].title);
-    });
+    }
 
     searchSpace = Array.from(searchSet.keys());
     searchSpace.sort((a, b) => a.localeCompare(b));
     searchSpace.forEach((item) => {
-      let div = document.createElement("div");
-      div.innerHTML = item;
-      div.onmousedown = (e) => {
+      let libraryDiv = document.createElement("div"),
+        selectableDiv = document.createElement("div");
+
+      libraryDiv.innerHTML = selectableDiv.innerHTML = item;
+
+      libraryDiv.onmousedown = (e) => {
         window["library-search-field"].value = e.target.innerHTML;
-        window["search-sample"].classList.add("hidden");
+        window["library-search-sample"].classList.add("hidden");
       };
-      window["search-sample-content"].append(div);
+      selectableDiv.onmousedown = (e) => {
+        window["selectable-search-field"].value = e.target.innerHTML;
+        window["selectable-search-sample"].classList.add("hidden");
+      };
+
+      window["library-search-sample-content"].append(libraryDiv);
+      window["selectable-search-sample-content"].append(selectableDiv);
     });
     searchSet = null;
 
@@ -49,7 +72,9 @@ class ObjectFactory {
     let arr1 = [];
     let arr2, arr4;
     for (let key in obj) {
-      arr1.push(obj[key]);
+      if (!key.endsWith("#") && !obj[key].isHided) {
+        arr1.push(obj[key]);
+      }
     }
     let arr3 = arr1.slice();
 
@@ -82,7 +107,8 @@ class ObjectFactory {
   }
 
   _builder(arr) {
-    let obj = {};
+    let obj = {},
+      isNew = this.reg.test(arr[0]);
     obj.title = isNew ? arr[0].replace(this.reg, "") : arr[0];
     obj.artist = arr[1];
     obj.startTime = arr[2];
@@ -94,178 +120,10 @@ class ObjectFactory {
     obj.isNew = true;
     obj.id = hash(obj.title + obj.src);
     obj.playedCounts = 0;
+    obj.isHided = false;
 
     return obj;
   }
 }
 
-class ModalManager {
-  constructor() {}
-
-  createModal(type) {
-    switch (type) {
-      case "queue-play": {
-        let answer = prompt(
-          "현재 재생 대기 중인 음악이 있습니다. 그대로 유지하고 재생하겠습니까? (yes: 재생 대기 목록 유지 | clear: 지우고 재생)"
-        );
-        if (!answer || answer.startsWith("c")) return "clear";
-        else if (answer.startsWith("y")) return "keep";
-        else return "cancel";
-      }
-      case "clear-record": {
-        let answer = confirm("정말로 기록을 삭제하시겠습니까?");
-        if (answer) return true;
-        else return false;
-      }
-    }
-  }
-}
-
-class PlaylistManager {
-  constructor() {
-    let f9Ids = [
-      "b8c7ae2910424c46ee902c2d89b92bae",
-      "b4c6da2da37901c304515cb037be5aa3",
-      "db95bc4542cd1b09846eb457e0466b65",
-      "f3b6994b4c6357599a6c2216b1147553",
-      "840309a1673dc890296a3b46488f53d0",
-      "dca2c4e9aba2b938c6a90eacd4692ba9",
-      "62963235b875a134c90a5bdb1d0e7009",
-      "e63b158a5766e783082f6bc698764cfa",
-      "b97d9deb688e95123bc5056751e61874",
-      "8766b377dd71d237834c7889d2c353c0",
-      "bca77e0673e76fb5b97049106a4592da",
-      "78fdf3ffbdc79e644b8f915fbadd4da2",
-      "5408f44cb7b22af2a1cb6d2107721080",
-      "b5f43499021d52b70f5ffa371577eb7f",
-      "17ccc83bece16520a59c8889feb4e0ad",
-      "315e91611a0a510f6f1c880baab0e55f",
-    ];
-    this.tempPlaylistFragment = new DocumentFragment();
-    this.tempPlaylistArr = f9Ids.map((item) => objTable[item]);
-    this.tempModified = [];
-    this.tempChanges = { added: [], deleted: [] };
-    this.tempContext = hash("프롬이가 채고야" + Date.now());
-    this.tempPlaylistArr.forEach((obj, index) => {
-      let elem = document.createElement("div", { is: "playlist-item" });
-      elem.setup(obj, this.tempContext, index + 1);
-      this.tempPlaylistFragment.append(elem);
-    });
-  }
-
-  _delete(num) {
-    if (this.tempChanges.deleted.length == this.tempPlaylistArr.length) return;
-    if (!this.tempModified.length)
-      this.tempModified = this.tempPlaylistArr.slice();
-
-    let length = this.tempModified.length;
-    let randNum,
-      delTarget,
-      gotcha = false;
-
-    while (!gotcha) {
-      randNum = Math.floor(Math.random() * length);
-      if (this.tempChanges.added.includes(this.tempModified[randNum])) {
-        continue;
-      } else {
-        gotcha = true;
-        delTarget = this.tempModified[randNum];
-      }
-    }
-
-    this.tempChanges.deleted.push(delTarget);
-    this.tempModified.splice(randNum, 1);
-
-    if (num) this._delete(--num);
-    else return;
-  }
-
-  _add(num) {
-    if (!this.tempModified.length)
-      this.tempModified = this.tempPlaylistArr.slice();
-
-    let length = this.tempModified.length;
-    let randNum = Math.floor(Math.random() * length);
-    let gotcha = false,
-      addTarget;
-
-    while (!gotcha) {
-      let target = libraryManager.chooseRandObj();
-      if (this.tempModified.includes(target)) {
-        continue;
-      } else {
-        gotcha = true;
-        addTarget = target;
-      }
-    }
-
-    this.tempChanges.added.push(addTarget);
-    this.tempModified.splice(randNum, 0, addTarget);
-
-    if (num) this._add(--num);
-    else return;
-  }
-
-  _switch(num) {
-    if (!this.tempModified.length)
-      this.tempModified = this.tempPlaylistArr.slice();
-
-    let length = this.tempModified.length;
-    let rand1 = Math.floor(Math.random() * length);
-    let rand2 = Math.floor(Math.random() * length);
-
-    [this.tempModified[rand1], this.tempModified[rand2]] = [
-      this.tempModified[rand2],
-      this.tempModified[rand1],
-    ];
-
-    if (num) this._switch(--num);
-    else return;
-  }
-
-  _init() {
-    this.tempModified = [];
-    this.tempChanges = { added: [], deleted: [] };
-  }
-
-  _confirmChange() {
-    if (!this.tempModified.length) return;
-    QueueManager.applyPlaylistChanges(
-      this.tempModified,
-      "playlist:" + this.tempContext,
-      this.tempChanges
-    );
-
-    this.tempPlaylistArr = this.tempModified.slice();
-    this.tempPlaylistFragment = new DocumentFragment();
-    this.tempPlaylistArr.forEach((obj, index) => {
-      let elem = document.createElement("div", { is: "playlist-item" });
-      elem.setup(obj, this.tempContext, index + 1);
-      this.tempPlaylistFragment.append(elem);
-    });
-    Array.prototype.forEach.call(this.tempPlaylistFragment, (item, index) => {
-      item.updateIndex(index + 1);
-    });
-    this._init();
-    this._appendTempPlaylist();
-  }
-
-  _appendTempPlaylist() {
-    queueManager.record.innerHTML = "";
-    queueManager.record.append(
-      playlistManager.tempPlaylistFragment.cloneNode(true)
-    );
-  }
-
-  getPlaylistContents(context) {
-    if (!context) return;
-    if (context.startsWith("playlist:")) return this.tempPlaylistArr;
-    else return [];
-  }
-
-  getPlaylistName(context) {
-    if (!context) return;
-    if (context.startsWith("playlist:")) return "프롬이가 채고야";
-    return null;
-  }
-}
+*/

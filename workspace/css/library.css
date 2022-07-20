@@ -1,0 +1,288 @@
+
+/* 라이브러리-셀렉터블 스타일 */
+
+#library-container .content,
+#selectable-container .content {
+  height: calc(100% - 128px);
+}
+
+#library-container.only-liked [is-liked=false],
+#selectable-container.only-liked [is-liked=false] {
+  display: none;
+}
+
+#library-container.only-new [is-new=false],
+#selectable-container.only-new [is-new=false] {
+  display: none;
+}
+
+.searching .music-item:not(.searched) {
+  display: none;
+}
+
+.scrollable {
+  height: 100%;
+}
+
+.header.search {
+  height: 56px;
+  padding: none;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+/* 라이브러리 버튼 스타일 */
+
+.library-btn {
+  position: relative;
+  width: 72px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.library-btn::before {
+  position: absolute;
+  content: '';
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 4px;
+  mix-blend-mode: multiply;
+}
+
+.library-btn:hover::before {
+  background-color: var(--color-base-1);
+}
+
+.library-btn:active::before {
+  background-color: var(--color-base-2);
+}
+
+.library-btn::after {
+  position: absolute;
+  font: var(--font-tiny-bold);
+  letter-spacing: -0.01em;
+  top: 7px;
+  left: 24px;
+}
+
+/* 검색창 스타일 시작 */
+
+.tag-box {
+  display: flex;
+  align-items: center;
+  width: 216px;
+  height: 24px;
+  background-color: white;
+  border-radius: 6px;
+  position: relative;
+  padding: 0 24px;
+  margin-right: 8px;
+  outline: none;
+}
+
+.tag-box::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  background: url("../assets/img/default/search-g.svg") no-repeat center/16px;
+}
+
+.tag-box.focused {
+  outline: solid 2px var(--color-primary-darker, #4344d4);
+}
+
+.tag-box.focused::before {
+  background: url("../assets/img/default/search-gd.svg") no-repeat center/16px;
+}
+
+.tag-box input {
+  flex-grow: 1;
+  padding: 0;
+  color: #707070;
+  font: var(--font-small, 400 12px/16px NotoSans);
+  transform: translateY(0.5px);
+}
+
+.tag-box input::-webkit-input-placeholder {
+  color: #a9a9a9;
+}
+
+.tag-box input:focus::-webkit-input-placeholder {
+  color: transparent;
+}
+
+.tag-box .clear-search {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  background: url("../assets/img/default/clear-gd.svg") no-repeat center/16px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.tag-box.focused .clear-search {
+  opacity: 1;
+}
+
+/* 자동완성 스타일 시작 */
+
+.search-sample[data-simplebar] {
+  display: block;
+  position: absolute;
+  top: calc(100% - 8px);
+  left: 24px;
+  width: 200px;
+  height: fit-content;
+  max-height: 288px;
+  z-index: 1000;
+  transition: none;
+  cursor: pointer;
+}
+
+.search-sample.hidden {
+  display: none;
+}
+
+.search-sample-content {
+  width: 100%;
+  height: fit-content;
+}
+
+.search-sample-content div {
+  position: relative;
+  display: none;
+  text-align: start;
+  width: 100%;
+  height: 24px;
+  padding: 6px 16px;
+  font: var(--font-small, 400 12px/1 NotoSans);
+  color: var(--color-ceil-1, #707070);
+  background-color: var(--color-base, #fff);
+}
+
+.search-sample-content div.searched {
+  display: block;
+}
+
+.search-sample-content div:hover {
+  background-color: var(--color-base-2);
+}
+
+.search-sample-content div::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color-base-1, #f5f5f5);
+}
+
+.search-sample-content div:last-child::after,
+.search-sample-content div:hover::after {
+  display: none;
+}
+
+
+/* 태그 스타일 시작 */
+.tag-box .tag {
+  display: flex;
+  align-items: center;
+  height: 16px;
+  padding: 0 4px;
+  margin-right: 4px;
+  background-color: var(--color-ceil-2, #a9a9a9);
+}
+
+.tag .tag-content {
+  display: block;
+  color: #fff;
+  font: 400 10px/1 "NotoSans";
+  letter-spacing: -0.02em;
+  transform: translateY(1px);
+}
+
+.tag-box .tag.invalid {
+  background-color: var(--color-secondary, #ff678b);
+}
+
+.tag .remove-tag {
+  margin-left: 2px;
+  width: 10px;
+  height: 10px;
+  background: url("../assets/img/default/clear-w.svg") no-repeat center/10px;
+  cursor: pointer;
+}
+
+/* 검색 설정 버튼 스타일 시작 */
+
+.search-opt-btn {
+  background-repeat: no-repeat;
+  background-position: top 4px left 4px;
+  background-size: 16px;
+  background-image: url("../assets/img/default/tune-w.svg");
+}
+
+.search-opt-btn::after {
+  content: '검색 설정';
+  color: white;
+}
+
+/* 서브 헤더 스타일 시작 */
+
+.sub-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+  padding: 4px 16px 4px 32px;
+  background-color: var(--color-base-2);
+  color: var(--color-ceil-2);
+  font: var(--font-tiny-bold);
+}
+
+.sub-header > span {
+  transform: translateY(1px);
+}
+
+.sort-btn {
+  width: 48px;
+  margin-right: 8px;
+  margin-left: auto;
+  background-repeat: no-repeat;
+  background-position: top 4px left 4px;
+  background-size: 16px;
+  background-image: url("../assets/img/default/sort-gd.svg");
+}
+
+.sort-btn::after {
+  content: '정렬';
+  color: inherit;
+}
+
+.add-to-btn {
+  background-repeat: no-repeat;
+  background-position: top 4px left 4px;
+  background-size: 16px;
+  background-image: url("../assets/img/default/add-to-playlist-gd.svg");
+}
+
+#selectable-add-btn {
+  background-image: url("../assets/img/default/add-gd.svg");
+}
+
+.add-to-btn::after {
+  content: "전체 추가";
+  color: inherit;
+}

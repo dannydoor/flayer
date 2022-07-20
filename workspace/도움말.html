@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+      />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/help.css" />
+    <title>도움말</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>도움말</h1>
+      <h4>
+        <div class="flayer"></div> 는 ‘fancy + player’로써, 국군 장병들이
+        국방홍보원을 통해 제공되는 뮤직비디오들을 <br>조금 더 fancy하고 체계적인
+        환경에서 감상할 수 있도록 도와드리는 플레이어입니다.
+      </h4>
+      <p>
+        아래에서 flayer의 각 항목에 대한 도움을
+        받아보십시오. 혹시나 해결되지 않는 문제점이나 버그가 있다면
+        github.com/dannydoor/flayer에 남겨주세요.
+      </p>
+      <p class="alert">
+        경고: flayer는 Chrome에서만 정상적으로 작동할 수
+        있습니다. <br>Internet Explorer를 사용 중이시라면 예상치 못한 각종 문제가
+        발생할 수 있습니다. 되도록이면 Chrome을 사용해주십시오.
+      </p>
+      <ul class="flexer">단축키
+        <p class="flexee">Spacebar : 재생/일시정지</p>
+        <p class="flexee">← : 5초 앞으로 이동</p>
+        <p class="flexee">→ : 5초 뒤로 이동</p>
+        <p class="flexee">Ctrl + ← : 이전 곡</p>
+        <p class="flexee">Ctrl + → : 다음 곡</p>
+        <p class="flexee">↑ : 음량 키우기</p>
+        <p class="flexee">↓ : 음량 줄이기</p>
+        <p class="flexee">M : 음소거</p>
+        <p class="flexee">Alt + M : 메인 메뉴</p>
+        <p class="flexee">Alt + L : 라이브러리</p>
+        <p class="flexee">Alt + P : 플레이리스트</p>
+        <p class="flexee">Alt + Q : 재생 중인 목록</p>
+        <p class="flexee">Alt + , : 설정</p>
+        <p class="flexee">Alt + H : 도움말</p>
+        <p class="flexee">Enter : 전체화면</p>
+      </ul>
+      <ul class="flexer">팁
+        <li class="flexee">지금 듣고 있는 음악의 가수의 음악들이 궁금하다면 컨트롤러의 가수 이름을 더블클릭해보세요.</li>
+        <li class="flexee">이전 곡, 다음 곡 또는 현재 플레이리스트가 궁금하다면 버튼에 마우스를 올려놓아보세요.</li>
+        <li class="flexee">제목이나 이름이 너무 길어 생략된 경우 마우스를 오래 올려놓으면 확인할 수 있습니다.</li>
+        <li class="flexee">flayer를 벗어나서도 뮤직비디오를 감상하고 싶다면 우측
+          상단의 <button class="playlist ex"></button>버튼을 닮은 버튼을 클릭하고, <button
+            class="open ex"></button> 버튼을 닮은 버튼을 클릭하세요. (버그가 있어
+          제대로 표시되지 않을 수 있습니다)</li>
+        <li class="flexee">플레이리스트 기능을 이용해 자신만의 재생목록을 만들고, 파일의 형태로 공유해보세요.</li>
+        <li class="flexee">데이터베이스를 업데이트할 때는 설정의 기능을 이용해주세요. 국방홍보원 게시판에 주기적으로
+          업데이트되는 음악 플레이어의 db.js 파일을 업로드하면 됩니다.</li>
+        <li class="flexee">flayer의 폴더 위치를 옮기기 전에는 설정의 백업
+          기능을 사용하세요.</li>
+      </ul>
+      <ul class="flexer">컨트롤바
+        <p class="flexee">플레이어 하단에 위치한 컨트롤바입니다. 이곳을 통해 현재 재생 중인 음악의 정보를 확인하고, 재생
+          상태 또는 음량을 제어하며, 원하는 명령을 실행할 수도 있습니다. 현재 음악의 재생 상태는 브라우저가 새로고침돼도 유지됩니다.
+          재생 시간은 유지되지 않습니다.</p>
+        <li class="flexee">재생 중인 목록 버튼<button class="list ex"></button>: ‘재생 중인
+          목록'을 열 수 있는 버튼입니다. ‘재생 중인 목록’에 대한
+          자세한 정보는 해당 항목을 참고하십시오.</li>
+        <li class="flexee">컨트롤 패널: 재생/일시정지 상태를 제어하거나 이전 곡 또는 다음 곡으로 넘어갈 수 있습니다.
+          또한 버튼에 마우스를 갖다 대면 이전 곡 혹은 다음 곡을 확인할 수 있습니다. 음악의 재생 시간이 10초 이내로 남을 경우
+          다음 곡 정보가 자동으로 표시됩니다.</li>
+        <li class="flexee">재생/음량 패널: 재생 바와 음량 바가 위치한 패널입니다. 재생 바를 통해 현재 진행 상태를
+          확인하고 원하는 시간으로 재생 위치를 옮길 수 있습니다. 음량 바도 동일하게 조작할 수 있으며, 음소거<button
+            class="mute ex"></button>버튼을 통해 음소거
+          상태를 바꿀 수 있습니다.</li>
+        <ul class="flexee flexer">곡 정보 패널: 현재 재생 중인 음악의 제목과 가수 뿐만 아니라 재생 중인
+          플레이리스트 정보와 좋아요 상태를 확인할 수
+          있는 패널입니다.
+          <li class="flexee">제목: 제목이 너무 길어 생략된 경우 마우스를 일정 시간 올려 놓으면 전체 제목을 확인할 수
+            있습니다.</li>
+          <li class="flexee">가수: 가수를 더블클릭하면 라이브러리에서 곧바로 해당 가수의 음악이 검색됩니다.</li>
+          <li class="flexee">플레이리스트 버튼<button class="playlist ex"></button>:
+            마우스를 갖다대면 현재 재생 중인 플레이리스트의 이름을 볼 수 있으며,
+            클릭 시 해당 플레이리스트로 곧바로 이동합니다. 플레이리스트 재생이 아닌 경우 비활성화됩니다.</li>
+          <li class="flexee">좋아요 버튼<button class="like ex"></button>: 현재 음악의 좋아요
+            상태를 변경할 수 있습니다. </li>
+          <li class="flexee">미트볼 버튼<button class="meatballs ex"></button>: 현재
+            음악에 대한 메뉴를 확인할 수 있습니다. 자세한 정보는 ‘컨텍스트메뉴'
+            항목을 참고하십시오</li>
+        </ul>
+        <li class="flexee">전체화면 버튼<button class="fullscreen ex"></button>: 전체화면을
+          활성화하는 버튼입니다.</li>
+      </ul>
+      <ul class="flexer">재생 중인 목록
+        <p class="flexee">앞으로 재생될 음악들을 확인할 수 있는 ‘재생 대기열'과 1분 이상 재생된 음악들의 ‘기록'로
+          구성됩니다. flayer의
+          음악 재생은 온전히 이 재생 중인 목록에 저장된 순서를 따라갑니다. 재생 중인 목록은 브라우저가 새로고침돼도 유지됩니다.</p>
+        <li class="flexee">재생 대기열: 현재 음악에 이어서 재생될 음악들을 확인하고, 순서나 구성을 변경할 수 있습니다.
+          재생 대기열의 음악을 클릭하면 곧바로 해당 음악이 재생됩니다. 플레이리스트를 재생 중인 경우 해당 플레이리스트의 구성을 변경할
+          경우 변경사항이 곧바로 반영됩니다. 하지만 큐 상태가 비활성화될 경우 변경된 곡 순서는 무시됩니다.</li>
+        <li class="flexee">플레이리스트 이름: 현재 플레이리스트를 재생 중인 경우 해당 플레이리스트의 이름이 표시되고, 이
+          이름을 더블클릭하면 해당 플레이리스트 창이 바로 표시됩니다.</li>
+        <li class="flexee">큐 상태 버튼<button class="linked ex"></button>: 재생 대기열의
+          구성이나 순서를 사용자가 임의로 조작했는지를 나타냅니다. 쉽게
+          말하면, 재생 대기열에 사용자가 관여했는지를 나타내는 겁니다. 사용자가 재생 대기열의 음악을 추가하거나 지우거나 순서를
+          변경하여 조작을 가하면 큐의 상태는 비활성화<button class="linked-g ex"></button>됩니다. 큐의
+          상태가 비활성화되면 새로운 음악을 재생할 경우 재생 대기열의 음악을
+          어떻게 처리할 건지를 결정할 수 있는 창이 표시됩니다. 이때 “계속 재생”을 선택할 경우 재생 대기열이 유지되며 큐 상태는
+          비활성화를 유지합니다. ‘지우기'를 선택할 시 큐 상태가 다시 활성화<button class="linked-p ex"></button>되며
+          재생 대기열이 초기화됩니다. <u>단, ‘임의
+            재생'이
+            활성화돼있을 때는 예외적으로 재생 대기열의 순서를 바꾸더라도 큐 상태가 비활성화되지 않습니다.</u></li>
+        <li class="flexee">기록: 1분 이상 재생된 음악들을 확인할 수 있습니다. 현재 음악이 1분 이상 재생된 채로
+          넘어가면 자동으로 이곳에 쌓입니다. ‘기록'의 음악을 클릭하면 곧바로 재생 대기열에 삽입되어 재생됩니다. 이때 큐 상태가
+          활성화되어있었다면 자동으로 비활성화됩니다.</li>
+      </ul>
+      <ul class="flexer">메뉴 버튼
+        <p class="flexee">메인 메뉴 혹은 라이브러리와 플레이리스트에 빠르게 접근할 수 있는 버튼들입니다. 마우스를 올리면
+          나타나고, 마우스가 나가면
+          약간의 시간이 흐른 후 감춰집니다.</p>
+        <ul class="flexer flexee">메인 메뉴
+          <li class="flexee">라이브러리<button class="library ex"></button>: 데이터베이스에
+            저장된 전체 음악에 접근하고 검색할 수 있는 탭입니다. 자세한
+            설명은 ‘라이브러리' 항목을 참고하십시오.</li>
+          <li class="flexee">플레이리스트<button class="playlist ex"></button>: 저장된
+            플레이리스트들에 접근할 수 있는 탭입니다. 자세한 설명은
+            ‘플레이리스트’ 항목을 참고하십시오.</li>
+          <li class="flexee">설정<button class="setting ex"></button>: 데이터베이스와
+            브라우저에 저장된 정보, 숨긴 항목, 테마에 대한 설정을 취할 수 있는
+            탭입니다. 자세한 설명은 ‘설정' 항목을 참고하십시오.</li>
+          <li class="flexee">국방홍보원 바로가기<button class="open ex"></button>: 국방홍보원
+            사이트로 곧바로 이동할 수 있습니다.</li>
+          <li class="flexee">도움말<button class="help ex"></button>: flayer에 대한
+            도움말을 확인할 수 있습니다.</li>
+        </ul>
+        <li class="flexee">라이브러리 버튼<button class="library ex"></button>: 메인 메뉴를
+          통하지 않고 바로 라이브러리로 접근할 수 있는 버튼입니다.</li>
+        <li class="flexee">플레이리스트 버튼<button class="playlist ex"></button>: 메인
+          메뉴를 통하지 않고 바로 플레이리스트로 접근할 수 있는 버튼입니다.</li>
+      </ul>
+      <ul class="flexer">라이브러리
+        <p class="flexee">데이터베이스에 포함된 전체 음악에 접근, 검색, 재생할 수 있습니다.</p>
+        <ul class="flexee flexer">검색 패널
+          <li class="flexee">검색 창<button class="search ex"></button>: 검색어를 입력해
+            해당 검색어가 제목 또는 가수 이름에 포함되는 검색 결과를 추릴
+            수 있습니다. 검색 결과에는 각종 기호 및 특수문자, 띄어쓰기는 영향을 미치지 않습니다. ‘태그'를 추가해 제목 또는
+            가수에 대해서만 검색하도록 필터를 적용할 수 있습니다. 태그는 검색창에 #가수 또는 #제목을 입력하고 스페이스바를 눌러
+            추가하거나 검색 설정에서 바꿀 수 있습니다.</li>
+          <li class="flexee">검색 설정<button class="tune ex"></button>: 검색창에 적용된
+            태그를 수정하거나 라이브러리에 표시할 음악에 대한 필터를 적용할
+            수 있습니다. ‘새로 추가된 항목'을 선택하면 데이터베이스를 업데이트하면서 새로 추가된 음악만을 표시합니다. ‘좋아요
+            표시한 항목’을 선택하면 좋아요가 표시된 음악들만 표시됩니다. 검색과 필터는 동시에 적용됩니다.</li>
+        </ul>
+        <ul class="flexee flexer">기타 패널
+          <li class="flexee">정렬 버튼<button class="sort ex"></button>: 라이브러리의 정렬
+            상태를 변경합니다. 정렬 상태는 브라우저가 새로고침되더라도
+            유지됩니다.</li>
+          <li class="flexee">전체 추가<button class="to-playlist ex"></button>: 현재
+            표시된 항목들을 한꺼번에 특정 플레이리스트에 추가할 수 있는 창이
+            열립니다.</li>
+        </ul>
+        <ul class="flexee flexer">라이브러리
+          <p class="flexee">라이브러리의 음악을 더블클릭하면 재생할 수 있습니다. <button class="add
+              ex"></button> 버튼을 누르면 해당 음악을
+            특정 플레이리스트에 추가할 수 있는 창이 열립니다. <button class="meatballs ex"></button>
+            버튼을 누르면 해당 음악에 대한 메뉴가 표시됩니다. 이
+            메뉴는 우클릭을 통해서도 열 수 있습니다. 자세한 내용은 ‘컨텍스트메뉴' 항목을 참고하십시오.</p>
+        </ul>
+      </ul>
+      <ul class="flexer">플레이리스트
+        <p class="flexee">사용자가 직접 원하는 구성과 순서로 재생목록을 구현할 수 있는 기능입니다. 각 플레이리스트는
+          브라우저가 새로고침돼도 유지됩니다. 플레이리스트는 파일 형태로 다운받아 공유할 수 있고, 다운받은 파일을 다시 불러올 수도
+          있습니다.</p>
+        <ul class="flexee flexer">플레이리스트 목록
+          <li class="flexee">새로 만들기<button class="add ex"></button>: 클릭 시 완전히
+            처음부터 제작할 건지, 파일을 불러올 건지에 대한 메뉴를
+            확인할 수 있습니다. 파일을 불러올 경우 해당 파일의 플레이리스트의 정보를 불러온 편집 화면을 전시합니다.</li>
+          <li class="flexee">파일 불러오기<button class="file ex"></button>: .flay
+            확장자의 파일을 받아 새로운 플레이리스트를 생성합니다. 이름이
+            동일한 플레이리스트가 있을 시 해당 플레이리스트를 덮어씌울 건지를 결정할 수 있습니다. 데이터베이스에 없는 음악이
+            포함되어있더라도 문제없이 추가됩니다. 단, 해당 음악은 라이브러리에 표시되지 않습니다.</li>
+          <li class="flexee">플레이리스트 아이템: 클릭 시 연결된 플레이리스트 탭을 전시합니다. 해당 플레이리스트가 재생
+            중일 시 시각적으로 표시합니다.</li>
+          <li class="flexee">플레이리스트 정렬 버튼<button class="sort ex"></button>: 이름,
+            생성 시각, 마지막으로 재생된 시각에 따라 플레이리스트
+            아이템들을 정렬합니다. 정렬 상태는 브라우저가 새로고침돼도 유지됩니다.</li>
+        </ul>
+        <ul class="flexee flexer">플레이리스트 탭
+          <li class="flexee">재생 버튼<button class="play ex"></button>: 플레이리스트의 첫
+            번째 항목부터 차례로 재생합니다.</li>
+          <li class="flexee">임의 재생 버튼<button class="shuffle ex"></button>: 임의의
+            순서로 플레이리스트의 항목들을 재생합니다.</li>
+          <li class="flexee">플레이리스트: 음악을 더블 클릭하여 재생할 수 있습니다. <button class="add
+              ex"></button> 버튼을 클릭하면 해당
+            음악만 특정 플레이리스트에 추가할 수 있는 창이 전시됩니다. <button class="meatballs ex"></button>
+            버튼을 클릭하면 해당 음악에 대한 메뉴가
+            표시됩니다. 이 메뉴는 우클릭으로도 표시할 수 있습니다. 자세한 내용은 ‘컨텍스트메뉴' 항목을 참고하십시오.</li>
+          <ul class="flexee flexer">미트볼 버튼<button class="meatballs ex"></button>:
+            플레이리스트에 대한 메뉴를 표시합니다.
+            <li class="flexee">편집<button class="edit ex"></button>: 플레이리스트 편집을
+              시작합니다.</li>
+            <li class="flexee">제거<button class="delete ex"></button>: 플레이리스트를
+              제거합니다.</li>
+            <li class="flexee">플레이리스트에 추가<button class="to-playlist ex"></button>:
+              플레이리스트의 모든 음악을 특정 플레이리스트에 추가할 수 있는 창이
+              전시됩니다.</li>
+            <li class="flexee">파일로 저장<button class="file ex"></button>: 플레이리스트의
+              정보를 .flay 확장자의 파일로 만들어 저장합니다.</li>
+            <li class="flexee">바로 다음에 재생<button class="add-before ex"></button>:
+              플레이리스트의 모든 음악을 현재 재생 중인 음악 다음에 바로
+              재생되도록 재생 대기열에 추가합니다.</li>
+            <li class="flexee">나중에 재생<button class="add-next ex"></button>:
+              플레이리스트의 모든 음악을 재생 대기열이 모두 재생된 후 재생되도록 재생
+              대기열에 추가합니다.</li>
+          </ul>
+        </ul>
+        <ul class="flexee flexer">플레이리스트 편집 창
+          <p class="flexee">
+            플레이리스트을 생성하거나 편집하기 위한 창입니다. 플레이리스트가 편집 중일 때는 라이브러리나 재생중인 목록 등 다른 창을
+            전시할 수 없습니다. 플레이리스트 생성 시 생성 시각을 기반으로 ID가 주어지고, 생성 시각이 기록됩니다. 해당
+            플레이리스트가 재생 중인 경우 편집이 완료됐을 때 변경사항이 재생 중인 목록에 반영됩니다.
+          </p>
+          <li class="flexee">플레이리스트 이름 입력창: 플레이리스트의 이름은 2자 이상, 40자 이하 적을 수 있습니다.
+            필수적으로 입력해야 합니다.</li>
+          <li class="flexee">플레이리스트 설명 입력창: 100자 이하로 적을 수 있는 플레이리스트에 대한 설명입니다.
+            적어도 되고, 안 적어도 됩니다.</li>
+          <li class="flexee">음악 추가: 라이브러리와 비슷한 창이 전시되며, 검색과 필터를 통해 추가하고자 하는 음악을
+            선택할 수 있습니다. 여기서 ‘전체 추가<button class="add ex"></button>'의 기능은
+            ‘플레이리스트에 추가<button class="to-playlist ex"></button>' 기능이 아니라 표시된 모든
+            음악을 선택하는
+            기능입니다. 만약 플레이리스트에 이미 존재하는 음악이 포함된 경우 추가 작업이 자동으로 무시됩니다.</li>
+        </ul>
+        <ul class="flexee flexer">플레이리스트에 추가
+          <p class="flexee">
+            원하는 음악(들)을 특정 플레이리스트에 추가할 수 있도록 플레이리스트 목록 창이 전시됩니다. 여기서 해당 음악을 추가하고자
+            하는 플레이리스트를 고를 수 있습니다. 만약 플레이리스트에 이미 존재하는 음악이 포함된 경우 자동으로 해당 음악은
+            무시됩니다. 여기서 새로운 플레이리스트를 만들 경우 해당 음악(들)이 포함된 플레이리스트 편집 창이 전시됩니다.
+          </p>
+        </ul>
+      </ul>
+      <ul class="flexer">설정
+        <p class="flexee">데이터베이스 업데이트, 저장 정보 백업 및 복원 또는 초기화, 숨긴 항목 관리, 다크 모드 관리를
+          할 수 있습니다. 다크 모드를 제외하고, 변경된 정보가 반영되기 위해선 반드시 새로고침을 해주어야 합니다.</p>
+        <li class="flexee">데이터베이스 업데이트: .js 확장자의 파일을 받습니다. 업데이트 시 하단에 데이터베이스가
+          업데이트된 시각이 표시됩니다. 데이터베이스가 업데이트될 때 업데이트된 데이터베이스에 포함되지 않은 ID의 음악들은
+          라이브러리에서 숨겨지나, 플레이리스트에 추가된 음악들은 그대로 존재합니다. flayer의 js 폴더 내부 db.js의 파일은
+          flayer 최초 실행 시, 또는 저장 정보가 초기화 시에만 참조되기 때문에 이 파일을 업데이트한다고 변경사항이 반영되지
+          않습니다. 업데이트 때는 되도록 이 기능을 이용해주세요.</li>
+        <li class="flexee">저장 정보 관리: flayer의 파일의 위치가 변경되거나 구성하는 파일이 임의로 수정되면
+          저장됐던 모든 정보가 소실될 수 있습니다. 이런 경우를 대비해 현재 브라우저에 저장된 모든 정보를 백업하고 복원해보세요.
+          새로고침했을 때 유지되는 모든 정보가 여기에 포함됩니다. .json 확장자의 파일로 백업 및 복원됩니다. </li>
+        <li class="flexee">숨긴 항목 관리: 숨겨진 모든 음악을 확인하고 원하는 음악을 다시 선택해 숨김을 해제할 수
+          있습니다.</li>
+        <li class="flexee">테마: 스위치를 통해 다크 모드를 제어할 수 있습니다. 테마는 새로 고침 시에도 유지됩니다.</li>
+      </ul>
+      <ul class="flexer">음악들은 서로 어떻게 구분되나요?
+        <p class="flexee">
+          각각의 음악 항목들은 자신의 음악에 대한 정보를 담고 있습니다. 여기에는 ID, 제목, 가수, 영상 url 등등이 있습니다.
+          라이브러리에 있는 음악이든, 재생 대기열의 음악이든 같은 ID를 가진 음악은 똑같은 음악 정보를 담고 있습니다. ID는
+          데이터베이스 로드시 자동으로 부여되는데, 제목과 영상 url을 조합해 만들어집니다. 그래서 동일한 영상에서 추출한 두 음악의
+          제목이 같은 경우 동일한 ID가 부여될 수 있고, 반대로 영상 url과 시작 시간, 종료 시간이 모두 동일하더라도 제목이
+          다르면 서로 다른 음악으로 처리될 수 있습니다. 다만 제목에 포함된 기호나 특수문자, 띄어쓰기의 차이는 무시됩니다.
+          데이터베이스에서 제목을 수정할 때 이 부분을 고려해주세요.
+        </p>
+      </ul>
+      <ul class="flexer">컨텍스트메뉴
+        <p class="flexee">각 음악에 대한 다양한 기능을 사용할 수 있는 메뉴입니다. 미트볼<button
+            class="meatballs ex"></button> 버튼 또는 우클릭을 통해 표시할
+          수 있습니다.</p>
+        <li class="flexee">숨기기<button class="hide ex"></button>: 해당 음악을 flayer
+          상에서 숨깁니다. 숨긴 음악을 다시 표시하고 싶다면 설정의
+          숨김 해제 기능을 이용하세요.</li>
+        <li class="flexee">제거(재생 대기열 및 플레이리스트만 해당)<button class="delete ex"></button>:
+          재생 대기열 또는 플레이리스트에서 제거합니다.</li>
+        <li class="flexee">플레이리스트에 추가<button class="to-playlist ex"></button>:
+          해당 음악을 추가할 플레이리스트를 고릅니다. 자세한 정보는 ‘플레이리스트에
+          추가' 항목을 참고하세요.</li>
+        <li class="flexee">바로 다음에 재생<button class="add-before ex"></button>: 해당
+          음악을 현재 재생 중인 음악 바로 다음에 재생되도록 재생 대기열에
+          추가합니다. 큐 상태를 비활성화합니다.</li>
+        <li class="flexee">나중에 재생<button class="add-next ex"></button>: 해당 음악을
+          재생 대기열의 마지막에 추가합니다. 위 기능과 함께 큐 상태를
+          비활성화<button class="linked-g ex"></button>합니다.</li>
+        <li class="flexee">플레이리스트 보기<button class="playlist ex"></button>: 해당
+          음악의 플레이리스트를 바로 표시합니다.</li>
+        <li class="flexee">좋아요<button class="like ex"></button>: 해당 음악의 좋아요 상태를
+          바꿉니다.</li>
+      </ul>
+      <ul class="flexer">미디어세션
+        <p class="flexee">
+          미디어세션은 뮤직비디오 재생 시 브라우저의 우측 상단에 표시되는 <button class="playlist ex"></button>와
+          닮은 버튼을
+          통해 접근할 수 있는 기능으로, 일종의 리모컨으로
+          작동할 수 있으며, 뮤직비디오를 pip 모드로 브라우저 바깥에서도 감상할 수 있게 해주는 편리한 기능입니다. 다만,
+          flayer에서 의문의 버그로 인해 제대로 작동하지 않는 상황이 다수 보고되었습니다. 혹여나 이에 대한 해결책을 알고 계신
+          분은 flayer의 github에 의견을 남겨주세요. github.com/dannydoor/flayer
+        </p>
+      </ul>
+      <p>flayer의 복제, 수정, 재배포는 출처를 남기시고 자유롭게 해주세요. 제 빈 자리를 대신한 유지보수 환영합니다.
+        github에 의견 많이 남겨주세요.</p>
+    </div>
+    <footer>
+      <span>∙ Copyright 2022. 이영훈 All Right Reserved.</span>
+    </footer>
+    <script>
+      document.querySelectorAll(".flexer").forEach(el => {
+        el.onclick = (e) => {
+          e.stopPropagation();
+          if (!e.target.classList.contains("flexer")) return;
+        let target = e.target.closest(".flexer");
+          target.classList.toggle("opened");
+      }
+      })
+    </script>
+  </body>
+</html>

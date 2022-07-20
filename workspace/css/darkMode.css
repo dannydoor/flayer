@@ -1,0 +1,660 @@
+body.dark-mode {
+  --color-base: #303030;
+  --color-base-1: #414141;
+  --color-base-2: #545454;
+  --color-base-3: #707070;
+  --color-ceil-2: #a9a9a9;
+  --color-ceil-1: #d9d9d9;
+  --color-ceil: #fff;
+  --color-base-blurred: rgba(30,30,30,0.7);
+  --color-base-1-blurred: rgba(41,41,41,0.7);
+  --color-base-2-blurred: rgba(54,54,54,0.7);
+  --color-primary-darker: #5253eb;
+  --color-primary-darker-blurred: rgba(82, 83, 235, 0.7);
+  --color-primary: #696af4;
+  --color-primary-blurred: rga(105, 106, 244, 0.7);
+  --color-primary-lighter: #7c7df0;
+  --color-primary-lightest: #9d9efe;
+  --color-secondary: #ff83a0;
+  --color-secondary-blurred: rgba(255, 131, 160, 0.7);
+  --color-secondary-darker: #ff678b;
+}
+
+/* blend-mode */
+.dark-mode .music-item .music-meatballs::after, 
+.dark-mode .music-item .music-add::after,
+.dark-mode .library-btn::before,
+.dark-mode .header .meatballs::after,
+.dark-mode .header .playlist-sort-btn::after {
+  mix-blend-mode: overlay;
+}
+
+/* background */
+.dark-mode #tab {
+  box-shadow: 8px 0 8px -4px rgb(0 0 0 / 25%);
+}
+
+.dark-mode #video-cover {
+  background: url("../assets/img/dark/main-logo-p.svg") no-repeat center/400px auto;
+  background-color: #202020;
+  box-shadow: inset 0px -9px 9px -6px rgb(0 0 0 / 50%);
+}
+
+.dark-mode #tab:not(.invisible) ~ #video-cover {
+  box-shadow: inset 9px -9px 9px -6px rgb(0 0 0 / 50%);
+}
+
+#open-menu:not(.active) {
+  background: url("../assets/img/dark/logo-w.svg") no-repeat center/64px;
+  background-color: var(--color-primary, #595ae2);
+}
+
+#open-menu.active {
+  background: url("../assets/img/dark/logo-p.svg") no-repeat center/64px;
+  background-color: #fff;
+}
+
+.dark-mode .close-button {
+  background: url("../assets/img/dark/clear-w.svg") no-repeat center/24px;
+}
+
+.dark-mode #open-menu:not(.active) {
+  background: url("../assets/img/dark/logo-w.svg") no-repeat center/64px;
+  background-color: var(--color-primary, #595ae2);
+}
+
+.dark-mode #open-library:not(.active) {
+  background: url("../assets/img/dark/library-p.svg") no-repeat center/40px;
+  background-color: #fff;
+}
+
+.dark-mode #open-library.active {
+  background: url("../assets/img/dark/library-w.svg") no-repeat center/40px;
+  background-color: var(--color-primary);
+}
+
+.dark-mode #open-playlist:not(.active) {
+  background: url("../assets/img/dark/playlist-p.svg") no-repeat center/40px;
+  background-color: #fff;
+}
+
+.dark-mode #open-playlist.active {
+  background: url("../assets/img/dark/playlist-w.svg") no-repeat center/40px;
+  background-color: var(--color-primary);
+}
+
+.dark-mode .tag-box .clear-search {
+  background: url("../assets/img/dark/clear-gd.svg") no-repeat center/16px;
+}
+
+.dark-mode .tag .remove-tag {
+  background: url("../assets/img/dark/clear-w.svg") no-repeat center/10px;
+}
+
+.dark-mode .search-opt-btn {
+  background-image: url("../assets/img/dark/tune-w.svg");
+}
+
+.dark-mode .sort-btn {
+  background-image: url("../assets/img/dark/sort-gd.svg");
+}
+
+.dark-mode .add-to-btn {
+  background-image: url("../assets/img/dark/add-to-playlist-gd.svg");
+}
+
+.dark-mode #selectable-add-btn {
+  background-image: url("../assets/img/dark/add-gd.svg");
+}
+
+.dark-mode .header .playlist-sort-btn {
+  background: url("../assets/img/dark/sort-w.svg") no-repeat center/24px;
+}
+
+.dark-mode .playlist-item.item:not(.item-playing) {
+  background-image: url("../assets/img/dark/playlist.svg");
+}
+
+.dark-mode .playlist-item.item.item-playing {
+  background-image: url("../assets/img/dark/playlist-p.svg");
+}
+
+.dark-mode .playlist-item.create-new {
+  background-image: url("../assets/img/dark/add-w.svg");
+}
+
+.dark-mode .playlist-item.create-new .playlist-name{
+  color: white;
+}
+
+.dark-mode .playlist-item.item::before {
+  background: url("../assets/img/dark/right-g.svg") no-repeat center/24px;
+}
+
+.dark-mode .playlist-item.item.item-playing::before {
+  background: url("../assets/img/dark/right-p.svg") no-repeat center/24px;
+}
+
+.dark-mode .header .hide-button {
+  background: url("../assets/img/dark/left-w.svg") no-repeat center/24px;
+}
+
+.dark-mode .header .meatballs {
+  background: url("../assets/img/dark/meatballs-w.svg") no-repeat center/24px;
+}
+
+.dark-mode .playlist-btns .play {
+  background-image: url("../assets/img/dark/play-w.svg");
+}
+
+.dark-mode .playlist-btns .shuffle {
+  background-image: url("../assets/img/dark/shuffle-w.svg");
+}
+
+.dark-mode .add-songs {
+  background-image: url("../assets/img/dark/add-p.svg");
+}
+
+.dark-mode .add-new-songs::before {
+  background: url("../assets/img/dark/add-p.svg") no-repeat center/24px;
+}
+
+.dark-mode #main-menu .header {
+  background: url("../assets/img/dark/main-logo-w.svg") no-repeat;
+  background-position: top 48px left 40px;
+  background-size: auto 48px;
+  background-color: var(--color-primary);
+}
+
+.dark-mode .big-item::after {
+  background: url("../assets/img/dark/right-g.svg") no-repeat center/24px;
+}
+
+.dark-mode .big-item.library {
+  background-image: url("../assets/img/dark/library.svg");
+}
+
+.dark-mode .big-item.playlist {
+  background-image: url("../assets/img/dark/playlist.svg");
+}
+
+.dark-mode .big-item.setting {
+  background-image: url("../assets/img/dark/setting.svg");
+}
+
+.dark-mode .big-item.shortcut {
+  background-image: url("../assets/img/dark/open.svg");
+}
+
+.dark-mode .big-item.help {
+  background-image: url("../assets/img/dark/help.svg");
+}
+
+.dark-mode .big-item:hover::after {
+  background: url("../assets/img/dark/right-p.svg") no-repeat center/24px;
+}
+
+.dark-mode .big-item:hover.library {
+  background-image: url("../assets/img/dark/library-p.svg");
+}
+
+.dark-mode .big-item:hover.playlist {
+  background-image: url("../assets/img/dark/playlist-p.svg");
+}
+
+.dark-mode .big-item:hover.setting {
+  background-image: url("../assets/img/dark/setting-p.svg");
+}
+
+.dark-mode .big-item:hover.shortcut {
+  background-image: url("../assets/img/dark/open-p.svg");
+}
+
+.dark-mode .big-item:hover.help {
+  background-image: url("../assets/img/dark/help-p.svg");
+}
+
+.dark-mode .input-name,
+.dark-mode .input-desc {
+  background-color: var(--color-base);
+}
+
+/* queue */
+
+.dark-mode #queue-state.active {
+  background: url("../assets/img/dark/linked-p.svg") no-repeat center/24px;
+}
+
+.dark-mode #queue-state:not(.active) {
+  background: url("../assets/img/dark/linked-gd.svg") no-repeat center/24px;
+}
+
+/* controller */
+
+.dark-mode #open-queue {
+  background: url("../assets/img/dark/list-p.svg") no-repeat center/36px;
+}
+
+.dark-mode #open-queue:hover {
+  background-color: var(--color-base-1);
+}
+
+.dark-mode #fullscreen-button {
+  background: url("../assets/img/dark/fullscreen-p.svg") no-repeat center/36px;
+}
+
+.dark-mode #fullscreen-button:disabled {
+  background: url("../assets/img/dark/fullscreen-g.svg") no-repeat center/36px;
+}
+
+.dark-mode #open-queue.active {
+  background: url("../assets/img/dark/list-w.svg") no-repeat center/36px;
+  background-color: var(--color-primary);
+}
+
+.dark-mode #repeat-button {
+  background: url("../assets/img/dark/repeat-w.svg") no-repeat center/24px;
+}
+
+.dark-mode #repeat-button:disabled,
+.dark-mode #repeat-button.active:disabled,
+.dark-mode #repeat-button.active.one:disabled {
+  background: url("../assets/img/dark/repeat-g.svg") no-repeat center/24px;
+}
+
+.dark-mode #repeat-button.active {
+  background: url("../assets/img/dark/repeat-w.svg") no-repeat center/24px;
+}
+
+.dark-mode #repeat-button.active.one {
+  background: url("../assets/img/dark/repeat-one-w.svg") no-repeat center/24px;
+}
+
+.dark-mode #shuffle-button {
+  background: url("../assets/img/dark/shuffle-w.svg") no-repeat center/24px;
+}
+
+.dark-mode #shuffle-button:disabled,
+.dark-mode #shuffle-button.active:disabled {
+  background: url("../assets/img/dark/shuffle-g.svg") no-repeat center/24px;
+}
+
+.dark-mode #shuffle-button.active {
+  background: url("../assets/img/dark/shuffle-w.svg") no-repeat center/24px;
+}
+
+.dark-mode #prev-button {
+  background: url("../assets/img/dark/prev.svg") no-repeat center/36px;
+}
+
+.dark-mode #prev-button:disabled {
+  background: url("../assets/img/dark/prev-g.svg") no-repeat center/36px;
+}
+
+.dark-mode #next-button {
+  background: url("../assets/img/dark/next.svg") no-repeat center/36px;
+}
+
+.dark-mode #next-button:disabled {
+  background: url("../assets/img/dark/next-g.svg") no-repeat center/36px;
+}
+
+.dark-mode #play-or-pause.play {
+  background: url("../assets/img/dark/play.svg") no-repeat center/36px;
+}
+
+.dark-mode #play-or-pause.play:disabled {
+  background: url("../assets/img/dark/play-g.svg") no-repeat center/36px;
+}
+
+.dark-mode #play-or-pause.pause {
+  background: url("../assets/img/dark/pause.svg") no-repeat center/36px;
+}
+
+.dark-mode #play-or-pause.pause:disabled {
+  background: url("../assets/img/dark/pause-g.svg") no-repeat center/36px;
+}
+
+.dark-mode #mute-button {
+  background: url("../assets/img/dark/mute-gdd.svg") no-repeat center/16px;
+}
+
+.dark-mode #mute-button:hover {
+  background: url("../assets/img/dark/mute-p.svg") no-repeat center/16px;
+}
+
+.dark-mode #volume-button {
+  background: url("../assets/img/dark/volume-up-gdd.svg") no-repeat center/16px;
+}
+
+.dark-mode #open-curr-playlist {
+  background: url("../assets/img/dark/playlist-p.svg") no-repeat center/24px;
+}
+
+.dark-mode #open-curr-playlist:disabled {
+  background: url("../assets/img/dark/playlist-g.svg") no-repeat center/24px;
+}
+
+.dark-mode #like-this-button {
+  background: url("../assets/img/dark/like-s.svg") no-repeat center/24px;
+}
+
+.dark-mode #like-this-button:active:not(:disabled) {
+  background: url("../assets/img/dark/like-sd.svg") no-repeat center/24px;
+}
+
+.dark-mode #like-this-button:disabled {
+  background: url("../assets/img/dark/like-g.svg") no-repeat center/24px;
+}
+
+.dark-mode #like-this-button.liked {
+  background: url("../assets/img/dark/liked-s.svg") no-repeat center/24px;
+}
+
+.dark-mode #like-this-button.liked:active {
+  background: url("../assets/img/dark/liked-sd.svg") no-repeat center/24px;
+}
+
+.dark-mode #like-this-button.liked:disabled {
+  background: url("../assets/img/dark/liked-g.svg") no-repeat center/24px;
+}
+
+.dark-mode #meatballs-button {
+  background: url("../assets/img/dark/meatballs-g.svg") no-repeat center/24px;
+}
+
+.dark-mode #meatballs-button:active:not(:disabled) {
+  background: url("../assets/img/dark/meatballs-gd.svg") no-repeat center/24px;
+  background-color: var(--color-base-2);
+}
+
+/* music-item */
+.dark-mode .music-item.library:not(.playing):hover .front-indicator,
+.dark-mode .music-item.playlist:not(.playing):hover .front-indicator,
+.dark-mode .music-item.record:not(.playing):hover .front-indicator,
+.dark-mode .music-item.queue:not(.playing):hover .front-indicator{
+  background: url("../assets/img/dark/play-p.svg") no-repeat center/16px;
+}
+
+.dark-mode .music-item.library.playing .front-indicator,
+.dark-mode .music-item.playlist.playing .front-indicator {
+  background: url("../assets/img/dark/note-p.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-meatballs {
+  background: url("../assets/img/dark/meatballs-g.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-meatballs:hover  {
+  background: url("../assets/img/dark/meatballs-gd.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-add {
+  background: url("../assets/img/dark/add-gd.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-add:hover {
+  background: url("../assets/img/dark/add-p.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-drag {
+  background: url("../assets/img/dark/drag.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-delete {
+  background: url("../assets/img/dark/delete-gd.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-delete:hover {
+  background: url("../assets/img/dark/delete-s.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-delete:active {
+  background: url("../assets/img/dark/delete-sd.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item .music-select {
+  background: url("../assets/img/dark/add-g.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item.selected .music-select {
+  background: url("../assets/img/dark/done-p.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item.active:not(.playing):hover .front-indicator {
+  background: url("../assets/img/dark/play-w.svg") no-repeat center/16px;
+}
+
+.dark-mode .music-item.active.playing .front-indicator {
+  background: url("../assets/img/dark/note-w.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item.active::after {
+  background-color: transparent;
+}
+
+.dark-mode .music-item.active .music-add {
+  background: url("../assets/img/dark/add-w.svg") no-repeat center/24px;
+}
+
+.dark-mode .music-item.active .music-meatballs {
+  background: url("../assets/img/dark/meatballs-w.svg") no-repeat center/24px;
+}
+
+/* contextmenu */
+
+.dark-mode .contextmenu.menu .item.checked {
+  background-image: url("../assets/img/dark/done-p.svg");
+}
+
+.dark-mode .contextmenu .item.create {
+  background-image: url("../assets/img/dark/add.svg");
+}
+
+.dark-mode .contextmenu .item.file {
+  background-image: url("../assets/img/dark/file.svg");
+}
+
+.dark-mode .contextmenu .item.hide {
+  background-image: url("../assets/img/dark/hide-s.svg");
+}
+
+.dark-mode .contextmenu .item.to-playlist {
+  background-image: url("../assets/img/dark/add-to-playlist.svg");
+}
+
+.dark-mode .contextmenu .item.edit {
+  background-image: url("../assets/img/dark/edit.svg");
+}
+
+.dark-mode .contextmenu .item.delete {
+  background-image: url("../assets/img/dark/delete-s.svg");
+}
+
+.dark-mode .contextmenu .item.download {
+  background-image: url("../assets/img/dark/download.svg");
+}
+
+.dark-mode .contextmenu .item.next {
+  background-image: url("../assets/img/dark/add-before.svg");
+}
+
+.dark-mode .contextmenu .item.later {
+  background-image: url("../assets/img/dark/add-next.svg");
+}
+
+.dark-mode [is-liked="false"] .contextmenu .item.like {
+  background-image: url("../assets/img/dark/like.svg");
+}
+
+.dark-mode [is-liked="true"] .contextmenu .item.like {
+  background-image: url("../assets/img/dark/dislike.svg");
+}
+
+.dark-mode .contextmenu .item.show:not(.disabled) {
+  background-image: url("../assets/img/dark/playlist.svg");
+}
+
+.dark-mode .contextmenu .item.show.disabled {
+  background-image: url("../assets/img/dark/playlist-g.svg");
+}
+
+.dark-mode .contextmenu .item:hover {
+  background-color: var(--color-base-1);
+}
+
+/* popup */
+
+.dark-mode .popup.added {
+  background: url("../assets/img/dark/add-before-wb.svg") no-repeat center/300px auto;
+}
+
+.dark-mode .popup.liked {
+  background: url("../assets/img/dark/like-wb.svg") no-repeat center/300px auto;
+}
+
+.dark-mode .popup.disliked {
+  background: url("../assets/img/dark/dislike-wb.svg") no-repeat center/300px auto;
+}
+
+.dark-mode .popup.next {
+  background: url("../assets/img/dark/add-before-wb.svg") no-repeat center/300px auto;
+}
+
+.dark-mode .popup.later {
+  background: url("../assets/img/dark/add-next-wb.svg") no-repeat center/300px auto;
+}
+
+.dark-mode .setting-btn[data-func="upload-db"],
+.dark-mode .setting-btn[data-func="upload-ls"] {
+  background-image: url("../assets/img/dark/file-p.svg");
+}
+
+.dark-mode .setting-btn[data-func="download-ls"] {
+  background-image: url("../assets/img/dark/download-p.svg");
+}
+
+.dark-mode .setting-bt [data-func="reset-ls"] {
+  background-image: url("../assets/img/dark/delete-s.svg");
+}
+
+.dark-mode .setting-btn[data-func="manage-hided"] {
+  background-image: url("../assets/img/dark/setting-p.svg");
+}
+
+/* etc. */
+
+.dark-mode .music-item:nth-child(2n) {
+  background-color: #353535;
+}
+
+.dark-mode .music-item:nth-child(2n):hover {
+  background-color: var(--color-base-1);
+}
+
+.dark-mode .music-item:nth-child(2n).active,
+.dark-mode .music-item:nth-child(2n).active:hover {
+  background-color: var(--color-primary);
+}
+
+.dark-mode .music-item:nth-child(2n).active:active {
+  background-color: var(--color-primary-darker);
+}
+
+.dark-mode #repeat-button:hover:not(:disabled),
+.dark-mode #shuffle-button:hover:not(:disabled) {
+  background-color: var(--color-base-1, #F5F5F5);
+}
+
+.dark-mode #repeat-button:active,
+.dark-mode #shuffle-button:active {
+  background-color: var(--color-base-2, #EBEBEB);
+}
+
+.dark-mode #repeat-button.active:not(:disabled),
+.dark-mode #repeat-button.one.active:not(:disabled),
+.dark-mode #shuffle-button.active:not(:disabled) {
+  background-color: var(--color-primary, #595ae2);
+}
+
+.dark-mode #repeat-button.active:hover:not(:disabled),
+.dark-mode #shuffle-button.active:hover:not(:disabled) {
+  background-color: var(--color-primary-lighter);
+}
+
+.dark-mode #repeat-button.active:active:not(:disabled),
+.dark-mode #shuffle-button.active:active:not(:disabled) {
+  background-color: var(--color-primary-lightest);
+}
+
+.dark-mode .music-item .music-meatballs:hover::after, 
+.dark-mode .music-item .music-add:hover::after{
+  background-color: #a9a9a9;
+}
+
+.dark-mode .contextmenu .item::after {
+  mix-blend-mode: overlay;
+  background-color: #a9a9a9;
+}
+
+.dark-mode .library-btn:hover::before {
+  background-color: #a9a9a9;
+}
+
+.dark-mode .library-btn:active::before {
+  background-color: #bebebe;
+}
+
+.dark-mode .contextmenu.menu .contour {
+  mix-blend-mode: overlay;
+  background-color: #a9a9a9;
+}
+
+.dark-mode #tab:not(.invisible) ~ .control-panel {
+  box-shadow: 0 -6px 6px -2px rgba(0, 0, 0, 0.25);
+}
+
+.dark-mode .tooltip {
+  background-color: #383838;
+}
+
+.dark-mode .tooltip::before {
+  border-color: #383838 transparent transparent transparent;
+  filter: drop-shadow(0 12px 8px rgba(0,0,0,0.5));
+}
+
+.dark-mode #queue-state .tooltip::before {
+  border-color: transparent transparent #383838 transparent;
+}
+
+
+.dark-mode .header .meatballs:hover::after,
+.dark-mode .header .playlist-sort-btn:hover::after {
+  background-color: #a9a9a9;
+}
+
+.dark-mode .header .meatballs:active::after, 
+.dark-mode .header .playlist-sort-btn:active::after {
+  background-color: #bebebe;
+}
+
+.dark-mode .modal .buttons-right button:not(.fill) {
+  color: var(--color-primary-lighter);
+}
+
+.dark-mode .contextmenu .item {
+  background-color: #383838;
+}
+
+.dark-mode .search-sample-content div:hover {
+  background-color: var(--color-base-2);
+}
+
+.dark-mode .setting-desc {
+  color: var(--color-ceil-2);
+}
+
+.dark-mode .buttons-right button:disabled,
+.dark-mode .modal .buttons-right button:disabled {
+  background-color: var(--color-base-3);
+}

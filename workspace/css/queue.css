@@ -1,5 +1,5 @@
 #queue-container {
-  z-index: 9999;
+  z-index: 1000;
 }
 
 .queue-item-header{
@@ -15,7 +15,7 @@
   background-color: var(--color-base-2-blurred, rgba(235, 235, 235, 0.7));
   backdrop-filter: blur(12px);
   scroll-snap-align: start;
-  z-index: 99999;
+  z-index: 10000;
 }
 
 .queue-desc {
@@ -56,6 +56,10 @@
   min-height: calc(100vh - 168px);
 }
 
+.tab-container+#queue-container #queue-content {
+  min-height: calc(100vh - 288px);
+}
+
 #queue-content .music-item {
   display: none;
 }
@@ -64,21 +68,21 @@
   display: flex;
 }
 
-#queue-status {
+#queue-state {
   position: relative;
   width: 24px;
   height: 24px;
 }
 
-#queue-status.active {
-  background: url("../assets/img/24px/Linked-p.svg") no-repeat center/24px;
+#queue-state.active {
+  background: url("../assets/img/default/linked-p.svg") no-repeat center/24px;
 }
 
-#queue-status:not(.active) {
-  background: url("../assets/img/24px/Linked-gd.svg") no-repeat center/24px;
+#queue-state:not(.active) {
+  background: url("../assets/img/default/linked-gd.svg") no-repeat center/24px;
 }
 
-#queue-status .tooltip {
+#queue-state .tooltip {
   width: 160px;
   height: 96px;
   top: calc(100% + 20px);
@@ -88,28 +92,29 @@
   z-index: 1000;
 }
 
-#queue-status.active .tooltip.on.visible,
-#queue-status:not(.active) .tooltip.off.visible {
+#queue-state.active .tooltip.on.visible,
+#queue-state:not(.active) .tooltip.off.visible {
   visibility: visible;
   opacity: 1;
 }
 
-#queue-status.active .tooltip.off.visible,
-#queue-status:not(.active) .tooltip.on.visible {
+#queue-state.active .tooltip.off.visible,
+#queue-state:not(.active) .tooltip.on.visible {
   visibility: hidden;
   opacity: 0;
 }
 
-#queue-status .tooltip.on .tooltip-header {
+#queue-state .tooltip.on .tooltip-header {
   color: var(--color-primary, #595ae2);
 }
 
-#queue-status .tooltip-desc p {
+#queue-state .tooltip-desc p {
   font: 400 12px/16px "NotoSans";
   letter-spacing: -0.02em;
+  color: var(--color-ceil);
 }
 
-#queue-status .tooltip::before {
+#queue-state .tooltip::before {
   content: '';
   box-sizing: border-box;
   position: absolute;

@@ -4,7 +4,7 @@ class MusicItem extends HTMLDivElement {
     this.context = "";
     this._builder = this._builder.bind(this);
     this._setInnerText = this._setInnerText.bind(this);
-    this._updateLikeStatus = this._updateLikeStatus.bind(this);
+    this.toggleLikeState = this.toggleLikeState.bind(this);
 
     if (this.getAttribute("music-id")) this.updateProp();
   }
@@ -32,15 +32,26 @@ class MusicItem extends HTMLDivElement {
     songArtist.innerHTML = artist + " · " + songDuration;
   }
 
-  _updateLikeStatus() {
-    let id = this.getAttribute("music-id");
-    let musics = document.querySelectorAll(`[music-id=${id}]`);
-    let currentLike = this.getAttribute("is-liked");
+  toggleLikeState() {
+    let id = this.getAttribute("music-id"),
+      musics = document.querySelectorAll(`[music-id="${id}"]`),
+      currentLike = this.referencedObj.isLiked,
+      isPlaying = this.referencedObj.isPlaying;
 
-    musics.forEach((item) => {
-      if (item.getAttribute("is-liked") == currentLike) return;
-      item.setAttribute("is-liked", currentLike);
-    });
+    if (isPlaying) window["like-this-button"].click();
+    else {
+      musics.forEach((item) => {
+        item.setAttribute("is-liked", !currentLike);
+      });
+      this.referencedObj.isLiked = !currentLike;
+    }
+
+    // 토스트 표시
+    if (this.referencedObj.isLiked) {
+      PopupManager.createToast("liked");
+    } else {
+      PopupManager.createToast("disliked");
+    }
   }
 
   get musicObj() {
@@ -112,7 +123,13 @@ class MusicItem extends HTMLDivElement {
     this.isNew = this.getAttribute("music-id");
     this.context = this.getAttribute("context");
     if (this.getAttribute("index")) this.index = this.getAttribute("index");
-    this.referencedObj = objTable[this.musicId];
+    this.referencedObj = DbManager.db[this.musicId]
+      ? DbManager.db[this.musicId]
+      : DbManager.db[this.musicId + "#"]
+      ? DbManager.db[this.musicId + "#"]
+      : DbManager.db[this.musicId.slice(-1)]
+      ? DbManager.db[this.musicId.slice(-1)]
+      : undefined;
   }
 
   bindHandler() {}
@@ -153,10 +170,17 @@ class PlayableItem extends MusicItem {
     QueueManager.playThis(this.referencedObj, this.context);
   }
 
-  _addToPlaylistForButton(e) {
+  onContextMenu(e) {
     e.preventDefault();
+    e.stopPropagation();
+    let elem = e.target.closest(".music-item");
+    ContextmenuManager.addItemContextmenu(elem);
+  }
 
-    // playlistManager.addToPlaylist([this.referencedObj]); // 플레이리스트 매니저의 플레이리스트 추가 함수
+  onClickAddToPlaylist(e) {
+    e.preventDefault();
+    let id = e.target.closest(".music-item").getAttribute("music-id");
+    PlaylistManager.addToPlaylist(id);
   }
 
   bindHandler() {
@@ -164,7 +188,11 @@ class PlayableItem extends MusicItem {
     this.ondblclick = this.onDblclick.bind(this);
 
     const addButton = this.querySelector(".music-add");
-    addButton.onclick = this._addToPlaylistForButton.bind(this);
+    addButton.onclick = this.onClickAddToPlaylist.bind(this);
+
+    const meatballs = this.querySelector(".music-meatballs");
+    meatballs.onclick = this.onContextMenu.bind(this);
+    this.oncontextmenu = this.onContextMenu.bind(this);
   }
 }
 
@@ -184,23 +212,6 @@ class LibraryItem extends PlayableItem {
     this.setAttribute("context", this.context);
 
     this.bindHandler();
-  }
-
-  onContextMenu(e) {
-    e.preventDefault();
-
-    QueueManager.playNext(this.referencedObj, this.context);
-    /* let contextMenu = document.createElement("library-context");
-    contextMenu.setup(this);
-    this.append(contextMenu); */ // 컨텍스트 메뉴 만들어 추가.
-  }
-
-  bindHandler() {
-    super.bindHandler();
-
-    const meatballs = this.querySelector(".music-meatballs");
-    meatballs.onclick = this.onContextMenu.bind(this);
-    this.oncontextmenu = this.onContextMenu.bind(this);
   }
 }
 
@@ -228,19 +239,10 @@ class RecordItem extends PlayableItem {
     QueueManager.playRecord(this.musicObj);
   }
 
-  onContextMenu(e) {
-    e.preventDefault();
-    // 컨텍스트 메뉴
-  }
-
   bindHandler() {
     super.bindHandler();
 
-    this.onclick = this.onClick.bind(this);
-
-    const meatballs = this.querySelector(".music-meatballs");
-    meatballs.onclick = this.onContextMenu.bind(this);
-    this.oncontextmenu = this.onContextMenu.bind(this);
+    this.onclick = this.ondblclick = this.onClick.bind(this);
   }
 }
 
@@ -273,21 +275,6 @@ class PlaylistItem extends PlayableItem {
     this.index = index;
     this.querySelector(".front-indicator").innerHTML = index;
   }
-
-  onContextMenu(e) {
-    e.preventDefault();
-    /* let contextMenu = document.createElement("playlist-context");
-    contextMenu.setup(this);
-    this.append(contextMenu); */ // 컨텍스트 메뉴 생성
-  }
-
-  bindHandler() {
-    super.bindHandler();
-
-    let meatballs = this.querySelector(".music-meatballs");
-    meatballs.onclick = this.onContextMenu.bind(this);
-    this.oncontextmenu = this.onContextMenu.bind(this);
-  }
 }
 
 class QueueItem extends MusicItem {
@@ -307,7 +294,7 @@ class QueueItem extends MusicItem {
     this.context = context;
     this.classList.add("queue");
     if (!index) {
-      this.index = hash(Math.floor(Math.random() * Date.now()) + obj.id);
+      this.index = hash(Math.floor(Math.random() * Date.now()));
     } else {
       this.index = index;
     }
@@ -334,18 +321,16 @@ class QueueItem extends MusicItem {
 
   onContextMenu(e) {
     e.preventDefault();
-
-    QueueManager.playNext(this.musicObj, this.getAttribute("context"));
-    /* let contextMenu = document.createElement("queue-context");
-    contextMenu.setup(this);
-    this.append(contextMenu); */
+    e.stopPropagation();
+    let elem = e.target.closest(".music-item");
+    ContextmenuManager.addItemContextmenu(elem);
   }
 
   bindHandler() {
     super.bindHandler();
 
     this.onclick = this.onClick.bind(this);
-    this.oncontextmenu = this.onContextMenu.bind(this);
+    this.oncontextmenu = this.onContextMenu;
 
     let deleteButton = this.querySelector(".music-delete");
     deleteButton.onclick = this._deleteMusic.bind(this);
@@ -374,7 +359,7 @@ class EditingItem extends MusicItem {
   _deleteMusic(e) {
     e.preventDefault();
 
-    this.remove();
+    playlistManager?.editManager.deleteSong(this);
   }
 
   bindHandler() {
@@ -384,32 +369,36 @@ class EditingItem extends MusicItem {
     deleteButton.onclick = this._deleteMusic.bind(this);
     let dragButton = this.querySelector(".music-drag");
     dragButton.onclick = (e) => e.preventDefault();
+    this.oncontextmenu = (e) => e.preventDefault();
   }
 }
 
 class SelectableItem extends MusicItem {
   constructor() {
     super();
+
+    if (this.getAttribute("music-id")) {
+      this.bindHandler();
+    }
   }
 
   setup(obj) {
     this._builder("selectable");
-    this.isSelected = false;
     super.setup(obj);
     this.classList.add("selectable");
 
     this.bindHandler();
   }
 
-  _toggleSelectedStatus(e) {
-    this.isSelected = !this.isSelected;
-    this.classList.toggle("selected");
-    // this.index = selectableManager.addOrClear(this.referencedObj, this.index) => 인덱스가 undefined이면 스택에 추가, 새로운 인덱스를 반환, 인덱스가 있으면 해당 인덱스의 아이템 삭제 후 undefined 반환.
+  _onclick() {
+    let id = this.getAttribute("music-id");
+    playlistManager?.selectableManager.toggleSelectedState(id);
   }
 
   bindHandler() {
     super.bindHandler();
-    this.onclick = this._toggleSelectedStatus.bind(this);
+    this.onclick = this._onclick.bind(this);
+    this.oncontextmenu = (e) => e.preventDefault();
   }
 }
 

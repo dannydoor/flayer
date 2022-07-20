@@ -7,12 +7,18 @@
   margin: 0;
   padding: 12px 16px 12px 4px;
   background-color: var(--color-base, #fff);
-  /* backdrop-filter: blur(16px); */
+  border-radius: 4px;
 }
 
 .music-item,
 .music-item * {
   transition: none;
+}
+
+.music-item.queue,
+.music-item.record,
+.music-item.selectable {
+  cursor: pointer;
 }
 
 .music-item::after {
@@ -56,13 +62,13 @@
 .music-item.playlist:not(.playing):hover .front-indicator,
 .music-item.record:not(.playing):hover .front-indicator,
 .music-item.queue:not(.playing):hover .front-indicator{
-  background: url("../assets/img/16px/Play-p.svg") no-repeat center/16px;
+  background: url("../assets/img/default/play-p.svg") no-repeat center/16px;
   color: transparent;
 }
 
 .music-item.library.playing .front-indicator,
 .music-item.playlist.playing .front-indicator {
-  background: url("../assets/img/24px/Note-p.svg") no-repeat center/24px;
+  background: url("../assets/img/default/note-p.svg") no-repeat center/24px;
   color: transparent;
 }
 
@@ -107,12 +113,17 @@
 }
 
 .music-item .button-field {
+  position: relative;
   display: flex;
   flex-direction: row-reverse;
   width: 56px;
   height: 24px;
   align-items: center;
   margin-left: 8px;
+}
+
+.music-item button {
+  cursor: pointer;
 }
 
 .music-item .button-field button:not(.music-select) {
@@ -124,12 +135,13 @@
   border-radius: 50%;
 }
 
-.music-item:hover .button-field button {
+.music-item:hover .button-field button,
+.music-item .contextmenu {
   visibility: visible;
 }
 
 .music-item .music-meatballs {
-  background: url("../assets/img/24px/Meatballs-g.svg") no-repeat center/24px;
+  background: url("../assets/img/default/meatballs-g.svg") no-repeat center/24px;
   margin-left: 8px;
 }
 
@@ -159,38 +171,39 @@
 
 .music-item .music-meatballs:hover  {
   visibility: visible;
-  background: url("../assets/img/24px/Meatballs-gd.svg") no-repeat center/24px;
+  background: url("../assets/img/default/meatballs-gd.svg") no-repeat center/24px;
 }
 
 .music-item .music-add {
-  background: url("../assets/img/24px/Add-gd.svg") no-repeat center/24px;
+  background: url("../assets/img/default/add-gd.svg") no-repeat center/24px;
 }
 
 .music-item .music-add:hover {
   visibility: visible;
-  background: url("../assets/img/24px/Add-p.svg") no-repeat center/24px;
+  background: url("../assets/img/default/add-p.svg") no-repeat center/24px;
 }
 
 .music-item .music-drag {
+  position: relative;
   display: block;
   width: 24px;
   height: 24px;
-  background: url("../assets/img/24px/Drag.svg") no-repeat center/24px;
+  background: url("../assets/img/default/drag.svg") no-repeat center/24px;
   margin-left: 8px;
 }
 
 .music-item .music-delete {
-  background: url("../assets/img/24px/Delete-gd.svg") no-repeat center/24px;
+  background: url("../assets/img/default/delete-gd.svg") no-repeat center/24px;
 }
 
 .music-item .music-delete:hover {
   visibility: visible;
-  background: url("../assets/img/24px/Delete-s.svg") no-repeat center/24px;
+  background: url("../assets/img/default/delete-s.svg") no-repeat center/24px;
 }
 
 .music-item .music-delete:active {
   visibility: visible;
-  background: url("../assets/img/24px/Delete-sd.svg") no-repeat center/24px;
+  background: url("../assets/img/default/delete-sd.svg") no-repeat center/24px;
 }
 
 .music-item.selected * {
@@ -201,7 +214,7 @@
   display: block;
   width: 24px;
   height: 24px;
-  background: url("../assets/img/24px/Add-g.svg") no-repeat center/24px;
+  background: url("../assets/img/default/add-g.svg") no-repeat center/24px;
   margin-left: 8px;
 }
 
@@ -209,7 +222,7 @@
   display: block;
   width: 24px;
   height: 24px;
-  background: url("../assets/img/24px/Done-p.svg") no-repeat center/24px;
+  background: url("../assets/img/default/done-p.svg") no-repeat center/24px;
 }
 
 .music-item.active,
@@ -221,17 +234,21 @@
   background-color: var(--color-primary-darker);
 }
 
+.music-item.active .front-indicator {
+  color: white;
+}
+
 .music-item.active .song-artist,
 .music-item.active .song-title {
   color: white !important;
 }
 
 .music-item.active:not(.playing):hover .front-indicator {
-  background: url("../assets/img/16px/Play-w.svg") no-repeat center/16px;
+  background: url("../assets/img/default/play-w.svg") no-repeat center/16px;
 }
 
 .music-item.active.playing .front-indicator {
-  background: url("../assets/img/24px/Note-w.svg") no-repeat center/24px;
+  background: url("../assets/img/default/note-w.svg") no-repeat center/24px;
 }
 
 .music-item.active::after {
@@ -239,11 +256,11 @@
 }
 
 .music-item.active .music-add {
-  background: url("../assets/img/24px/Add-w.svg") no-repeat center/24px;
+  background: url("../assets/img/default/add-w.svg") no-repeat center/24px;
 }
 
 .music-item.active .music-meatballs {
-  background: url("../assets/img/24px/Meatballs-w.svg") no-repeat center/24px;
+  background: url("../assets/img/default/meatballs-w.svg") no-repeat center/24px;
 }
 
 .music-item.active .music-meatballs::after,

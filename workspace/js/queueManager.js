@@ -1,6 +1,6 @@
 class QueueManager {
   constructor(
-    queueStatus = true,
+    queueState = true,
     recordStack = null,
     queueRepo = null,
     queue = null,
@@ -9,7 +9,7 @@ class QueueManager {
     // 큐 요소와 프로퍼티 대응
     this.record = window["record-stack"];
     this.queue = window["queue-content"];
-    this.statusIndicator = window["queue-status"];
+    this.stateIndicator = window["queue-state"];
     this.clearButton = window["clear-record"];
     this.currPlaylistName = window["curr-playlist-name"];
     if (queueRepo) {
@@ -17,9 +17,12 @@ class QueueManager {
         ? queueRepo.cloneNode(true)
         : null;
     }
-    this.queueStatus = queueStatus;
+    this.queueState = queueState;
+    this.tempObj = undefined;
+    this.tempContext = undefined;
 
     // 메소드 바인딩
+    QueueManager.moveNext = QueueManager.moveNext.bind(this);
     QueueManager.playNext = QueueManager.playNext.bind(this);
     QueueManager.playLater = QueueManager.playLater.bind(this);
     QueueManager.playThis = QueueManager.playThis.bind(this);
@@ -33,11 +36,12 @@ class QueueManager {
     QueueManager.pushRecordStack = QueueManager.pushRecordStack.bind(this);
     QueueManager.makeUpLibraryItem = QueueManager.makeUpLibraryItem.bind(this);
     QueueManager.deleteQueueItem = QueueManager.deleteQueueItem.bind(this);
+    QueueManager.deletePlaylist = QueueManager.deletePlaylist.bind(this);
     QueueManager._onReorder = QueueManager._onReorder.bind(this);
     this._mapManager = this._mapManager.bind(this);
     this._clearQueue = this._clearQueue.bind(this);
     this._clearBeforeAfter = this._clearBeforeAfter.bind(this);
-    this._clearRecord = this._clearRecord.bind(this);
+    this.clearRecord = this.clearRecord.bind(this);
     this._applyToQueue = this._applyToQueue.bind(this);
     this._chooseRandom = this._chooseRandom.bind(this);
     this._shuffleQueue = this._shuffleQueue.bind(this);
@@ -48,21 +52,23 @@ class QueueManager {
     if (queue) this.queue.append(queue);
     recordStack = null;
     queue = null;
-    this._updateQueueStatus(queueStatus);
+    this._updateQueueState(queueState);
 
     setTimeout(() => {
       this.scrollWrapper = window["queue-container"].querySelector(
         ".simplebar-content-wrapper"
       );
       this.updateScroll();
-    }, 200);
+    }, 300);
 
     // 핸들러 달기 및 slip.js 적용
-    this.statusIndicator.onmouseover = this._onMouseOverTooltip;
-    this.statusIndicator.onmouseleave = this._onMouseLeaveTooltip;
-    this.clearButton.onclick = this._clearRecord.bind(this);
-    document.querySelector("#queue-container .close-button").onclick = () =>
-      window["open-queue"].click();
+    this.stateIndicator.onmouseover = this._onMouseOverTooltip;
+    this.stateIndicator.onmouseleave = this._onMouseLeaveTooltip;
+    this.currPlaylistName.ondblclick = () => {
+      window["open-playlist"].click();
+      TabManager.showContent(controller.currentInfo.context.slice(9));
+    };
+    this.clearButton.onclick = () => PopupManager.createModal("clear-record");
     this._setupQueueSlip();
   }
 
@@ -80,13 +86,13 @@ class QueueManager {
 
   // public 메소드
   static playNext(info, context, isShuffled = false, startId = null) {
-    if (this.queueStatus) this._updateQueueStatus(false);
+    if (this.queueState) this._updateQueueState(false);
 
     let currentMusicInQueue = QueueManager.currentMusic;
-    let currentIndex = currentMusicInQueue.index;
-    let currentMusicInRepo = this.queueRepo.querySelector(
-      `[index="${currentIndex}"]`
-    );
+    let currentIndex = currentMusicInQueue?.index;
+    let currentMusicInRepo = currentIndex
+      ? this.queueRepo.querySelector(`[index="${currentIndex}"]`)
+      : undefined;
     let tempFragment = new DocumentFragment();
 
     if (Array.isArray(info)) {
@@ -99,7 +105,11 @@ class QueueManager {
       tempFragment.append(elem);
     }
 
-    currentMusicInRepo.after(tempFragment.cloneNode(true));
+    if (currentMusicInRepo) {
+      currentMusicInRepo.after(tempFragment.cloneNode(true));
+    } else {
+      this.queueRepo.append(tempFragment.cloneNode(true));
+    }
 
     if (isShuffled) {
       let arr = Array.from(tempFragment);
@@ -111,25 +121,54 @@ class QueueManager {
       // 플레이리스트로부터 처음으로 재생할 음악의 id를 전달받아 이를 첫번째 요소로 올림.
       let nextMusic = tempFragment.querySelector(`[music-id="${startId}"]`);
       if (isShuffled) tempFragment.prepend(nextMusic);
-      currentMusicInQueue.after(tempFragment);
+
+      if (currentMusicInQueue) {
+        currentMusicInQueue.after(tempFragment);
+      } else {
+        this.queue.append(tempFragment);
+        Controller.playMusic();
+        return;
+      }
 
       Controller.updateMusicToPlay(nextMusic);
       Controller.updateByQueueChange();
 
       tempFragment = null;
+
+      // 토스트
+      PopupManager.createToast("next");
       return;
     }
 
-    currentMusicInQueue.after(tempFragment);
+    if (currentMusicInQueue) {
+      currentMusicInQueue.after(tempFragment);
+    } else {
+      this.queue.append(tempFragment);
+      Controller.playMusic();
+      return;
+    }
+
     tempFragment = null;
 
     Controller.updateByQueueChange();
     this.updateScroll();
+
+    // 토스트
+    PopupManager.createToast("next");
     return;
   }
 
+  static moveNext(elem) {
+    if (!controller.isShuffled && this.queueState)
+      this._updateQueueState(false);
+
+    QueueManager.currentMusic.after(elem);
+    Controller.updateByQueueChange();
+    this.updateScroll();
+  }
+
   static playLater(info, context) {
-    if (this.queueStatus) this._updateQueueStatus(false);
+    if (this.queueState) this._updateQueueState(false);
 
     let tempFragment = new DocumentFragment();
 
@@ -146,6 +185,13 @@ class QueueManager {
     this.queueRepo.append(tempFragment.cloneNode(true));
     this.queue.append(tempFragment);
     tempFragment = null;
+
+    if (!QueueManager.currentMusic) {
+      Controller.playMusic();
+    }
+
+    // 토스트
+    PopupManager.createToast("later");
     return;
   }
 
@@ -163,7 +209,7 @@ class QueueManager {
     currentDeletionChecker = currentDeletionChecker.bind(this);
     clearQueueData = clearQueueData.bind(this);
 
-    if (this.queueStatus) {
+    if (this.queueState) {
       // 큐 저장소가 온전히 플레이리스트의 것.
       this._repositoryBuilder(fullList, context);
       let [deleteList] = currentDeletionChecker();
@@ -337,107 +383,13 @@ class QueueManager {
   }
 
   static playThis(obj, context) {
-    let isExistingKept = false;
-    clearQueue = clearQueue.bind(this);
-    let isLibrary = context.startsWith("library"),
-      isFiltered =
-        window["library-container"].classList.contains("searching") ||
-        window["library-container"].classList.contains("only-liked") ||
-        window["library-container"].classList.contains("only-new");
+    this.tempObj = obj;
+    this.tempContext = context;
 
-    if (!this.queueStatus) {
-      let howToHandleExistingQueue = modalManager.createModal("queue-play");
-      // 모달 매니저가 기존의 재생 대기열을 비울 건지에 대한 모달을 띄우고 대답을 기다리는 프로미스를 생성 후 대답 반환.
-      if (howToHandleExistingQueue == "canceled") {
-        return;
-      } else if (howToHandleExistingQueue == "clear") {
-        clearQueue();
-        this._updateQueueStatus(true);
-      } else if (howToHandleExistingQueue == "keep") {
-        isExistingKept = true;
-      }
+    if (!this.queueState) {
+      PopupManager.createModal("queue");
     } else {
-      clearQueue();
-    }
-
-    if (isExistingKept) {
-      if (isLibrary) {
-        // 라이브러리 요소의 경우 그 음악만 나중에 재생.
-        if (isFiltered) {
-          let contextMusics = libraryManager.getFilteredContents();
-          QueueManager.playNext(
-            contextMusics,
-            context,
-            controller.isShuffled,
-            obj.id
-          );
-        } else {
-          QueueManager.playNext(obj, context);
-          controller.nextButton.click();
-        }
-        return;
-      } else {
-        // 플레이리스트는 컨텍스트의 음악을 한꺼번에 나중에 재생.
-        let contextMusics = playlistManager.getPlaylistContents(context);
-        QueueManager.playNext(
-          contextMusics,
-          context,
-          controller.isShuffled,
-          obj.id
-        );
-        return;
-      }
-    }
-
-    if (controller.currentInfo?.reference) {
-      controller.currentInfo.reference.isPlaying = false;
-    }
-    document.querySelectorAll(".playing").forEach((item) => {
-      item.classList.remove("playing");
-    });
-    document.querySelectorAll(".current").forEach((item) => {
-      item.classList.remove("current");
-    });
-
-    if (isLibrary && !isFiltered) {
-      let nextObj;
-
-      if (!controller.isShuffled) {
-        nextObj = libraryManager.getNextObj(obj.id); // 라이브러리 매니저가 정렬 조건에 따라 알아서 골라줌.
-      } else {
-        nextObj = this._chooseRandom();
-      }
-
-      let arr = nextObj ? [obj, nextObj] : [obj];
-      this._applyToQueue(arr, context);
-      this.queueRepo = null; // 라이브러리는 저장소를 따로 만들지 않음.
-    } else {
-      let currentId = obj.id;
-      let contextMusics = isLibrary
-        ? libraryManager.getFilteredContents()
-        : playlistManager.getPlaylistContents(context);
-
-      this._applyToQueue(contextMusics, context);
-      let currentMusic = this.queue.querySelector(`[music-id="${currentId}"]`);
-      if (controller.isShuffled) {
-        this._shuffleQueue(true);
-        this.queue.prepend(currentMusic);
-      } else {
-        Controller.updateMusicToPlay(currentMusic);
-        return;
-      }
-    }
-
-    Controller.playMusic();
-
-    this.updateScroll();
-
-    function clearQueue() {
-      Array.prototype.forEach.call(this.queue.children, (elem) => {
-        this._mapManager(elem.musicObj, "delete");
-      });
-
-      this._clearQueue();
+      this.processMusicToPlay();
     }
   }
 
@@ -455,12 +407,14 @@ class QueueManager {
   }
 
   static makeUpLibraryItem(isForced = false) {
-    let isLibrary = controller.currentInfo.context.startsWith("library"),
+    let isLibrary = controller.currentInfo?.context?.startsWith("library"),
       isPureLibrary = !this.queueRepo,
       isShuffled = controller.isShuffled,
       target = controller.currentMusic;
     addBefore = addBefore.bind(this);
     addAfter = addAfter.bind(this);
+
+    if (isLibrary === undefined) return;
 
     if (isPureLibrary && isForced && !isShuffled) {
       this._clearBeforeAfter();
@@ -470,7 +424,7 @@ class QueueManager {
       noPrev = target == QueueManager.queueFirstChild,
       needsMakeUp = noNext || noPrev;
 
-    if (!isLibrary || !needsMakeUp || !this.queueStatus || !isPureLibrary)
+    if (!isLibrary || !needsMakeUp || !this.queueState || !isPureLibrary)
       return;
 
     let targetId = target.getAttribute("music-id");
@@ -523,13 +477,18 @@ class QueueManager {
   }
 
   static pushRecordStack(obj) {
+    if (obj.isHided) return;
     let newRecordElem = document.createElement("div", { is: "record-item" });
     newRecordElem.setup(obj);
     this.record.append(newRecordElem);
   }
 
   static setPlaylistName() {
-    let name = playlistManager.getPlaylistName(controller.currentInfo.context);
+    let context = controller?.currentInfo?.context
+      ? controller.currentInfo.context
+      : QueueManager.currentMusic?.context;
+
+    let name = playlistManager.getPlaylistName(context);
 
     if (name) {
       this.currPlaylistName.innerHTML = name;
@@ -539,10 +498,10 @@ class QueueManager {
   }
 
   static deleteQueueItem(elem) {
-    this._updateQueueStatus(false);
+    this._updateQueueState(false);
     let isCurrent = elem.classList.contains("current");
     let needUpdate =
-      elem.previousElementSibling.classList.contains("current") ||
+      elem.previousElementSibling?.classList.contains("current") ||
       (elem.nextElementSibling
         ? elem.nextElementSibling.classList.contains("current")
         : false);
@@ -566,11 +525,138 @@ class QueueManager {
     }
   }
 
+  static deletePlaylist(id) {
+    let context = "playlist:" + id,
+      arr = this.queue.querySelectorAll(`[context="${context}"]`),
+      isCurrentIncluded = Array.from(arr).includes(QueueManager.currentMusic),
+      noOtherMusic = this.queue.children.length == arr.length,
+      prevQueueState = this.queueState;
+
+    if (!arr.length) return;
+
+    arr.forEach((item) => QueueManager.deleteQueueItem(item));
+    this._updateQueueState(prevQueueState);
+
+    if (isCurrentIncluded) {
+      if (noOtherMusic) {
+        Controller.stop();
+      } else {
+        Controller.updateMusicToPlay(QueueManager.queueFirstChild);
+      }
+    } else {
+      Controller.updateByQueueChange();
+    }
+    QueueManager.setPlaylistName();
+  }
+
   updateScroll() {
     this.scrollWrapper.scrollTop =
       this.scrollWrapper.scrollHeight -
       this.queue.previousElementSibling.offsetHeight -
       this.queue.scrollHeight;
+  }
+
+  processMusicToPlay(isExistingKept = false) {
+    clearQueue = clearQueue.bind(this);
+    let obj = this.tempObj,
+      context = this.tempContext,
+      isLibrary = context.startsWith("library"),
+      isFiltered =
+        window["library-container"].classList.contains("searching") ||
+        window["library-container"].classList.contains("only-liked") ||
+        window["library-container"].classList.contains("only-new");
+
+    if (!obj && !context) return;
+
+    this.tempObj = this.tempContext = undefined;
+
+    if (isExistingKept) {
+      if (isLibrary) {
+        // 라이브러리 요소의 경우 그 음악만 나중에 재생.
+        if (isFiltered) {
+          let contextMusics = libraryManager.getFilteredContents();
+          QueueManager.playNext(
+            contextMusics,
+            context,
+            controller.isShuffled,
+            obj.id
+          );
+        } else {
+          QueueManager.playNext(obj, context);
+          controller.nextButton.click();
+        }
+        return;
+      } else {
+        // 플레이리스트는 컨텍스트의 음악을 한꺼번에 나중에 재생.
+        let contextMusics = playlistManager.getPlaylistContents(context);
+        QueueManager.playNext(
+          contextMusics,
+          context,
+          controller.isShuffled,
+          obj.id
+        );
+        return;
+      }
+    } else {
+      clearQueue();
+      this._updateQueueState(true);
+    }
+
+    if (controller.currentInfo?.reference) {
+      controller.currentInfo.reference.isPlaying = false;
+    }
+    document.querySelectorAll(".playing").forEach((item) => {
+      item.classList.remove("playing");
+    });
+    document.querySelectorAll(".current").forEach((item) => {
+      item.classList.remove("current");
+    });
+
+    if (isLibrary && !isFiltered) {
+      let nextObj;
+
+      if (!controller.isShuffled) {
+        nextObj = libraryManager.getNextObj(obj.id); // 라이브러리 매니저가 정렬 조건에 따라 알아서 골라줌.
+      } else {
+        nextObj = this._chooseRandom();
+      }
+
+      let arr = nextObj ? [obj, nextObj] : [obj];
+      this._applyToQueue(arr, context);
+      this.queueRepo = null; // 라이브러리는 저장소를 따로 만들지 않음.
+    } else {
+      let currentId = obj.id;
+      let contextMusics = isLibrary
+        ? libraryManager.getFilteredContents()
+        : playlistManager.getPlaylistContents(context);
+
+      this._applyToQueue(contextMusics, context);
+      let currentMusic = this.queue.querySelector(`[music-id="${currentId}"]`);
+      if (controller.isShuffled) {
+        this._shuffleQueue(true);
+        this.queue.prepend(currentMusic);
+      } else {
+        Controller.updateMusicToPlay(currentMusic);
+        return;
+      }
+    }
+
+    Controller.playMusic();
+
+    this.updateScroll();
+
+    function clearQueue() {
+      [].forEach.call(this.queue.children, (elem) => {
+        this._mapManager(elem.musicObj, "delete");
+      });
+
+      this._clearQueue();
+    }
+  }
+
+  clearRecord() {
+    this.record.innerHTML = "";
+    this.updateScroll();
   }
 
   // private 메소드
@@ -585,7 +671,7 @@ class QueueManager {
         this.queueRepo.append(elem);
       });
     } else {
-      let elem = this._itembuilder(obj, context);
+      let elem = this._itembuilder(info, context);
       this.queueRepo.append(elem);
     }
   }
@@ -623,14 +709,6 @@ class QueueManager {
     }
   }
 
-  _clearRecord() {
-    let sureToDelete = modalManager.createModal("clear-record");
-    // 모달 매니저가 진짜로 기록을 삭제할 건지 모달을 띄우고 사용자의 대답을 받는 프로미스를 생성, 대답을 반환.
-    if (!sureToDelete) return;
-    this.record.innerHTML = "";
-    this.updateScroll();
-  }
-
   _clearQueue() {
     this.queue.innerHTML = "";
   }
@@ -666,7 +744,7 @@ class QueueManager {
       }
 
       if (!controller.isShuffled) {
-        if (this.queueStatus) this._updateQueueStatus(false);
+        if (this.queueState) this._updateQueueState(false);
       }
 
       Controller.updateByQueueChange();
@@ -738,17 +816,17 @@ class QueueManager {
     shuffleFragment = null;
   }
 
-  _updateQueueStatus(bool) {
-    this.queueStatus = bool;
+  _updateQueueState(bool) {
+    this.queueState = bool;
     if (bool) {
-      this.statusIndicator.classList.add("active");
+      this.stateIndicator.classList.add("active");
     } else {
-      this.statusIndicator.classList.remove("active");
+      this.stateIndicator.classList.remove("active");
       if (!this.queueRepo) {
         // 저장고가 비워져있을 경우 큐를 복사해서 새로 만들어줌.
         this.queueRepo = new DocumentFragment();
 
-        Array.prototype.forEach.call(this.queue.children, (item) => {
+        [].forEach.call(this.queue.children, (item) => {
           let clone = item.cloneNode(true);
           clone.removeAttribute("style");
           clone.classList.remove("slip-reordering");
@@ -759,7 +837,7 @@ class QueueManager {
   }
 
   _itembuilder(obj, context) {
-    if (!obj) return;
+    if (!obj || obj.isHided == true) return;
     let elem = document.createElement("div", { is: "queue-item" });
     elem.setup(obj, context);
     this._mapManager(obj, "set");

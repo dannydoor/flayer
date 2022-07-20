@@ -1,7 +1,14 @@
 class SearchElem {
   constructor(type = "library") {
     this.type = type;
+    this.container = window[this.type + "-container"];
     this.searchBox = window[this.type + "-search-box"];
+    this.searchSample = window[this.type + "-search-sample"];
+    this.searchSampleContent = window[this.type + "-search-sample-content"];
+    this.searchOpt = window[this.type + "-search-opt"];
+    this.searchOpt = window[this.type + "-search-opt"];
+    this.manager =
+      type == "library" ? libraryManager : playlistManager.selectableManager;
     this.tagCount = 0;
     this.searchFilter = {
       title: true,
@@ -16,6 +23,7 @@ class SearchElem {
     this.autoComplete = this.autoComplete.bind(this);
 
     this.builder();
+    this.setupSearch();
   }
 
   builder() {
@@ -30,7 +38,7 @@ class SearchElem {
       this.searchBox.classList.add("focused");
     });
     mainInput.addEventListener("blur", (e) => {
-      libraryManager.updateDisplayedCounts();
+      this.manager.updateDisplayedCounts();
       this.searchBox.classList.remove("focused");
     });
     mainInput.addEventListener("keyup", this.tagChecker);
@@ -43,8 +51,8 @@ class SearchElem {
     this.searchBox.querySelector(".clear-search").onclick = () => {
       mainInput.value = "";
       mainInput.dispatchEvent(changeEvent);
-      window["search-sample"].classList.add("hidden");
-      libraryManager.updateDisplayedCounts();
+      this.searchSample.classList.add("hidden");
+      this.manager.updateDisplayedCounts();
 
       if (this.tagCount) {
         this.removeTag();
@@ -105,32 +113,29 @@ class SearchElem {
 
     let menuClass =
       content == "제목" ? "title" : content == "가수" ? "artist" : "all";
-    window["library-search-opt"].firstElementChild
+    this.searchOpt.firstElementChild
       .querySelector(".checked")
       .classList.remove("checked");
-    window["library-search-opt"]
-      .querySelector(`.${menuClass}`)
-      .classList.add("checked");
+    this.searchOpt.querySelector(`.${menuClass}`).classList.add("checked");
   }
 
   removeTag() {
     this.searchBox.querySelector(".tag")?.remove();
     this.tagCount = 0;
     this.setSearchFilter();
-    window["library-search-opt"].firstElementChild
+    this.searchOpt.firstElementChild
       .querySelector(".checked")
       .classList?.remove("checked");
-    window["library-search-opt"]
-      .querySelector(".all")
-      .classList?.add("checked");
+    this.searchOpt.querySelector(".all").classList?.add("checked");
   }
 
   keyDownHandler(e) {
+    e.stopPropagation();
     if (e.code == "Backspace" && e.target.value == "") {
       if (e.target.tagChecking) e.target.tagChecking = false;
       else if (this.tagCount) this.removeTag();
       this.inputBox.dispatchEvent(changeEvent);
-      libraryManager.updateDisplayedCounts();
+      this.manager.updateDisplayedCounts();
     }
   }
 
@@ -152,13 +157,13 @@ class SearchElem {
         return;
       }
     }
-    libraryManager.updateDisplayedCounts();
+    this.manager.updateDisplayedCounts();
   }
 
   search(e) {
     if (e.target.value.startsWith("#")) return;
 
-    window["search-sample"].classList.add("hidden");
+    this.searchSample.classList.add("hidden");
 
     let input = strFormatter(e.target.value),
       container = window[this.type + "-container"],
@@ -187,7 +192,7 @@ class SearchElem {
       });
     }
 
-    libraryManager.updateDisplayedCounts();
+    this.manager.updateDisplayedCounts();
     this.inputBox.blur();
   }
 
@@ -199,16 +204,42 @@ class SearchElem {
       value = target.value.toLowerCase().trim();
 
     if (target.tagChecking || value == "") {
-      window["search-sample"].classList.add("hidden");
+      this.searchSample.classList.add("hidden");
       return;
     } else {
-      window["search-sample"].classList.remove("hidden");
+      this.searchSample.classList.remove("hidden");
     }
 
-    [].forEach.call(window["search-sample-content"].children, (item) => {
+    [].forEach.call(this.searchSampleContent.children, (item) => {
       let str = item.innerHTML.toLowerCase();
       if (str.startsWith(value)) item.classList.add("searched");
       else item.classList.remove("searched");
     });
+  }
+
+  setupSearch() {
+    let searchSet = new Set(),
+      searchSpace;
+
+    for (let key in DbManager.db) {
+      searchSet.add(DbManager.db[key].artist);
+      searchSet.add(DbManager.db[key].title);
+    }
+
+    searchSpace = Array.from(searchSet.keys());
+    searchSpace.sort((a, b) => a.localeCompare(b));
+    searchSpace.forEach((item) => {
+      let div = document.createElement("div");
+
+      div.innerHTML = item;
+
+      div.onmousedown = (e) => {
+        window[this.type + "-search-field"].value = e.target.innerHTML;
+        window[this.type + "-search-sample"].classList.add("hidden");
+      };
+
+      window[this.type + "-search-sample-content"].append(div);
+    });
+    searchSet = null;
   }
 }
