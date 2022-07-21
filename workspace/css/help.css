@@ -79,6 +79,11 @@ ul:not(.flexee) {
 
 ul.flexer {
   position: relative;
+  cursor: pointer;
+}
+
+.flexer > :not(.flexer) {
+  cursor: default;
 }
 
 ul.flexer:not(.flexee) {
@@ -93,7 +98,7 @@ ul.flexer::after {
   content: '';
   width: 16px;
   height: 16px;
-  background: url("../assets/img/default/right-g.svg") no-repeat center/16px;
+  background: url("../assets/img/default/right.svg") no-repeat center/16px;
 }
 
 ul.flexee.flexer::after {
