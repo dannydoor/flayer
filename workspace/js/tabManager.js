@@ -222,6 +222,7 @@ class TabManager {
   }
 
   editCheck() {
+    // 현재 플레이리스트 편집 중인지를 체크
     if (this.isEditing) {
       PopupManager.createModal("tab");
       return true;

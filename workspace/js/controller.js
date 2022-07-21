@@ -325,6 +325,7 @@ class Controller {
   }
 
   static updateTooltip(prevOrNext = false, playlist = false) {
+    // 툴팁 내용 업데이트
     if (prevOrNext) {
       let prevObj = this.prevMusic?.musicObj;
       if (prevObj) {
@@ -379,6 +380,7 @@ class Controller {
   }
 
   static updatePlayingItems() {
+    // 라이브러리 정렬이 바뀌면서 playing 클래스가 날아갔을 때 다시 달아주는 메소드
     document
       .querySelectorAll(`[music-id="${this.currentInfo.id}"]`)
       .forEach((item) => {
@@ -387,6 +389,7 @@ class Controller {
   }
 
   static switchShuffleState(bool) {
+    // 플레이리스트의 버튼으로 재생할 때 컨트롤러의 셔플 상태를 바꿔주는 메소드
     if (this.isShuffled == bool) return;
     else {
       this.shuffleButton.click();
@@ -394,6 +397,7 @@ class Controller {
   }
 
   static stop() {
+    // 재생 중인 플레이리스트가 삭제되었을 때 컨트롤바를 초기화하는 메소드.
     let cover = window["video-cover"],
       storehouse = window["element-storehouse"];
 
@@ -550,6 +554,7 @@ class Controller {
     },
 
     updatePlaylistPlayState: () => {
+      // 플레이리스트가 재생되고 있을 때 플레이리스트의 재생 정보를 업데이트
       let isValid = this.currentInfo.context.startsWith("playlist:"),
         id = this.currentInfo.context.slice(9),
         now = Date.now(),

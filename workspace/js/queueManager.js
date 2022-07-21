@@ -1,3 +1,20 @@
+/*
+ * 재생 중인 목록 관리.
+ *
+ * moveNext() : 큐 아이템의 '바로 다음 순서로'
+ * playNext() : '바로 다음에 재생' 기능. 큐 상태가 비활성화 됐을 때 플레이리스트를 재생 대기열에 추가하는 과정도 담당
+ * playThis() : 라이브러리, 플레이리스트 아이템의 재생 메소드
+ * playQueue : 큐 아이템의 재생 메소드
+ * playRecord : 레코드 아이템의 재생 메소드
+ * applyPlaylistChanges() : 플레이리스트 변경 시 변경 사항을 재생 대기열에 적용하는 메소드
+ * setPlaylistName() : 재생 대기열에 표시되는 현재 재생 중인 플레이리스트 이름을 업데이트하는 메소드
+ * shuffleQueue() : 컨트롤바의 셔플 버튼 누를 때 호출됨.
+ * repeatQueue() : 컨트롤바의 반복 버튼 누를 때 호출됨.
+ * makeUplibraryItem = 라이브러리 재생 중 다음 곡과 이전 곡 골라서 전시
+ * deleteQueueItem = 큐 아이템 삭제 메소드
+ * deletePlaylist = 플레이리스트 삭제 시 변경사항 적용하는 메소드
+ */
+
 class QueueManager {
   constructor(
     queueState = true,
@@ -410,11 +427,13 @@ class QueueManager {
     let isLibrary = controller.currentInfo?.context?.startsWith("library"),
       isPureLibrary = !this.queueRepo,
       isShuffled = controller.isShuffled,
-      target = controller.currentMusic;
+      target = controller.currentMusic,
+      isFull =
+        this.queue.childElementCount == libraryManager.sortedArr[0].length;
     addBefore = addBefore.bind(this);
     addAfter = addAfter.bind(this);
 
-    if (isLibrary === undefined) return;
+    if (isLibrary === undefined || isFull) return;
 
     if (isPureLibrary && isForced && !isShuffled) {
       this._clearBeforeAfter();

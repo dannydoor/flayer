@@ -1,4 +1,8 @@
-// 플레이리스트의 생성과 수정, 검색을 관장
+/*
+ * 플레이리스트 생성, 편집, 정렬을 관리
+ *
+ *
+ */
 
 class PlaylistManager {
   constructor(playlistObjTable = {}, sortMode = 2) {
@@ -202,6 +206,7 @@ class PlaylistManager {
   }
 
   _addToEditor() {
+    // 플레이리스트에 추가 기능 중 플레이리스트를 새로 만들었을 때 편집창에 해당 음악 추가
     this.editManager.addSongs(...this.toAddSongs);
     this.toAddSongs = [];
 
@@ -215,6 +220,7 @@ class PlaylistManager {
   }
 
   _addToPlaylistDirectly(id) {
+    // 플레이리스트에 추가 기능으로 해당 플레이리스트에 바로 음악 추가
     let obj = this.table[id],
       addedArr = [],
       dupl = false;
@@ -249,6 +255,7 @@ class PlaylistManager {
   }
 
   _cancelAdding() {
+    // 플레이리스트에 추가 기능 중 취소 시
     this.toAddSongs = [];
 
     TabManager.hideFloat("add-container");
@@ -261,6 +268,7 @@ class PlaylistManager {
   }
 
   updateListSortMode(param = this.sortMode) {
+    // 플레이리스트 목록 정렬 업데이트
     let isAscending = !(param % 2),
       listItems = this.listElem.querySelector(".items"),
       addItems = this.addElem.querySelector(".items"),
@@ -335,6 +343,7 @@ class PlaylistManager {
 }
 
 class PlaylistSelectableManager {
+  // 플레이리스트 편집 창에서 음악 추가시 나타나는 창 관리. 라이브러리 매니저와 대동소이.
   constructor(objHashTable, sortMode = 0) {
     this.musicObjArr = [];
     for (let key in objHashTable) {
@@ -541,6 +550,7 @@ class PlaylistSelectableManager {
 }
 
 class PlaylistContent extends HTMLDivElement {
+  // 플레이리스트 아이템 각각의 생성자.
   constructor() {
     super();
     this.id;
@@ -738,6 +748,7 @@ class PlaylistContent extends HTMLDivElement {
   }
 
   addSongs() {
+    // 플레이리스트가 비워져 있을 때 바로 노래를 추가할 수 있는 편집창을 전시하는 메소드.
     let id = this.id,
       obj = playlistManager.table[id];
     playlistManager?.editManager?.buildEditElement(obj);
@@ -745,6 +756,7 @@ class PlaylistContent extends HTMLDivElement {
   }
 
   switchBtn(isEmpty = false) {
+    // 플레이리스트 내용물 상태에 따라 버튼을 교체.
     if (isEmpty) {
       this.querySelector(".playlist-btns")?.remove();
       if (this.querySelector(".add-songs")) return;
@@ -801,6 +813,7 @@ class PlaylistContent extends HTMLDivElement {
 }
 
 class PlaylistEditManager {
+  // 플레이리스트 편집창 관리
   constructor() {
     this.fullList = null;
     this.changes = {
@@ -895,6 +908,7 @@ class PlaylistEditManager {
   }
 
   deleteSongExternal(elem) {
+    // 편집창을 통하지 않고 컨텍스트메뉴를 통해 제거할 경우 호출되는 메소드
     ContextmenuManager.returnToStorehouse();
 
     let musicId = elem.getAttribute("music-id");
@@ -988,6 +1002,7 @@ class PlaylistEditManager {
   }
 
   _initChanges() {
+    // 초기화
     this.fullList = null;
     this.changes = {
       added: [],

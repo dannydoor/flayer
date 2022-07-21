@@ -1,4 +1,5 @@
-// 브라우저의 localStorage 관리.
+// 브라우저의 localStorage와 db에 저장되는 정보들 관리.
+// 숨겨진 항목들도 관리
 
 class DbManager {
   constructor() {

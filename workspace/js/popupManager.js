@@ -1,3 +1,8 @@
+/*
+ * 모달과 토스트를 아우르는 모든 팝업 요소들을 관리
+ * 해당 요소들의 전시와 숨기기, 핸들러를 모두 관장.
+ */
+
 class PopupManager {
   constructor() {
     this.storehouse = window["popup-storehouse"];

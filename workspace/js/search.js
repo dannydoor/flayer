@@ -1,3 +1,7 @@
+/*
+ * 검색, 태그 관리
+ */
+
 class SearchElem {
   constructor(type = "library") {
     this.type = type;

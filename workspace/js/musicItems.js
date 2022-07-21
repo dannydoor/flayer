@@ -1,3 +1,12 @@
+/*
+ * 음악 아이템들의 객체 생성자
+
+ * updateProp() : contstructor에서 초기화되지 않은 프로퍼티들이
+ * 요소가 복제되는 과정에서 소실됐을 때 다시 붙여주는 메소드
+ * 
+ * bindHandler() : 위와 같은 맥락에서 핸들러를 다시 달아주는 메소드.
+ */
+
 class MusicItem extends HTMLDivElement {
   constructor() {
     super();
@@ -55,6 +64,7 @@ class MusicItem extends HTMLDivElement {
   }
 
   get musicObj() {
+    // 사실 별로 쓸데없는 메소드이지만 고치는게 귀찮아서 놔뒀습니다.
     return this.referencedObj;
   }
 

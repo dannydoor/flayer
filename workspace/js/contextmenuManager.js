@@ -1,4 +1,4 @@
-// 컨텍스트 메뉴의 생성과 조합을 관장
+//컨텍스트메뉴를 포함해 각종 작은 메뉴의 생성과 핸들러를 관장
 class ContextmenuManager {
   constructor() {
     document.body.addEventListener(
