@@ -4,4 +4,4 @@
 자세한 사용법은 flayer 내의 도움말을 참고해주세요
 
 ***
-[figma 디자인 시안](https://www.figma.com/file/7wFtfgp1noEweiBT99B1yM/flayer?node-id=55%3A140)
+[figma 디자인 시안](https://www.figma.com/file/7wFtfgp1noEweiBT99B1yM/flayer?node-id=55%3A140](https://www.figma.com/community/file/1218932582399096794/flayer)https://www.figma.com/community/file/1218932582399096794/flayer)
